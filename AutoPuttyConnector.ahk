@@ -38,8 +38,17 @@ ifnotinstring, puttydir, Program
 	puttydir = %A_WorkingDir%\PuTTY
 	}
 gui, 2:add, Button, vButcreateconn gCreateconnection, Create Connection
-ifexist %a_workingdir%\saveddata
+ifexist %a_workingdir%\savedcons
 	{
+	FileCreateDir, tmp
+	run, %comspec% /c dir /b %a_workingdir%\savedcons > %a_workingdir%\tmp\savedconnectionslst
+	run, %comspec% /c findstr /n "." %a_workingdir%\tmp\savedconnectionslst > %a_workingdir%\tmp\numberedlist
+	sleep, 200
+	run, getnumoutput.bat
+	
+	
+	;fileread,savedconnections,savedconnectionstmp
+	;msgbox, %savedconnections%
 	}
 return
 }
@@ -63,8 +72,8 @@ return
 Saveconnection:
 {
 gui, 3:submit
-FileCreateDir, saveddata
-FileAppend, %puttydir%\putty %Host1% -pw %Pass1%, %A_workingdir%\saveddata\%Name1%
+FileCreateDir, savedcons
+FileAppend, %puttydir%\putty %Host1% -pw %Pass1%, %A_workingdir%\savedcons\%Name1%
 gui, 2:destroy
 goto MainMenu
 }
