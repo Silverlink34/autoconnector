@@ -1,12 +1,21 @@
 ;GUI for auto Putty SSH connections.Created by Brandon Galiher.
 
+;encryption functions are at bottom of script.
+
+;Parameters for the script listed here
+#SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
+#NoTrayIcon ;Kinda self explanatory.
+
+
+;Start of GUI below here
+
 Gui, 1:Show, w768 h485, Auto Putty Connector
 gui, 1:font, s16,
 GUI, 1:Add, Text,,Thank you for using Brandon's Auto Putty Connector.
 GUI, 1:Add, Text,,This GUI will store SSH information and auto-connect you to specified servers.
 gui, 1:add, button, vButok1 gMainMenu, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
-return
+exit
 
 Disclaimer:
 {
@@ -54,24 +63,26 @@ ifexist %a_workingdir%\savedcons
 	{
 		gui, 2:add, button, vButcon3 gConnection3, %Connection3%
 	}
-	ifinstring, connection0, 4
+	ifgreater, connection0, 4
 	{
 		gui, 2:add, button, vButcon4 gConnection4, %Connection4%
 	}
-	ifinstring, connection0, 5
+	ifgreater, connection0, 5
 	{
 		gui, 2:add, button, vButcon5 gConnection5, %Connection5%
 	}
-	ifinstring, connection0, 6
+	ifgreater, connection0, 6
 	{
 		gui, 2:add, button, vButcon6 gConnection6, %Connection6%
 	}
-	ifinstring, connection0, 7
+	ifgreater, connection0, 7
 	{
 		gui, 2:add, button, vButcon7 gConnection7, %Connection7%
 	}
+	Fileremovedir, tmp, 1	
 }
-return
+Return
+
 
 Createconnection:
 {
@@ -86,46 +97,186 @@ Createconnection:
 	GUI, 3:Add, Text,,SSH password
 	gui, 3:add, edit,password w240 vPass1,
 	gui, 3:add, button, vButsave1 gSaveconnection, Save Connection
-	return
- }
+	exit
+}
+
 
 Saveconnection:
 {
 	gui, 3:submit
 	FileCreateDir, savedcons
 	FileAppend, %puttydir%\putty %Host1% -pw %Pass1%, %A_workingdir%\savedcons\%Name1%
+	Fileread, data, %A_workingdir%\savedcons\%Name1%
+	Filedelete, %A_workingdir%\savedcons\%Name1%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%Name1%
 	gui, 2:destroy
 	gui, 3:destroy
 	gosub MainMenu
 }
+
+
+return ;keeps the script from running Connection1 when it gets to it
 Connection1:
 {
-	msgbox, it worked
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection1%
+	Filedelete, %A_workingdir%\savedcons\%connection1%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection1%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection1%
+	Fileread, data, %A_workingdir%\savedcons\%connection1%
+	filedelete, %A_workingdir%\savedcons\%connection1%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection1%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
 }
+return
+
 Connection2:
 {
-	msgbox, it worked
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection2%
+	Filedelete, %A_workingdir%\savedcons\%connection2%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection2%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection2%
+	Fileread, data, %A_workingdir%\savedcons\%connection2%
+	filedelete, %A_workingdir%\savedcons\%connection2%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection2%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
 }
+return
+
 Connection3:
 {
-	msgbox, it worked
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection3%
+	Filedelete, %A_workingdir%\savedcons\%connection3%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection3%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection3%
+	Fileread, data, %A_workingdir%\savedcons\%connection3%
+	filedelete, %A_workingdir%\savedcons\%connection3%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection3%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
 }
+return
+
 Connection4:
 {
-	msgbox, it worked
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection4%
+	Filedelete, %A_workingdir%\savedcons\%connection4%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection4%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection4%
+	Fileread, data, %A_workingdir%\savedcons\%connection4%
+	filedelete, %A_workingdir%\savedcons\%connection4%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection4%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
 }
+return
+
 Connection5:
 {
-	msgbox, it worked
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection5%
+	Filedelete, %A_workingdir%\savedcons\%connection5%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection5%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection5%
+	Fileread, data, %A_workingdir%\savedcons\%connection5%
+	filedelete, %A_workingdir%\savedcons\%connection5%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection5%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
 }
+return
+
 Connection6:
 {
-	msgbox, it worked
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection6%
+	Filedelete, %A_workingdir%\savedcons\%connection6%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection6%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection6%
+	Fileread, data, %A_workingdir%\savedcons\%connection6%
+	filedelete, %A_workingdir%\savedcons\%connection6%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection6%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
 }
+return
+
 Connection7:
 {
-	msgbox, it worked
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection7%
+	Filedelete, %A_workingdir%\savedcons\%connection7%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection7%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection7%
+	Fileread, data, %A_workingdir%\savedcons\%connection7%
+	filedelete, %A_workingdir%\savedcons\%connection7%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection7%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
 }
-guiclose: 
-exitapp
+return
+
+
+;Encrypt and Decrypt Functions listed here
+
+Decrypt(Data,Pass) {
+	b := 0, j := 0, x := "0x"
+	VarSetCapacity(Result,StrLen(Data)//2)
+	Loop 256
+		a := A_Index - 1
+		,Key%a% := Asc(SubStr(Pass, Mod(a,StrLen(Pass))+1, 1)) 
+		,sBox%a% := a
+	Loop 256
+		a := A_Index - 1
+		,b := b + sBox%a% + Key%a%  & 255
+		,sBox%a% := (sBox%b%+0, sBox%b% := sBox%a%) ; SWAP(a,b)
+	Loop % StrLen(Data)//2
+		i := A_Index  & 255
+		,j := sBox%i% + j  & 255
+		,k := sBox%i% + sBox%j%  & 255
+		,sBox%i% := (sBox%j%+0, sBox%j% := sBox%i%) ; SWAP(i,j)
+		,Result .= Chr((x . SubStr(Data,2*A_Index-1,2)) ^ sBox%k%)
+   	Return Result
+}
+Return
+
+Encrypt(Data,Pass) { 
+	Format := A_FormatInteger 
+	SetFormat Integer, Hex 
+	b := 0, j := 0 
+	VarSetCapacity(Result,StrLen(Data)*2) 
+	Loop 256 
+		a := A_Index - 1 
+		,Key%a% := Asc(SubStr(Pass, Mod(a,StrLen(Pass))+1, 1)) 
+		,sBox%a% := a 
+	Loop 256 
+		a := A_Index - 1 
+		,b := b + sBox%a% + Key%a%  & 255 
+		,sBox%a% := (sBox%b%+0, sBox%b% := sBox%a%) ; SWAP(a,b) 
+	Loop Parse, Data 
+		i := A_Index & 255 
+		,j := sBox%i% + j  & 255 
+		,k := sBox%i% + sBox%j%  & 255 
+		,sBox%i% := (sBox%j%+0, sBox%j% := sBox%i%) ; SWAP(i,j) 
+		,Result .= SubStr(Asc(A_LoopField)^sBox%k%, -1, 2) 
+	StringReplace Result, Result, x, 0, All 
+	SetFormat Integer, %Format% 
+	Return Result 
+}
+
+GuiEscape:
+GuiClose:
+ExitApp
 
