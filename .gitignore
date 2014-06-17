@@ -8,6 +8,7 @@
 bin/
 tmp/
 savedcons
+config.txt
 *.tmp
 *.bak
 *.swp

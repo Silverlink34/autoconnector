@@ -6,15 +6,33 @@
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
 #NoTrayIcon ;Kinda self explanatory.
 
+;Check for config.txt options
+fileread, config, config.txt
+ifinstring, config, skipenabled
+	gosub MainMenu
+else
+	gosub guistart
+return
+
+goto guistart ;keeps script from auto-running the hotkey label
+;hotkey label for when box is checked
+enablehotkey:
+fileappend,	`nhotkeyenabled, %a_workingdir%\config.txt
+gui, 2:destroy
+goto, mainmenu
+return
+
 
 ;Start of GUI below here
-
+guistart:
 Gui, 1:Show, w768 h485, Auto Putty Connector
 gui, 1:font, s16,
 GUI, 1:Add, Text,,Thank you for using Brandon's Auto Putty Connector.
 GUI, 1:Add, Text,,This GUI will store SSH information and auto-connect you to specified servers.
 gui, 1:add, button, vButok1 gMainMenu, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
+;Option to skip intro/disclaimer
+gui, 1:add, checkbox, vskipintro, Skip this screen on next run?
 exit
 
 Disclaimer:
@@ -24,6 +42,10 @@ msgbox, I do not own AutoHotkey, Putty, or any other programs this script calls 
 
 MainMenu:
 gui, 1:submit
+ifequal, skipintro, 1
+{
+	fileappend, skipenabled, %a_workingdir%\config.txt
+}
 gui, 2:show, w768 h485
 gui, 2:font, s16,
 GUI, 2:Add, Text,,Create a new connection or choose a saved connection.
@@ -43,6 +65,7 @@ ifnotinstring, puttydir, Program
 	puttydir = %A_WorkingDir%\PuTTY
 }
 gui, 2:add, Button, vButcreateconn gCreateconnection, Create Connection
+;Detect existing/saved connections and create buttons for them	
 ifexist %a_workingdir%\savedcons
 {
 	FileCreateDir, tmp
@@ -278,5 +301,7 @@ Encrypt(Data,Pass) {
 
 GuiEscape:
 GuiClose:
+2guiclose:
+3guiclose:
 ExitApp
 
