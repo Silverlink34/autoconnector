@@ -64,7 +64,7 @@ ifnotinstring, puttydir, Program
 	GUI, 2:Add, Text,,Could not find default installation of PuTTY. Using included PuTTY.
 	puttydir = %A_WorkingDir%\PuTTY
 }
-gui, 2:add, Button, vButcreateconn gCreateconnection, Create Connection
+gui, 2:add, Button, border vButcreateconn gCreateconnection, Create Connection
 ;Detect existing/saved connections and create buttons for them	
 ifexist %a_workingdir%\savedcons
 {
@@ -76,7 +76,7 @@ ifexist %a_workingdir%\savedcons
 	stringsplit, connection, vconnlist,]
 	ifgreater, connection0, 1
 	{
-		gui, 2:add, button, vButcon1 gConnection1, %Connection1%
+		gui, 2:add, button, section Y+20 vButcon1 gConnection1, %Connection1%
 	}
 	ifgreater, connection0, 2
 	{
@@ -96,11 +96,23 @@ ifexist %a_workingdir%\savedcons
 	}
 	ifgreater, connection0, 6
 	{
-		gui, 2:add, button, vButcon6 gConnection6, %Connection6%
+		gui, 2:add, button, ys vButcon6 gConnection6, %Connection6%
 	}
 	ifgreater, connection0, 7
 	{
 		gui, 2:add, button, vButcon7 gConnection7, %Connection7%
+	}
+	ifgreater, connection0, 8
+	{
+		gui, 2:add, button, vButcon8 gConnection8, %Connection8%
+	}
+	ifgreater, connection0, 9
+	{
+		gui, 2:add, button, vButcon9 gConnection9, %Connection9%
+	}
+	ifgreater, connection0, 10
+	{
+		gui, 2:add, button, vButcon10 gConnection10, %Connection10%
 	}
 	Fileremovedir, tmp, 1	
 }
@@ -245,6 +257,54 @@ Connection7:
 	Fileread, data, %A_workingdir%\savedcons\%connection7%
 	filedelete, %A_workingdir%\savedcons\%connection7%
 	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection7%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
+}
+return
+
+Connection8:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection8%
+	Filedelete, %A_workingdir%\savedcons\%connection8%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection8%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection8%
+	Fileread, data, %A_workingdir%\savedcons\%connection8%
+	filedelete, %A_workingdir%\savedcons\%connection8%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection8%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
+}
+return
+
+connection9:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection9%
+	Filedelete, %A_workingdir%\savedcons\%connection9%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection9%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection9%
+	Fileread, data, %A_workingdir%\savedcons\%connection9%
+	filedelete, %A_workingdir%\savedcons\%connection9%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection9%
+	run, %sshconnect%
+	gui, 2:destroy
+	sshconnect =
+}
+return
+
+connection10:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\savedcons\%connection10%
+	Filedelete, %A_workingdir%\savedcons\%connection10%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection10%
+	Fileread, sshconnect, %A_workingdir%\savedcons\%connection10%
+	Fileread, data, %A_workingdir%\savedcons\%connection10%
+	filedelete, %A_workingdir%\savedcons\%connection10%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection10%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
