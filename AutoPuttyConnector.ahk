@@ -6,6 +6,8 @@
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
 #NoTrayIcon ;Kinda self explanatory.
 #NoEnv ;supposed to make compatibility better
+;Set working directory to always use base .ahk file path.
+SetWorkingDir %A_ScriptDir%
 
 ;Check for config.txt options
 fileread, config, config.txt
@@ -69,9 +71,10 @@ ifnotinstring, puttydir, Program
 	GUI, 2:Add, Text,,Could not find default installation of PuTTY. Using included PuTTY.
 	puttydir = %A_WorkingDir%\PuTTY
 }
-gui, 2:add, Button, border vButcreateconn gCreateconnection, Create Connection
-gui, 2:add, text,,_________________________________________________________________________________
-;Detect existing/saved connections and create buttons for them	
+gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
+gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
+gui, 2:add, text,xs,_________________________________________________________________________________
+;Detect existing/saved connections and create buttons for them
 ifexist %a_workingdir%\savedcons
 {
 	FileCreateDir, tmp
@@ -155,6 +158,64 @@ Saveconnection:
 	gosub MainMenu
 }
 
+Deleteconnection:
+{	gui, 2:submit
+	gui, 4:show, w768 h485
+	gui, 4:font, s16,
+	gui, 4:add, text,cRed,You are in delete connection mode. Click a connection to remove it.
+	gui, 4:add, text,,Click Return to go back to Connection Menu.
+	gui, 4:add, button, border vbutreturn greturnmainmenu,Return
+	gui, 4:add, text,,_________________________________________________________________________________
+	ifexist %a_workingdir%\savedcons
+	{
+		ifgreater, connection0, 1
+		{
+			gui, 4:add, button, section Y+20 vButRcon1 gRmvConnection1, %Connection1%
+		}
+		ifgreater, connection0, 2
+		{
+			gui, 4:add, button, vButRcon2 gRmvConnection2, %Connection2%
+		}
+		ifgreater, connection0, 3
+		{
+			gui, 4:add, button, vButRcon3 gRmvConnection3, %Connection3%
+		}
+		ifgreater, connection0, 4
+		{
+			gui, 4:add, button, vButRcon4 gRmvConnection4, %Connection4%
+		}
+		ifgreater, connection0, 5
+		{
+			gui, 4:add, button, vButRcon5 gRmvConnection5, %Connection5%
+		}
+		ifgreater, connection0, 6
+		{
+			gui, 4:add, button, ys vButRcon6 gRmvConnection6, %Connection6%
+		}
+		ifgreater, connection0, 7
+		{
+			gui, 4:add, button, vButRcon7 gRmvConnection7, %Connection7%
+		}
+		ifgreater, connection0, 8
+		{
+			gui, 4:add, button, vButRcon8 gRmvConnection8, %Connection8%
+		}
+		ifgreater, connection0, 9
+		{
+			gui, 4:add, button, vButRcon9 gRmvConnection9, %Connection9%
+		}
+		ifgreater, connection0, 10
+		{
+			gui, 4:add, button, vButRcon10 gRmvConnection10, %Connection10%
+		}
+	}	
+	return
+	returnmainmenu:
+	gui, 2:destroy
+	gui, 4:destroy
+	gosub mainmenu
+	exit
+}
 
 return ;keeps the script from running Connection1 when it gets to it
 Connection1:
@@ -317,7 +378,166 @@ connection10:
 }
 return
 
-
+RmvConnection1:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection2:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection2%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection3:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection4:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection5:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection6:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection7:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection8:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection9:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvConnection10:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\savedcons\%connection1%
+		gui, 4:destroy
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
 ;Encrypt and Decrypt Functions listed here
 
 Decrypt(Data,Pass) {
