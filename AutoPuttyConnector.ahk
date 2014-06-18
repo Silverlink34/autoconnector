@@ -5,6 +5,7 @@
 ;Parameters for the script listed here
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
 #NoTrayIcon ;Kinda self explanatory.
+#NoEnv ;supposed to make compatibility better
 
 ;Check for config.txt options
 fileread, config, config.txt
@@ -29,6 +30,8 @@ Gui, 1:Show, w768 h485, Auto Putty Connector
 gui, 1:font, s16,
 GUI, 1:Add, Text,,Thank you for using Brandon's Auto Putty Connector.
 GUI, 1:Add, Text,,This GUI will store SSH information and auto-connect you to specified servers.
+GUI, 1:Add, Text,,Saved passwords are encrypted with 128bit encryption method.
+GUI, 1:Add, Text,,Connections are saved to savedconns folder.
 gui, 1:add, button, vButok1 gMainMenu, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
 ;Option to skip intro/disclaimer
@@ -38,6 +41,8 @@ exit
 Disclaimer:
 {
 msgbox, I do not own AutoHotkey, Putty, or any other programs this script calls upon. `nI am simply the author of the script. `n`nI am also not responsible for any damage to your computer, you are the user that decided to trust my program.
+gui, 1:destroy
+gosub guistart
 }
 
 MainMenu:
@@ -48,7 +53,7 @@ ifequal, skipintro, 1
 }
 gui, 2:show, w768 h485
 gui, 2:font, s16,
-GUI, 2:Add, Text,,Create a new connection or choose a saved connection.
+GUI, 2:Add, Text,,Please create a new connection or choose a saved connection.
 ifexist C:\Program Files (x86)\PuTTY
 {
 	GUI, 2:Add, Text,,Using locally installed version of Putty. 
@@ -65,11 +70,12 @@ ifnotinstring, puttydir, Program
 	puttydir = %A_WorkingDir%\PuTTY
 }
 gui, 2:add, Button, border vButcreateconn gCreateconnection, Create Connection
+gui, 2:add, text,,_________________________________________________________________________________
 ;Detect existing/saved connections and create buttons for them	
 ifexist %a_workingdir%\savedcons
 {
 	FileCreateDir, tmp
-	run, %comspec% /c dir /b %a_workingdir%\savedcons > %a_workingdir%\tmp\connectionlist
+	run, %comspec% /c dir /b %a_workingdir%\savedcons > %a_workingdir%\tmp\connectionlist,, hide
 	sleep, 200
 	fileread, vconnlist, %a_workingdir%/tmp/connectionlist
 	stringreplace, vconnlist, vconnlist,`r`n,],all
