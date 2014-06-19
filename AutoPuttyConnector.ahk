@@ -157,9 +157,10 @@ Saveconnection:
 	gui, 3:destroy
 	gosub MainMenu
 }
-
+return
 Deleteconnection:
 {	gui, 2:submit
+	gui, 2:destroy
 	gui, 4:show, w768 h485
 	gui, 4:font, s16,
 	gui, 4:add, text,cRed,You are in delete connection mode. Click a connection to remove it.
@@ -381,11 +382,12 @@ return
 RmvConnection1:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\savedcons\%connection1%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -397,11 +399,12 @@ return
 RmvConnection2:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\savedcons\%connection2%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -413,11 +416,12 @@ return
 RmvConnection3:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection3%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection3%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -429,11 +433,12 @@ return
 RmvConnection4:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection4%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection4%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -445,11 +450,12 @@ return
 RmvConnection5:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection5%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection5%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -461,11 +467,12 @@ return
 RmvConnection6:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection6%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection6%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -477,11 +484,12 @@ return
 RmvConnection7:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection7%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection7%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -493,11 +501,12 @@ return
 RmvConnection8:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection8%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection8%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -509,11 +518,12 @@ return
 RmvConnection9:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection9%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection9%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
@@ -525,11 +535,12 @@ return
 RmvConnection10:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %conection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection10%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\savedcons\%connection10%
 		gui, 4:destroy
+		gosub MainMenu
 	}
 	else
 	{
