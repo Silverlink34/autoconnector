@@ -28,7 +28,7 @@ gui, 1:font, s16,
 GUI, 1:Add, Text,,Thank you for using Brandon's Auto Putty Connector.
 GUI, 1:Add, Text,,This GUI will store SSH information and auto-connect you to specified servers.
 GUI, 1:Add, Text,,Saved passwords are encrypted with 128bit encryption method.
-GUI, 1:Add, Text,,Connections are saved to savedconns folder.
+GUI, 1:Add, Text,,Connections are saved to Saved Connections folder.
 gui, 1:add, button, vButok1 gMainMenu, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
 ;Option to skip intro/disclaimer
@@ -53,71 +53,77 @@ gui, 2:font, s16,
 GUI, 2:Add, Text,,Please create a new connection or choose a saved connection.
 ifexist C:\Program Files (x86)\PuTTY
 {
-	GUI, 2:Add, Text,,Using locally installed version of Putty. 
 	puttydir = C:\Program Files (x86)\PuTTY
 }
 ifexist C:\Program Files\PuTTY
 {
-	GUI, 2:Add, Text,,Using locally installed version of Putty.
 	puttydir = C:\Program Files\PuTTY
 }
 ifnotinstring, puttydir, Program
 {
-	GUI, 2:Add, Text,,Could not find default installation of PuTTY. Using included PuTTY.
 	puttydir = %A_WorkingDir%
 	fileinstall, putty.exe,%a_workingdir%/putty.exe,1
 }
 gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
 gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
 gui, 2:add, text,xs,_________________________________________________________________________________
-;Detect existing/saved connections and create buttons for them
-ifexist %a_workingdir%\savedcons
-{
+gui, 2:add, radio,checked1 section vsshconn gdetectssh,SSH
+gui, 2:add, radio,ys vrdpconn ,RDP
+gui, 2:add, radio,ys vtelnetconn,Telnet
+gui, 2:add, radio,ys vvncconn,VNC
+gui, 2:submit, nohide
+ifequal, sshconn, 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+	gosub detectssh
+;Detect existing/saved SSH connections and create buttons for them
+exit
+Detectssh:
+ifexist %a_workingdir%\SavedConnections\SSH
+{	
 	FileCreateDir, tmp
-	run, %comspec% /c dir /b %a_workingdir%\savedcons > %a_workingdir%\tmp\connectionlist,, hide
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\SSH > %a_workingdir%\tmp\sshlist,, hide
 	sleep, 200
-	fileread, vconnlist, %a_workingdir%/tmp/connectionlist
-	stringreplace, vconnlist, vconnlist,`r`n,],all
-	stringsplit, connection, vconnlist,]
-	ifgreater, connection0, 1
+	fileread, vsshlist, %a_workingdir%\tmp\sshlist
+	stringreplace, vsshlist, vsshlist,`r`n,],all
+	stringsplit, SSH, vsshlist,]
+	ifgreater, SSH0, 1
 	{
-		gui, 2:add, button, section Y+20 vButcon1 gConnection1, %Connection1%
+		gui, 2:add, button, section xs Y+20 vButcon1 gSSH1, %SSH1%
 	}
-	ifgreater, connection0, 2
+	ifgreater, SSH0, 2
 	{
-		gui, 2:add, button, vButcon2 gConnection2, %Connection2%
+		gui, 2:add, button, vButcon2 gSSH2, %SSH2%
 	}
-	ifgreater, connection0, 3
+	ifgreater, SSH0, 3
 	{
-		gui, 2:add, button, vButcon3 gConnection3, %Connection3%
+		gui, 2:add, button, vButcon3 gSSH3, %SSH3%
 	}
-	ifgreater, connection0, 4
+	ifgreater, SSH0, 4
 	{
-		gui, 2:add, button, vButcon4 gConnection4, %Connection4%
+		gui, 2:add, button, vButcon4 gSSH4, %SSH4%
 	}
-	ifgreater, connection0, 5
+	ifgreater, SSH0, 5
 	{
-		gui, 2:add, button, vButcon5 gConnection5, %Connection5%
+		gui, 2:add, button, vButcon5 gSSH5, %SSH5%
 	}
-	ifgreater, connection0, 6
+	ifgreater, SSH0, 6
 	{
-		gui, 2:add, button, ys vButcon6 gConnection6, %Connection6%
+		gui, 2:add, button, ys vButcon6 gSSH6, %SSH6%
 	}
-	ifgreater, connection0, 7
+	ifgreater, SSH0, 7
 	{
-		gui, 2:add, button, vButcon7 gConnection7, %Connection7%
+		gui, 2:add, button, vButcon7 gSSH7, %SSH7%
 	}
-	ifgreater, connection0, 8
+	ifgreater, SSH0, 8
 	{
-		gui, 2:add, button, vButcon8 gConnection8, %Connection8%
+		gui, 2:add, button, vButcon8 gSSH8, %SSH8%
 	}
-	ifgreater, connection0, 9
+	ifgreater, SSH0, 9
 	{
-		gui, 2:add, button, vButcon9 gConnection9, %Connection9%
+		gui, 2:add, button, vButcon9 gSSH9, %SSH9%
 	}
-	ifgreater, connection0, 10
+	ifgreater, SSH0, 10
 	{
-		gui, 2:add, button, vButcon10 gConnection10, %Connection10%
+		gui, 2:add, button, vButcon10 gSSH10, %SSH10%
 	}
 	Fileremovedir, tmp, 1	
 }
@@ -129,26 +135,43 @@ Createconnection:
 	gui, 2:submit
 	gui, 3:show, w768 h485
 	gui, 3:font, s16,
-	GUI, 3:Add, Text,,Enter connection details. Credentials are encrypted and saved.
-	GUI, 3:Add, Text,,Connection Name
+	GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`n`nCredentials are encrypted and saved.
+	gui, 3:add, text,xs,_________________________________________________________________________________
+	gui, 3:add, radio,checked1 section vcsshconn gcreatessh,SSH
+	gui, 3:add, radio,ys vcrdpconn, gcreateRDP
+	gui, 3:add, radio,ys vctelnetconn,Telnet
+	gui, 3:add, radio,ys vcvncconn,VNC
+	gui, 3:submit, nohide
+	ifequal, sshconn, 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+		gosub createssh
+	exit
+	Createssh:
+	GUI, 3:Add, Text,xs,Connection Name
 	gui, 3:add, edit,w300 vName1,My SSH Connection
 	GUI, 3:Add, Text,,Username, host and port
 	gui, 3:add, edit,w300 vHost1, user@server:port
 	GUI, 3:Add, Text,,SSH password
 	gui, 3:add, edit,password w240 vPass1,
-	gui, 3:add, button, vButsave1 gSaveconnection, Save Connection
+	gui, 3:add, button, vButsave1 gsavessh, Save Connection
 	exit
+	Createrdp:
+	gui, 3:add, text,xs section,Connection Name
+	gui, 3:add, edit,w300 vName1,My RDP Connection
+	gui, 3:add, text,Server domain or public ip and port
+	gui, 3:add, edit,w300, vServer1,server:port
+	
 }
 
 
-Saveconnection:
+Savessh:
 {
 	gui, 3:submit
-	FileCreateDir, savedcons
-	FileAppend, %puttydir%\putty %Host1% -pw %Pass1%, %A_workingdir%\savedcons\%Name1%
-	Fileread, data, %A_workingdir%\savedcons\%Name1%
-	Filedelete, %A_workingdir%\savedcons\%Name1%
-	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%Name1%
+	FileCreateDir, SavedConnections
+	FileCreateDir, SSH
+	FileAppend, %puttydir%\putty %Host1% -pw %Pass1%, %A_workingdir%\SavedConnections\SSH\%Name1%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%Name1%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%Name1%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%Name1%
 	gui, 2:destroy
 	gui, 3:destroy
 	gosub MainMenu
@@ -163,47 +186,47 @@ Deleteconnection:
 	gui, 4:add, text,,Click Return to go back to Connection Menu.
 	gui, 4:add, button, border vbutreturn greturnmainmenu,Return
 	gui, 4:add, text,,_________________________________________________________________________________
-	ifexist %a_workingdir%\savedcons
+	ifexist %a_workingdir%\SavedConnections
 	{
-		ifgreater, connection0, 1
+		ifgreater, SSH0, 1
 		{
-			gui, 4:add, button, section Y+20 vButRcon1 gRmvConnection1, %Connection1%
+			gui, 4:add, button, section Y+20 vButRcon1 gRmvSSH1, %SSH1%
 		}
-		ifgreater, connection0, 2
+		ifgreater, SSH0, 2
 		{
-			gui, 4:add, button, vButRcon2 gRmvConnection2, %Connection2%
+			gui, 4:add, button, vButRcon2 gRmvSSH2, %SSH2%
 		}
-		ifgreater, connection0, 3
+		ifgreater, SSH0, 3
 		{
-			gui, 4:add, button, vButRcon3 gRmvConnection3, %Connection3%
+			gui, 4:add, button, vButRcon3 gRmvSSH3, %SSH3%
 		}
-		ifgreater, connection0, 4
+		ifgreater, SSH0, 4
 		{
-			gui, 4:add, button, vButRcon4 gRmvConnection4, %Connection4%
+			gui, 4:add, button, vButRcon4 gRmvSSH4, %SSH4%
 		}
-		ifgreater, connection0, 5
+		ifgreater, SSH0, 5
 		{
-			gui, 4:add, button, vButRcon5 gRmvConnection5, %Connection5%
+			gui, 4:add, button, vButRcon5 gRmvSSH5, %SSH5%
 		}
-		ifgreater, connection0, 6
+		ifgreater, SSH0, 6
 		{
-			gui, 4:add, button, ys vButRcon6 gRmvConnection6, %Connection6%
+			gui, 4:add, button, ys vButRcon6 gRmvSSH6, %SSH6%
 		}
-		ifgreater, connection0, 7
+		ifgreater, SSH0, 7
 		{
-			gui, 4:add, button, vButRcon7 gRmvConnection7, %Connection7%
+			gui, 4:add, button, vButRcon7 gRmvSSH7, %SSH7%
 		}
-		ifgreater, connection0, 8
+		ifgreater, SSH0, 8
 		{
-			gui, 4:add, button, vButRcon8 gRmvConnection8, %Connection8%
+			gui, 4:add, button, vButRcon8 gRmvSSH8, %SSH8%
 		}
-		ifgreater, connection0, 9
+		ifgreater, SSH0, 9
 		{
-			gui, 4:add, button, vButRcon9 gRmvConnection9, %Connection9%
+			gui, 4:add, button, vButRcon9 gRmvSSH9, %SSH9%
 		}
-		ifgreater, connection0, 10
+		ifgreater, SSH0, 10
 		{
-			gui, 4:add, button, vButRcon10 gRmvConnection10, %Connection10%
+			gui, 4:add, button, vButRcon10 gRmvSSH10, %SSH10%
 		}
 	}	
 	return
@@ -215,173 +238,173 @@ Deleteconnection:
 }
 
 return ;keeps the script from running Connection1 when it gets to it
-Connection1:
+SSH1:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection1%
-	Filedelete, %A_workingdir%\savedcons\%connection1%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection1%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection1%
-	Fileread, data, %A_workingdir%\savedcons\%connection1%
-	filedelete, %A_workingdir%\savedcons\%connection1%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection1%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH1%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH1%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH1%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH1%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH1%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH1%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH1%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-Connection2:
+SSH2:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection2%
-	Filedelete, %A_workingdir%\savedcons\%connection2%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection2%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection2%
-	Fileread, data, %A_workingdir%\savedcons\%connection2%
-	filedelete, %A_workingdir%\savedcons\%connection2%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection2%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH2%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH2%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH2%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH2%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH2%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH2%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH2%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-Connection3:
+SSH3:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection3%
-	Filedelete, %A_workingdir%\savedcons\%connection3%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection3%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection3%
-	Fileread, data, %A_workingdir%\savedcons\%connection3%
-	filedelete, %A_workingdir%\savedcons\%connection3%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection3%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH3%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH3%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH3%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH3%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH3%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH3%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH3%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-Connection4:
+SSH4:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection4%
-	Filedelete, %A_workingdir%\savedcons\%connection4%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection4%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection4%
-	Fileread, data, %A_workingdir%\savedcons\%connection4%
-	filedelete, %A_workingdir%\savedcons\%connection4%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection4%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH4%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH4%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH4%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH4%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH4%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH4%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH4%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-Connection5:
+SSH5:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection5%
-	Filedelete, %A_workingdir%\savedcons\%connection5%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection5%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection5%
-	Fileread, data, %A_workingdir%\savedcons\%connection5%
-	filedelete, %A_workingdir%\savedcons\%connection5%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection5%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH5%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH5%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH5%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH5%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH5%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH5%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH5%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-Connection6:
+SSH6:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection6%
-	Filedelete, %A_workingdir%\savedcons\%connection6%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection6%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection6%
-	Fileread, data, %A_workingdir%\savedcons\%connection6%
-	filedelete, %A_workingdir%\savedcons\%connection6%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection6%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH6%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH6%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH6%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH6%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH6%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH6%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH6%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-Connection7:
+SSH7:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection7%
-	Filedelete, %A_workingdir%\savedcons\%connection7%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection7%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection7%
-	Fileread, data, %A_workingdir%\savedcons\%connection7%
-	filedelete, %A_workingdir%\savedcons\%connection7%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection7%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH7%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH7%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH7%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH7%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH7%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH7%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH7%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-Connection8:
+SSH8:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection8%
-	Filedelete, %A_workingdir%\savedcons\%connection8%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection8%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection8%
-	Fileread, data, %A_workingdir%\savedcons\%connection8%
-	filedelete, %A_workingdir%\savedcons\%connection8%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection8%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH8%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH8%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH8%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH8%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH8%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH8%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH8%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-connection9:
+SSH9:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection9%
-	Filedelete, %A_workingdir%\savedcons\%connection9%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection9%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection9%
-	Fileread, data, %A_workingdir%\savedcons\%connection9%
-	filedelete, %A_workingdir%\savedcons\%connection9%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection9%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH9%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH9%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH9%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH9%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH9%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH9%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH9%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-connection10:
+SSH10:
 {
 	Gui, 2:submit
-	Fileread, data, %A_workingdir%\savedcons\%connection10%
-	Filedelete, %A_workingdir%\savedcons\%connection10%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\savedcons\%connection10%
-	Fileread, sshconnect, %A_workingdir%\savedcons\%connection10%
-	Fileread, data, %A_workingdir%\savedcons\%connection10%
-	filedelete, %A_workingdir%\savedcons\%connection10%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\savedcons\%connection10%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH10%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%SSH10%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH10%
+	Fileread, sshconnect, %A_workingdir%\SavedConnections\SSH\%SSH10%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%SSH10%
+	filedelete, %A_workingdir%\SavedConnections\SSH\%SSH10%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%SSH10%
 	run, %sshconnect%
 	gui, 2:destroy
 	sshconnect =
 }
 exit
 
-RmvConnection1:
+RmvSSH1:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection1%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH1%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -392,13 +415,13 @@ RmvConnection1:
 	}
 }
 return
-RmvConnection2:
+RmvSSH2:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection2%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH2%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -409,13 +432,13 @@ RmvConnection2:
 	}
 }
 return
-RmvConnection3:
+RmvSSH3:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection3%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH3%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection3%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH3%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -426,13 +449,13 @@ RmvConnection3:
 	}
 }
 return
-RmvConnection4:
+RmvSSH4:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection4%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH4%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection4%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH4%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -443,13 +466,13 @@ RmvConnection4:
 	}
 }
 return
-RmvConnection5:
+RmvSSH5:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection5%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH5%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection5%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH5%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -460,13 +483,13 @@ RmvConnection5:
 	}
 }
 return
-RmvConnection6:
+RmvSSH6:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection6%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH6%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection6%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH6%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -477,13 +500,13 @@ RmvConnection6:
 	}
 }
 return
-RmvConnection7:
+RmvSSH7:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection7%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH7%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection7%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH7%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -494,13 +517,13 @@ RmvConnection7:
 	}
 }
 return
-RmvConnection8:
+RmvSSH8:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection8%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH8%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection8%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH8%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -511,13 +534,13 @@ RmvConnection8:
 	}
 }
 return
-RmvConnection9:
+RmvSSH9:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection9%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH9%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection9%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH9%
 		gui, 4:destroy
 		gosub MainMenu
 	}
@@ -528,13 +551,13 @@ RmvConnection9:
 	}
 }
 return
-RmvConnection10:
+RmvSSH10:
 {
 	gui, 4:submit
-	msgbox, 4,Really Delete?,Are you sure you wish to delete %connection10%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %SSH10%? `nPress Yes to delete or No to go back to Delete Connections Menu.
 	ifmsgbox yes
 	{
-		filedelete, %A_workingdir%\savedcons\%connection10%
+		filedelete, %A_workingdir%\SavedConnections\SSH\%SSH10%
 		gui, 4:destroy
 		gosub MainMenu
 	}
