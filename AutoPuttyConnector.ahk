@@ -6,8 +6,12 @@
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
 #NoTrayIcon ;Kinda self explanatory.
 #NoEnv ;supposed to make compatibility better
+
+;ahk2exe compiling options listed here
+filecreatedir, %a_mydocuments%/AutoConnector
+
 ;Set working directory to always use base .ahk file path.
-SetWorkingDir %A_ScriptDir%
+SetWorkingDir %a_mydocuments%/AutoConnector
 
 ;Check for config.txt options
 fileread, config, config.txt
@@ -16,15 +20,6 @@ ifinstring, config, skipenabled
 else
 	gosub guistart
 return
-
-goto guistart ;keeps script from auto-running the hotkey label
-;hotkey label for when box is checked
-enablehotkey:
-fileappend,	`nhotkeyenabled, %a_workingdir%\config.txt
-gui, 2:destroy
-goto, mainmenu
-return
-
 
 ;Start of GUI below here
 guistart:
@@ -69,7 +64,8 @@ ifexist C:\Program Files\PuTTY
 ifnotinstring, puttydir, Program
 {
 	GUI, 2:Add, Text,,Could not find default installation of PuTTY. Using included PuTTY.
-	puttydir = %A_WorkingDir%\PuTTY
+	puttydir = %A_WorkingDir%
+	fileinstall, putty.exe,%a_workingdir%/putty.exe,1
 }
 gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
 gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
@@ -233,7 +229,7 @@ Connection1:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 Connection2:
 {
@@ -249,7 +245,7 @@ Connection2:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 Connection3:
 {
@@ -265,7 +261,7 @@ Connection3:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 Connection4:
 {
@@ -281,7 +277,7 @@ Connection4:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 Connection5:
 {
@@ -297,7 +293,7 @@ Connection5:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 Connection6:
 {
@@ -313,7 +309,7 @@ Connection6:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 Connection7:
 {
@@ -329,7 +325,7 @@ Connection7:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 Connection8:
 {
@@ -345,7 +341,7 @@ Connection8:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 connection9:
 {
@@ -361,7 +357,7 @@ connection9:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 connection10:
 {
@@ -377,7 +373,7 @@ connection10:
 	gui, 2:destroy
 	sshconnect =
 }
-return
+exit
 
 RmvConnection1:
 {
@@ -600,5 +596,6 @@ GuiEscape:
 GuiClose:
 2guiclose:
 3guiclose:
+4guiclose:
 ExitApp
 
