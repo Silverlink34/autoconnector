@@ -138,28 +138,31 @@ Createconnection:
 	GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`n`nCredentials are encrypted and saved.
 	gui, 3:add, text,xs,_________________________________________________________________________________
 	gui, 3:add, radio,checked1 section vcsshconn gcreatessh,SSH
-	gui, 3:add, radio,ys vcrdpconn, gcreateRDP
+	gui, 3:add, radio,ys vcrdpconn gcreaterdp,RDP
 	gui, 3:add, radio,ys vctelnetconn,Telnet
 	gui, 3:add, radio,ys vcvncconn,VNC
 	gui, 3:submit, nohide
 	ifequal, sshconn, 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
 		gosub createssh
 	exit
-	Createssh:
 	GUI, 3:Add, Text,xs,Connection Name
-	gui, 3:add, edit,w300 vName1,My SSH Connection
+	gui, 3:add, edit,w300 vsshname,My SSH Connection
 	GUI, 3:Add, Text,,Username, host and port
-	gui, 3:add, edit,w300 vHost1, user@server:port
+	gui, 3:add, edit,w300 vHost, user@server:port
 	GUI, 3:Add, Text,,SSH password
-	gui, 3:add, edit,password w240 vPass1,
+	gui, 3:add, edit,password w240 vPass,
 	gui, 3:add, button, vButsave1 gsavessh, Save Connection
 	exit
 	Createrdp:
-	gui, 3:add, text,xs section,Connection Name
-	gui, 3:add, edit,w300 vName1,My RDP Connection
+	gui, 3:add, text,xs,Connection Name
+	gui, 3:add, edit,w300 vrdpname,My RDP Connection
 	gui, 3:add, text,Server domain or public ip and port
-	gui, 3:add, edit,w300, vServer1,server:port
-	
+	gui, 3:add, edit,w300 vServer,server:port
+	gui, 3:add, text,Username and Password
+	gui, 3:add, edit,w300 vusername,username
+	gui, 3:add, edit,w300 x+30 password,password
+	gui, 3:add, button, vButsave2 gsaverdp, Save Connection
+	exit
 }
 
 
@@ -176,6 +179,10 @@ Savessh:
 	gui, 3:destroy
 	gosub MainMenu
 }
+return
+
+Saverdp:
+msgbox,test
 return
 Deleteconnection:
 {	gui, 2:submit
