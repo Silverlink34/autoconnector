@@ -82,49 +82,15 @@ ifexist %a_workingdir%\SavedConnections\SSH
 	FileCreateDir, tmp
 	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\SSH > %a_workingdir%\tmp\sshlist,, hide
 	sleep, 200
-	fileread, vsshlist, %a_workingdir%\tmp\sshlist
-	stringreplace, vsshlist, vsshlist,`r`n,],all
-	stringsplit, SSH, vsshlist,]
-	ifgreater, SSH0, 1
+	Loop, read, %A_workingdir%\tmp\sshlist
 	{
-		gui, 2:add, button, section xs Y+20 vButcon1 gSSH1, %SSH1%
+		ifequal, %a_index%, 1
+			gui, 2:add, button, section xs Y+20 gSSH1, %a_loopreadline%
+		ifequal, %a_index%, 6
+			gui, 2:add, button, ys gSSH6, %a_loopreadline%
+		gui, 2:add, button, gSSH%a_index%, %a_loopreadline%
 	}
-	ifgreater, SSH0, 2
-	{
-		gui, 2:add, button, vButcon2 gSSH2, %SSH2%
-	}
-	ifgreater, SSH0, 3
-	{
-		gui, 2:add, button, vButcon3 gSSH3, %SSH3%
-	}
-	ifgreater, SSH0, 4
-	{
-		gui, 2:add, button, vButcon4 gSSH4, %SSH4%
-	}
-	ifgreater, SSH0, 5
-	{
-		gui, 2:add, button, vButcon5 gSSH5, %SSH5%
-	}
-	ifgreater, SSH0, 6
-	{
-		gui, 2:add, button, ys vButcon6 gSSH6, %SSH6%
-	}
-	ifgreater, SSH0, 7
-	{
-		gui, 2:add, button, vButcon7 gSSH7, %SSH7%
-	}
-	ifgreater, SSH0, 8
-	{
-		gui, 2:add, button, vButcon8 gSSH8, %SSH8%
-	}
-	ifgreater, SSH0, 9
-	{
-		gui, 2:add, button, vButcon9 gSSH9, %SSH9%
-	}
-	ifgreater, SSH0, 10
-	{
-		gui, 2:add, button, vButcon10 gSSH10, %SSH10%
-	}
+return
 	Fileremovedir, tmp, 1	
 }
 Return
@@ -145,6 +111,7 @@ Createconnection:
 	ifequal, sshconn, 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
 		gosub createssh
 	exit
+	Createssh:
 	GUI, 3:Add, Text,xs,Connection Name
 	gui, 3:add, edit,w300 vsshname,My SSH Connection
 	GUI, 3:Add, Text,,Username, host and port
