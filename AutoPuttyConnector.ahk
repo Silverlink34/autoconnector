@@ -68,14 +68,15 @@ gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Conne
 gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
 gui, 2:add, text,xs,_________________________________________________________________________________
 gui, 2:add, radio,checked1 section vsshconn gdetectssh,SSH
-gui, 2:add, radio,ys vrdpconn ,RDP
+gui, 2:add, radio,ys vrdpconn gdetectrdp,RDP
 gui, 2:add, radio,ys vtelnetconn,Telnet
 gui, 2:add, radio,ys vvncconn,VNC
 gui, 2:submit, nohide
+gui, 2:add, text,xs section,_________________________________________________________________________________
 ifequal, sshconn, 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
 	gosub detectssh
-;Detect existing/saved SSH connections and create buttons for them
 exit
+;Detect existing/saved SSH connections and create buttons for them
 Detectssh:
 ifexist %a_workingdir%\SavedConnections\SSH
 {	
@@ -85,17 +86,20 @@ ifexist %a_workingdir%\SavedConnections\SSH
 	Loop, read, %A_workingdir%\tmp\sshlist
 	{
 		ifequal, %a_index%, 1
-			gui, 2:add, button, section xs Y+20 gSSH1, %a_loopreadline%
+			gui, 2:add, button,vssh1 section gSSH1, %a_loopreadline%
 		ifequal, %a_index%, 6
-			gui, 2:add, button, ys gSSH6, %a_loopreadline%
-		gui, 2:add, button, gSSH%a_index%, %a_loopreadline%
+			gui, 2:add, button,vssh6 ys gSSH6, %a_loopreadline%
+		gui, 2:add, button,vssh%a_index% gSSH%a_index%, %a_loopreadline%
+		ifequal,%a_index%, 10
+			break
 	}
-return
 	Fileremovedir, tmp, 1	
 }
 Return
-
-
+Detectrdp:
+guicontrol, hide, ssh1
+gui, 2:add, text,xs,RDP Sessions
+exit
 Createconnection:
 {
 	gui, 2:submit
@@ -115,19 +119,19 @@ Createconnection:
 	GUI, 3:Add, Text,xs,Connection Name
 	gui, 3:add, edit,w300 vsshname,My SSH Connection
 	GUI, 3:Add, Text,,Username, host and port
-	gui, 3:add, edit,w300 vHost, user@server:port
+	gui, 3:add, edit,w300 vsshserver, user@server:port
 	GUI, 3:Add, Text,,SSH password
-	gui, 3:add, edit,password w240 vPass,
+	gui, 3:add, edit,password w240 vsshpass,
 	gui, 3:add, button, vButsave1 gsavessh, Save Connection
 	exit
 	Createrdp:
 	gui, 3:add, text,xs,Connection Name
 	gui, 3:add, edit,w300 vrdpname,My RDP Connection
 	gui, 3:add, text,Server domain or public ip and port
-	gui, 3:add, edit,w300 vServer,server:port
+	gui, 3:add, edit,w300 vrdpserver,server:port
 	gui, 3:add, text,Username and Password
-	gui, 3:add, edit,w300 vusername,username
-	gui, 3:add, edit,w300 x+30 password,password
+	gui, 3:add, edit,w300 vrdpusername,username
+	gui, 3:add, edit,w300 x+30 password vrdppassword,password
 	gui, 3:add, button, vButsave2 gsaverdp, Save Connection
 	exit
 }
@@ -137,11 +141,11 @@ Savessh:
 {
 	gui, 3:submit
 	FileCreateDir, SavedConnections
-	FileCreateDir, SSH
-	FileAppend, %puttydir%\putty %Host1% -pw %Pass1%, %A_workingdir%\SavedConnections\SSH\%Name1%
-	Fileread, data, %A_workingdir%\SavedConnections\SSH\%Name1%
-	Filedelete, %A_workingdir%\SavedConnections\SSH\%Name1%
-	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%Name1%
+	FileCreateDir, SavedConnections\SSH
+	FileAppend, %puttydir%\putty %sshserver% -pw %sshpassword%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
 	gui, 2:destroy
 	gui, 3:destroy
 	gosub MainMenu
