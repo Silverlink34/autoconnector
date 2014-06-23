@@ -43,8 +43,14 @@ gosub guistart
 }
 
 MainMenu:
-ifnotequal, checkedbutton,0
-	checkedbutton = 1
+gui, 2:destroy
+ifnotequal, checkedbutton, rdp
+	checkedbutton = ssh
+ifnotequal, checkedbutton, vnc
+	checkedbutton = ssh
+ifnotequal, checkedbutton, telnet
+	checkedbutton = ssh
+msgbox, mainmenu %checkedbutton%
 gui, 1:submit
 ifequal, skipintro, 1
 {
@@ -69,17 +75,28 @@ ifnotinstring, puttydir, Program
 gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
 gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
 gui, 2:add, text,xs,_________________________________________________________________________________
-ifequal, showssh,1
+ifequal, checkedbutton,ssh
 	gui, 2:add, radio,section checked1 vsshconn gdetectssh,SSH
 else
 	gui, 2:add, radio,section vsshconn gdetectssh,SSH
-gui, 2:add, radio,ys vrdpconn gdetectrdp,RDP
-gui, 2:add, radio,ys vtelnetconn,Telnet
-gui, 2:add, radio,ys vvncconn,VNC
+ifequal, checkedbutton,rdp
+	gui, 2:add, radio,ys checked1 vrdpconn gdetecrdp,RDP
+else
+	gui, 2:add, radio,ys vrdpconn gdetectrdp,RDP
+ifequal, checkedbutton,telnet
+	gui, 2:add, radio,ys checked1 vtelnetconn,Telnet
+else
+	gui, 2:add, radio,ys vtelnetconn,Telnet
+ifequal, checkedbutton,vnc
+	gui, 2:add, radio, ys checked1 vvncconn,VNC
+else
+	gui, 2:add, radio,ys vvncconn,VNC
 gui, 2:add, text,xs section,_________________________________________________________________________________
 gui, 2:submit, nohide
-ifequal, sshconn, 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+ifequal, checkedbutton,ssh ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
 	gosub detectssh
+ifequal, checkedbutton,rdp
+	gosub detectrdp
 exit
 ;Detect existing/saved SSH connections and create buttons for them
 Detectssh:
@@ -102,9 +119,10 @@ ifexist %a_workingdir%\SavedConnections\SSH
 }
 Return
 Detectrdp:
-gui, 2:destroy
+checkedbutton = rdp
+msgbox,rdp %checkedbutton%
+gosub, mainmenu
 gui, 2:add, text,vrdptext,RDP Sessions
-guicontrol, move,rdptext,section Y-100
 exit
 Createconnection:
 {
