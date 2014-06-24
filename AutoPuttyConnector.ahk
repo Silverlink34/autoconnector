@@ -51,7 +51,7 @@ if rdpenabled = 1
 else
 	sshenabled = 1
 mainmenustart:
-msgbox, ssh=%sshenabled% rdp=%rdpenabled%
+;msgbox, ssh=%sshenabled% rdp=%rdpenabled%
 gui, 1:submit
 ifequal, skipintro, 1
 {
@@ -104,6 +104,7 @@ Checkssh:
 {
 gui, 2:destroy
 sshenabled = 1
+rdpenabled = 0
 gosub mainmenu
 }
 return
@@ -135,43 +136,101 @@ ifexist %a_workingdir%\SavedConnections\SSH
 Return
 
 Detectrdp:
-gui, 2:add, text,,RDP Connections go here
-
-Createconnection:
-{
-	gui, 2:submit
-	gui, 3:show, w768 h485
-	gui, 3:font, s16,
-	GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`n`nCredentials are encrypted and saved.
-	gui, 3:add, text,xs,_________________________________________________________________________________
-	gui, 3:add, radio,checked1 section vcsshconn gcreatessh,SSH
-	gui, 3:add, radio,ys vcrdpconn gcreaterdp,RDP
-	gui, 3:add, radio,ys vctelnetconn,Telnet
-	gui, 3:add, radio,ys vcvncconn,VNC
-	gui, 3:submit, nohide
-	ifequal, sshconn, 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
-		gosub createssh
-	exit
-	Createssh:
-	GUI, 3:Add, Text,xs,Connection Name
-	gui, 3:add, edit,w300 vsshname,My SSH Connection
-	GUI, 3:Add, Text,,Username, host and port
-	gui, 3:add, edit,w300 vsshserver, user@server:port
-	GUI, 3:Add, Text,,SSH password
-	gui, 3:add, edit,password w240 vsshpass,
-	gui, 3:add, button, vButsave1 gsavessh, Save Connection
-	exit
-	Createrdp:
-	gui, 3:add, text,xs,Connection Name
-	gui, 3:add, edit,w300 vrdpname,My RDP Connection
-	gui, 3:add, text,Server domain or public ip and port
-	gui, 3:add, edit,w300 vrdpserver,server:port
-	gui, 3:add, text,Username and Password
-	gui, 3:add, edit,w300 vrdpusername,username
-	gui, 3:add, edit,w300 x+30 password vrdppassword,password
-	gui, 3:add, button, vButsave2 gsaverdp, Save Connection
-	exit
+ifexist %a_workingdir%\SavedConnections\RDP
+{	
+	FileCreateDir, tmp
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\RDP > %a_workingdir%\tmp\rdplist,, hide
+	sleep, 200
+	Loop, read, %A_workingdir%\tmp\rdplist
+	{
+		ifequal, %a_index%, 1
+			gui, 2:add, button,vrdp1 section grdp1, %a_loopreadline%
+		ifequal, %a_index%, 6
+			gui, 2:add, button,vrdp6 ys grdp6, %a_loopreadline%
+		gui, 2:add, button,vrdp%a_index% grdp%a_index%, %a_loopreadline%
+		ifequal,%a_index%, 10
+			break
+	}
+	Fileremovedir, tmp, 1	
 }
+return
+Createconnection:
+
+if crdpenabled = 1
+{
+	csshenabled = 0
+	gosub createconnectionstart
+}
+else
+	csshenabled = 1
+	
+createconnectionstart:
+gui, 2:submit
+gui, 3:show, w768 h485
+gui, 3:font, s16,
+GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`n`nCredentials are encrypted and saved.
+gui, 3:add, text,xs,_________________________________________________________________________________
+if csshenabled = 1
+	gui, 3:add, radio,section checked1 vcsshconn gccheckssh,SSH
+else
+	gui, 3:add, radio,section vcsshconn gccheckssh,SSH
+if crdpenabled = 1
+	gui, 3:add, radio,ys checked1 vcrdpconn gccheckrdp,RDP
+else
+	gui, 3:add, radio,ys vcrdpconn gccheckrdp,RDP
+if ctelnetenabled = 1
+	gui, 3:add, radio,ys checked1 vctelnetconn,Telnet
+else
+	gui, 3:add, radio,ys vctelnetconn,Telnet
+if cvncenabled = 1
+	gui, 3:add, radio, ys checked1 vcvncconn,VNC
+else
+	gui, 3:add, radio,ys vcvncconn,VNC
+gui, 3:add, text,xs section,_________________________________________________________________________________
+gui, 3:submit, nohide
+if csshenabled = 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+	gosub createssh
+if crdpenabled = 1
+	gosub createrdp
+exit
+
+CCheckssh:
+{
+gui, 2:destroy
+csshenabled = 1
+crdpenabled = 0
+gosub mainmenu
+}
+return
+CCheckrdp:
+{
+gui, 2:destroy
+crdpenabled = 1
+gosub mainmenu
+}
+return
+
+
+Createssh:
+GUI, 3:Add, Text,xs,Connection Name
+gui, 3:add, edit,w300 vsshname,My SSH Connection
+GUI, 3:Add, Text,,Username, host and port
+gui, 3:add, edit,w300 vsshserver, user@server:port
+GUI, 3:Add, Text,,SSH password
+gui, 3:add, edit,password w240 vsshpass,
+gui, 3:add, button, vButsave1 gsavessh, Save Connection
+exit
+Createrdp:
+gui, 3:add, text,xs,Connection Name
+gui, 3:add, edit,w300 vrdpname,My RDP Connection
+gui, 3:add, text,Server domain or public ip and port
+gui, 3:add, edit,w300 vrdpserver,server:port
+gui, 3:add, text,Username and Password
+gui, 3:add, edit,w300 vrdpusername,username
+gui, 3:add, edit,w300 x+30 password vrdppassword,password
+gui, 3:add, button, vButsave2 gsaverdp, Save Connection
+exit
+
 
 
 Savessh:
