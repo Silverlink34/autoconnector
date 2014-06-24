@@ -43,14 +43,15 @@ gosub guistart
 }
 
 MainMenu:
-gui, 2:destroy
-ifnotequal, checkedbutton, rdp
-	checkedbutton = ssh
-ifnotequal, checkedbutton, vnc
-	checkedbutton = ssh
-ifnotequal, checkedbutton, telnet
-	checkedbutton = ssh
-msgbox, mainmenu %checkedbutton%
+if rdpenabled = 1
+{
+	sshenabled = 0
+	gosub mainmenustart
+}
+else
+	sshenabled = 1
+mainmenustart:
+msgbox, ssh=%sshenabled% rdp=%rdpenabled%
 gui, 1:submit
 ifequal, skipintro, 1
 {
@@ -75,14 +76,14 @@ ifnotinstring, puttydir, Program
 gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
 gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
 gui, 2:add, text,xs,_________________________________________________________________________________
-ifequal, checkedbutton,ssh
-	gui, 2:add, radio,section checked1 vsshconn gdetectssh,SSH
+if sshenabled = 1
+	gui, 2:add, radio,section checked1 vsshconn gcheckssh,SSH
 else
-	gui, 2:add, radio,section vsshconn gdetectssh,SSH
-ifequal, checkedbutton,rdp
-	gui, 2:add, radio,ys checked1 vrdpconn gdetecrdp,RDP
+	gui, 2:add, radio,section vsshconn gcheckssh,SSH
+if rdpenabled = 1
+	gui, 2:add, radio,ys checked1 vrdpconn gcheckrdp,RDP
 else
-	gui, 2:add, radio,ys vrdpconn gdetectrdp,RDP
+	gui, 2:add, radio,ys vrdpconn gcheckrdp,RDP
 ifequal, checkedbutton,telnet
 	gui, 2:add, radio,ys checked1 vtelnetconn,Telnet
 else
@@ -93,12 +94,26 @@ else
 	gui, 2:add, radio,ys vvncconn,VNC
 gui, 2:add, text,xs section,_________________________________________________________________________________
 gui, 2:submit, nohide
-ifequal, checkedbutton,ssh ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+if sshenabled = 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
 	gosub detectssh
-ifequal, checkedbutton,rdp
+if rdpenabled = 1
 	gosub detectrdp
 exit
 ;Detect existing/saved SSH connections and create buttons for them
+Checkssh:
+{
+gui, 2:destroy
+sshenabled = 1
+gosub mainmenu
+}
+return
+Checkrdp:
+{
+gui, 2:destroy
+rdpenabled = 1
+gosub mainmenu
+}
+return
 Detectssh:
 ifexist %a_workingdir%\SavedConnections\SSH
 {	
@@ -118,12 +133,10 @@ ifexist %a_workingdir%\SavedConnections\SSH
 	Fileremovedir, tmp, 1	
 }
 Return
+
 Detectrdp:
-checkedbutton = rdp
-msgbox,rdp %checkedbutton%
-gosub, mainmenu
-gui, 2:add, text,vrdptext,RDP Sessions
-exit
+gui, 2:add, text,,RDP Connections go here
+
 Createconnection:
 {
 	gui, 2:submit
