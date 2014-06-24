@@ -196,39 +196,39 @@ exit
 
 CCheckssh:
 {
-gui, 2:destroy
+gui, 3:destroy
 csshenabled = 1
 crdpenabled = 0
-gosub mainmenu
+gosub createconnection
 }
 return
 CCheckrdp:
 {
-gui, 2:destroy
+gui, 3:destroy
 crdpenabled = 1
-gosub mainmenu
+gosub createconnection
 }
 return
 
 
 Createssh:
-GUI, 3:Add, Text,xs,Connection Name
+GUI, 3:Add, Text,xs section,Connection Name
 gui, 3:add, edit,w300 vsshname,My SSH Connection
 GUI, 3:Add, Text,,Username, host and port
 gui, 3:add, edit,w300 vsshserver, user@server:port
 GUI, 3:Add, Text,,SSH password
 gui, 3:add, edit,password w240 vsshpass,
-gui, 3:add, button, vButsave1 gsavessh, Save Connection
+gui, 3:add, button,ys vButsave1 gsavessh, Save Connection
 exit
 Createrdp:
-gui, 3:add, text,xs,Connection Name
+gui, 3:add, text,xs section,Connection Name
 gui, 3:add, edit,w300 vrdpname,My RDP Connection
-gui, 3:add, text,Server domain or public ip and port
+gui, 3:add, text,,Server domain or public ip and port
 gui, 3:add, edit,w300 vrdpserver,server:port
-gui, 3:add, text,Username and Password
+gui, 3:add, text,,Username and Password
 gui, 3:add, edit,w300 vrdpusername,username
 gui, 3:add, edit,w300 x+30 password vrdppassword,password
-gui, 3:add, button, vButsave2 gsaverdp, Save Connection
+gui, 3:add, button,ys vButsave2 gsaverdp, Save Connection
 exit
 
 
