@@ -7,10 +7,10 @@
 #NoTrayIcon ;Kinda self explanatory.
 #NoEnv ;supposed to make compatibility better
 
-;ahk2exe compiling options listed here
+;Create working dir under My Documents
 filecreatedir, %a_mydocuments%/AutoConnector
 
-;Set working directory to always use base .ahk file path.
+;Set working directory to created dir ^^
 SetWorkingDir %a_mydocuments%/AutoConnector
 
 ;Check for config.txt options
@@ -28,7 +28,7 @@ gui, 1:font, s16,
 GUI, 1:Add, Text,,Thank you for using Brandon's Auto Putty Connector.
 GUI, 1:Add, Text,,This GUI will store SSH information and auto-connect you to specified servers.
 GUI, 1:Add, Text,,Saved passwords are encrypted with 128bit encryption method.
-GUI, 1:Add, Text,,Connections are saved to Saved Connections folder.
+GUI, 1:Add, Text,,All used files are stored under My Documents/AutoConnector.
 gui, 1:add, button, vButok1 gMainMenu, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
 ;Option to skip intro/disclaimer
@@ -70,8 +70,9 @@ ifexist C:\Program Files\PuTTY
 }
 ifnotinstring, puttydir, Program
 {
-	puttydir = %A_WorkingDir%
-	fileinstall, putty.exe,%a_workingdir%/putty.exe,1
+	filecreatedir, %a_workingdir%\programbin
+	puttydir = %A_WorkingDir%\programbin
+	fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
 }
 gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
 gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
@@ -168,8 +169,9 @@ createconnectionstart:
 gui, 2:submit
 gui, 3:show, w768 h485
 gui, 3:font, s16,
-GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`n`nCredentials are encrypted and saved.
-gui, 3:add, text,xs,_________________________________________________________________________________
+GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`nCredentials are saved and encrypted immediately.
+gui, 3:add,button,border x230 vreturnmainmenu gcrereturnmainmenu,Cancel
+gui, 3:add, text,xs y103,_________________________________________________________________________________
 if csshenabled = 1
 	gui, 3:add, radio,section checked1 vcsshconn gccheckssh,SSH
 else
@@ -210,7 +212,6 @@ gosub createconnection
 }
 return
 
-
 Createssh:
 GUI, 3:Add, Text,xs section,Connection Name
 gui, 3:add, edit,w300 vsshname,My SSH Connection
@@ -218,8 +219,9 @@ GUI, 3:Add, Text,,Username, host and port
 gui, 3:add, edit,w300 vsshserver, user@server:port
 GUI, 3:Add, Text,,SSH password
 gui, 3:add, edit,password w240 vsshpass,
-gui, 3:add, button,ys vButsave1 gsavessh, Save Connection
+gui, 3:add, button,border x20 y74 vButsave1 gsavessh, Save Connection
 exit
+
 Createrdp:
 gui, 3:add, text,xs section,Connection Name
 gui, 3:add, edit,w300 vrdpname,My RDP Connection
@@ -228,9 +230,14 @@ gui, 3:add, edit,w300 vrdpserver,server:port
 gui, 3:add, text,,Username and Password
 gui, 3:add, edit,w300 vrdpusername,username
 gui, 3:add, edit,w300 x+30 password vrdppassword,password
-gui, 3:add, button,ys vButsave2 gsaverdp, Save Connection
+gui, 3:add, button,border x20 y74 vButsave2 gsaverdp, Save Connection
 exit
 
+crereturnmainmenu:
+gui, 2:destroy
+gui, 3:destroy
+gosub mainmenu
+exit
 
 
 Savessh:
@@ -249,7 +256,20 @@ Savessh:
 return
 
 Saverdp:
-msgbox,test
+{
+	gui, 3:submit
+	filecreatedir, %a_workingdir%\programbin
+	fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
+	FileCreateDir, SavedConnections
+	FileCreateDir, SavedConnections\RDP
+	FileAppend, %a_workingdir%\programbin\rdp %sshserver% -pw %sshpassword%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
+	gui, 2:destroy
+	gui, 3:destroy
+	gosub MainMenu
+}
 return
 Deleteconnection:
 {	gui, 2:submit
@@ -257,8 +277,7 @@ Deleteconnection:
 	gui, 4:show, w768 h485
 	gui, 4:font, s16,
 	gui, 4:add, text,cRed,You are in delete connection mode. Click a connection to remove it.
-	gui, 4:add, text,,Click Return to go back to Connection Menu.
-	gui, 4:add, button, border vbutreturn greturnmainmenu,Return
+	gui, 4:add, button, border vbutreturn gdelreturnmainmenu,Return to Main Menu
 	gui, 4:add, text,,_________________________________________________________________________________
 	ifexist %a_workingdir%\SavedConnections
 	{
@@ -304,7 +323,7 @@ Deleteconnection:
 		}
 	}	
 	return
-	returnmainmenu:
+	delreturnmainmenu:
 	gui, 2:destroy
 	gui, 4:destroy
 	gosub mainmenu
