@@ -124,13 +124,18 @@ ifexist %a_workingdir%\SavedConnections\SSH
 	sleep, 200
 	Loop, read, %A_workingdir%\tmp\sshlist
 	{
-		ifequal, %a_index%, 1
+		if a_index = 1
+			msgbox, this is iteration1.
 			gui, 2:add, button,vssh1 section gSSH1, %a_loopreadline%
-		ifequal, %a_index%, 6
+			continue
+		if %a_index% = 6
 			gui, 2:add, button,vssh6 ys gSSH6, %a_loopreadline%
-		gui, 2:add, button,vssh%a_index% gSSH%a_index%, %a_loopreadline%
+			continue
+		msgbox, %a_index%
+		;gui, 2:add, button,vssh%a_index% gSSH%a_index%, %a_loopreadline%
 		ifequal,%a_index%, 10
 			break
+		return
 	}
 	Fileremovedir, tmp, 1	
 }
@@ -146,11 +151,18 @@ ifexist %a_workingdir%\SavedConnections\RDP
 	{
 		ifequal, %a_index%, 1
 			gui, 2:add, button,vrdp1 section grdp1, %a_loopreadline%
+		else
+			gosub rdpnot1or6
 		ifequal, %a_index%, 6
 			gui, 2:add, button,vrdp6 ys grdp6, %a_loopreadline%
+		else
+			gosub rdpnot1or6
+		exit
+		rdpnot1or6:
 		gui, 2:add, button,vrdp%a_index% grdp%a_index%, %a_loopreadline%
 		ifequal,%a_index%, 10
 			break
+		return
 	}
 	Fileremovedir, tmp, 1	
 }
@@ -262,10 +274,10 @@ Saverdp:
 	fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\RDP
-	FileAppend, %a_workingdir%\programbin\rdp %sshserver% -pw %sshpassword%, %A_workingdir%\SavedConnections\SSH\%sshname%
-	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
-	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
-	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
+	FileAppend, %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpusername% /p:%rdppassword%, %A_workingdir%\SavedConnections\RDP\%rdpname%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%rdpname%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%rdpname%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%rdpname%
 	gui, 2:destroy
 	gui, 3:destroy
 	gosub MainMenu
@@ -661,6 +673,24 @@ RmvSSH10:
 	}
 }
 return
+
+RDP1:
+{
+	Gui, 2:submit
+	msgbox, connection is %RDP1%
+	;Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	;Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	;Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
+	;Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	;Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	;filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	;fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
+	;run, %rdpconnect%
+	;gui, 2:destroy
+	;rdpconnect =
+}
+return
+
 ;Encrypt and Decrypt Functions listed here
 
 Decrypt(Data,Pass) {
