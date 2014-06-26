@@ -125,17 +125,21 @@ ifexist %a_workingdir%\SavedConnections\SSH
 	Loop, read, %A_workingdir%\tmp\sshlist
 	{
 		if a_index = 1
-			msgbox, this is iteration1.
-			gui, 2:add, button,vssh1 section gSSH1, %a_loopreadline%
+		{
+			SSH1 = %a_loopreadline%
+			gui, 2:add, button,vbutssh1 section gSSH1, %a_loopreadline%
 			continue
+		}
 		if %a_index% = 6
-			gui, 2:add, button,vssh6 ys gSSH6, %a_loopreadline%
+		{
+			;gui, 2:add, button,vbutssh6 ys gSSH6, %a_loopreadline%
+			msgbox, this is loop 6 actions.
 			continue
+		}
 		msgbox, %a_index%
 		;gui, 2:add, button,vssh%a_index% gSSH%a_index%, %a_loopreadline%
-		ifequal,%a_index%, 10
+		if a_index = 10
 			break
-		return
 	}
 	Fileremovedir, tmp, 1	
 }
