@@ -130,14 +130,14 @@ ifexist %a_workingdir%\SavedConnections\SSH
 			gui, 2:add, button,vbutssh1 section gSSH1, %a_loopreadline%
 			continue
 		}
-		if %a_index% = 6
+		if a_index = 6
 		{
-			;gui, 2:add, button,vbutssh6 ys gSSH6, %a_loopreadline%
-			msgbox, this is loop 6 actions.
+			SSH6 = %a_loopreadline%
+			gui, 2:add, button,vbutssh6 ys gSSH6, %a_loopreadline%
 			continue
 		}
-		msgbox, %a_index%
-		;gui, 2:add, button,vssh%a_index% gSSH%a_index%, %a_loopreadline%
+		SSH%a_index% = %a_loopreadline%
+		gui, 2:add, button,vbutssh%a_index% gSSH%a_index%, %a_loopreadline%
 		if a_index = 10
 			break
 	}
@@ -153,20 +153,22 @@ ifexist %a_workingdir%\SavedConnections\RDP
 	sleep, 200
 	Loop, read, %A_workingdir%\tmp\rdplist
 	{
-		ifequal, %a_index%, 1
-			gui, 2:add, button,vrdp1 section grdp1, %a_loopreadline%
-		else
-			gosub rdpnot1or6
-		ifequal, %a_index%, 6
-			gui, 2:add, button,vrdp6 ys grdp6, %a_loopreadline%
-		else
-			gosub rdpnot1or6
-		exit
-		rdpnot1or6:
-		gui, 2:add, button,vrdp%a_index% grdp%a_index%, %a_loopreadline%
-		ifequal,%a_index%, 10
+		if a_index = 1
+		{	
+			RDP1 = %a_loopreadline%
+			gui, 2:add, button,vbutrdp1 section grdp1, %a_loopreadline%
+			continue
+		}
+		if a_index = 6
+		{
+			RDP6 = %a_loopreadline%
+			gui, 2:add, button,vbutrdp6 ys grdp6, %a_loopreadline%
+			continue
+		}
+		RDP%a_index% = %a_loopreadline%
+		gui, 2:add, button,vbutrdp%a_index% grdp%a_index%, %a_loopreadline%
+		if a_index = 10
 			break
-		return
 	}
 	Fileremovedir, tmp, 1	
 }
@@ -244,8 +246,8 @@ gui, 3:add, edit,w300 vrdpname,My RDP Connection
 gui, 3:add, text,,Server domain or public ip and port
 gui, 3:add, edit,w300 vrdpserver,server:port
 gui, 3:add, text,,Username and Password
-gui, 3:add, edit,w300 vrdpusername,username
-gui, 3:add, edit,w300 x+30 password vrdppassword,password
+gui, 3:add, edit,w300 vrdpuser,username
+gui, 3:add, edit,w300 x+30 password vrdppass,password
 gui, 3:add, button,border x20 y74 vButsave2 gsaverdp, Save Connection
 exit
 
@@ -261,7 +263,7 @@ Savessh:
 	gui, 3:submit
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\SSH
-	FileAppend, %puttydir%\putty %sshserver% -pw %sshpassword%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	FileAppend, %puttydir%\putty %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
@@ -278,7 +280,7 @@ Saverdp:
 	fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\RDP
-	FileAppend, %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpusername% /p:%rdppassword%, %A_workingdir%\SavedConnections\RDP\%rdpname%
+	FileAppend, %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass%, %A_workingdir%\SavedConnections\RDP\%rdpname%
 	Fileread, data, %A_workingdir%\SavedConnections\RDP\%rdpname%
 	Filedelete, %A_workingdir%\SavedConnections\RDP\%rdpname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%rdpname%
@@ -681,19 +683,162 @@ return
 RDP1:
 {
 	Gui, 2:submit
-	msgbox, connection is %RDP1%
-	;Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	;Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	;Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
-	;Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	;Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	;filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	;fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
-	;run, %rdpconnect%
-	;gui, 2:destroy
-	;rdpconnect =
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
 }
-return
+exit
+
+RDP2:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP2%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP2%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP2%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP2%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP2%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP2%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP2%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP3:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP3%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP3%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP3%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP3%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP3%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP3%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP3%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP4:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP4%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP4%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP4%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP4%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP4%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP4%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP4%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP5:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP5%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP5%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP5%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP5%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP5%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP5%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP5%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP6:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP6%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP6%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP6%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP6%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP6%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP6%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP6%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP7:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP7%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP7%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP7%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP7%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP7%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP7%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP7%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP8:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP8%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP8%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP8%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP8%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP8%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP8%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP8%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP9:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP9%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP9%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP9%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP9%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP9%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP9%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP9%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
+
+RDP10:
+{
+	Gui, 2:submit
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP10%
+	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP10%
+	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP10%
+	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP10%
+	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP10%
+	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP10%
+	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP10%
+	run, %rdpconnect%
+	gui, 2:destroy
+	rdpconnect =
+}
+exit
 
 ;Encrypt and Decrypt Functions listed here
 
