@@ -290,63 +290,153 @@ Saverdp:
 }
 return
 Deleteconnection:
-{	gui, 2:submit
-	gui, 2:destroy
-	gui, 4:show, w768 h485
-	gui, 4:font, s16,
-	gui, 4:add, text,cRed,You are in delete connection mode. Click a connection to remove it.
-	gui, 4:add, button, border vbutreturn gdelreturnmainmenu,Return to Main Menu
-	gui, 4:add, text,,_________________________________________________________________________________
-	ifexist %a_workingdir%\SavedConnections
-	{
-		ifgreater, SSH0, 1
-		{
-			gui, 4:add, button, section Y+20 vButRcon1 gRmvSSH1, %SSH1%
-		}
-		ifgreater, SSH0, 2
-		{
-			gui, 4:add, button, vButRcon2 gRmvSSH2, %SSH2%
-		}
-		ifgreater, SSH0, 3
-		{
-			gui, 4:add, button, vButRcon3 gRmvSSH3, %SSH3%
-		}
-		ifgreater, SSH0, 4
-		{
-			gui, 4:add, button, vButRcon4 gRmvSSH4, %SSH4%
-		}
-		ifgreater, SSH0, 5
-		{
-			gui, 4:add, button, vButRcon5 gRmvSSH5, %SSH5%
-		}
-		ifgreater, SSH0, 6
-		{
-			gui, 4:add, button, ys vButRcon6 gRmvSSH6, %SSH6%
-		}
-		ifgreater, SSH0, 7
-		{
-			gui, 4:add, button, vButRcon7 gRmvSSH7, %SSH7%
-		}
-		ifgreater, SSH0, 8
-		{
-			gui, 4:add, button, vButRcon8 gRmvSSH8, %SSH8%
-		}
-		ifgreater, SSH0, 9
-		{
-			gui, 4:add, button, vButRcon9 gRmvSSH9, %SSH9%
-		}
-		ifgreater, SSH0, 10
-		{
-			gui, 4:add, button, vButRcon10 gRmvSSH10, %SSH10%
-		}
-	}	
-	return
-	delreturnmainmenu:
-	gui, 2:destroy
-	gui, 4:destroy
-	gosub mainmenu
-	exit
+if drdpenabled = 1
+{
+	dsshenabled = 0
+	gosub delmenustart
 }
+else
+	dsshenabled = 1
+	
+delmenustart:
+;msgbox, ssh=%sshenabled% rdp=%rdpenabled%
+gui, 2:submit
+gui, 2:destroy
+gui, 4:show, w768 h485
+gui, 4:font, s16,
+gui, 4:add, text,cRed,You are in delete connection mode. Click a connection to remove it.
+gui, 4:add, button, border vbutreturn gdelreturnmainmenu,Return to Main Menu
+gui, 4:add, text,xs,_________________________________________________________________________________
+if dsshenabled = 1
+	gui, 4:add, radio,section checked1 vdsshconn gdcheckssh,SSH
+else
+	gui, 4:add, radio,section vdsshconn gdcheckssh,SSH
+if drdpenabled = 1
+	gui, 4:add, radio,ys checked1 vdrdpconn gdcheckrdp,RDP
+else
+	gui, 4:add, radio,ys vdrdpconn gdcheckrdp,RDP
+ifequal, checkedbutton,telnet
+	gui, 4:add, radio,ys checked1 vdtelnetconn,Telnet
+else
+	gui, 4:add, radio,ys vdtelnetconn,Telnet
+ifequal, checkedbutton,vnc
+	gui, 4:add, radio, ys checked1 vdvncconn,VNC
+else
+	gui, 4:add, radio,ys vdvncconn,VNC
+gui, 4:add, text,xs section,_________________________________________________________________________________
+gui, 4:submit, nohide
+if dsshenabled = 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+	gosub ddetectssh
+if drdpenabled = 1
+	gosub ddetectrdp
+exit
+dCheckssh:
+{
+gui, 4:destroy
+dsshenabled = 1
+drdpenabled = 0
+gosub deleteconnection
+}
+return
+dCheckrdp:
+{
+gui, 4:destroy
+drdpenabled = 1
+gosub deleteconnection
+}
+return
+ddetectssh:
+if ssh1
+{
+	gui, 4:add, button, vdelssh1 grmvssh1,%SSH1%
+}
+if ssh2
+{
+	gui, 4:add, button, vdelssh2 grmvssh2,%ssh2%
+}
+if ssh3
+{
+	gui, 4:add, button, vdelssh3 grmvssh3,%ssh3%
+}
+if ssh4
+{
+	gui, 4:add, button, vdelssh4 grmvssh4,%ssh4%
+}
+if ssh5
+{
+	gui, 4:add, button, vdelssh5 grmvssh5,%ssh5%
+}
+if ssh6
+{
+	gui, 4:add, button, vdelssh6 grmvssh6,%ssh6%
+}
+if ssh7
+{
+	gui, 4:add, button, vdelssh7 grmvssh7,%ssh7%
+}
+if ssh8
+{
+	gui, 4:add, button, vdelssh8 grmvssh8,%ssh8%
+}
+if ssh9
+{
+	gui, 4:add, button, vdelssh9 grmvssh9,%ssh9%
+}
+if ssh10
+{
+	gui, 4:add, button, vdelssh10 grmvssh10,%ssh10%
+}
+return
+
+ddetectrdp:
+if rdp1
+{
+	gui, 4:add, button,vdelrdp1 grmvrdp1,%RDP1%
+}
+if rdp2
+{
+	gui, 4:add, button,vdelrdp2 grmvrdp2,%rdp2%
+}
+if rdp3
+{
+	gui, 4:add, button,vdelrdp3 grmvrdp3,%rdp3%
+}
+if rdp4
+{
+	gui, 4:add, button,vdelrdp4 grmvrdp4,%rdp4%
+}
+if rdp5
+{
+	gui, 4:add, button,vdelrdp5 grmvrdp5,%rdp5%
+}
+if rdp6
+{
+	gui, 4:add, button,vdelrdp6 grmvrdp6,%rdp6%
+}
+if rdp7
+{
+	gui, 4:add, button,vdelrdp7 grmvrdp7,%rdp7%
+}
+if rdp8
+{
+	gui, 4:add, button,vdelrdp8 grmvrdp8,%rdp8%
+}
+if rdp9
+{
+	gui, 4:add, button,vdelrdp9 grmvrdp9,%rdp9%
+}
+if rdp10
+{
+	gui, 4:add, button,vdelrdp10 grmvrdp10,%rdp10%
+}
+return
+
+delreturnmainmenu:
+gui, 2:destroy
+gui, 4:destroy
+gosub mainmenu
+exit
+
 
 return ;keeps the script from running Connection1 when it gets to it
 SSH1:
@@ -839,6 +929,177 @@ RDP10:
 	rdpconnect =
 }
 exit
+
+RmvRDP1:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP1%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP2:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP2%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP2%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP3:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP3%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP3%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP4:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP4%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP4%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP5:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP5%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP5%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP6:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP6%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP6%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP7:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP7%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP7%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP8:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP8%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP8%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP9:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP9%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP9%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
+RmvRDP10:
+{
+	gui, 4:submit
+	msgbox, 4,Really Delete?,Are you sure you wish to delete %RDP10%? `nPress Yes to delete or No to go back to Delete Connections Menu.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\RDP\%RDP10%
+		gui, 4:destroy
+		gosub MainMenu
+	}
+	else
+	{
+		gui, 4:destroy
+		gosub Deleteconnection
+	}
+}
+return
 
 ;Encrypt and Decrypt Functions listed here
 
