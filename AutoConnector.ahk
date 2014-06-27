@@ -23,11 +23,12 @@ return
 
 ;Start of GUI below here
 guistart:
-Gui, 1:Show, w768 h485, Auto Putty Connector
-gui, 1:font, s16,
-GUI, 1:Add, Text,,Thank you for using Brandon's Auto Putty Connector.
-GUI, 1:Add, Text,,This GUI will store SSH information and auto-connect you to specified servers.
-GUI, 1:Add, Text,,Saved passwords are encrypted with 128bit encryption method.
+Gui, 1:Show, w768 h485, AutoConnector
+gui, 1:font, s14,
+GUI, 1:Add, Text,,Thank you for using Brandon's AutoConnector.
+GUI, 1:Add, Text,,This application will quickly allow access to remote devices.
+GUI, 1:Add, Text,,Protocols supported are: SSH, RDP, Telnet and VNC.
+GUI, 1:Add, Text,,Saved usernames and passwords are encrypted with 128bit encryption method.
 GUI, 1:Add, Text,,All used files are stored under My Documents/AutoConnector.
 gui, 1:add, button, vButok1 gMainMenu, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
