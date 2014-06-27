@@ -48,6 +48,7 @@ exit
 submitmpass:
 gui, setmpass:submit, nohide
 data = %masterpass%
+pass = %masterpass%
 gui, setmpass:destroy
 fileappend, % Encrypt(Data,Pass), %a_workingdir%\config
 run, %comspec% /c attrib +h %a_workingdir%\config
@@ -66,6 +67,7 @@ exit
 verifympass:
 gui, mpass:submit
 fileread, data, %a_workingdir%\config
+pass = %entermpass%
 mpass := Decrypt(data,pass)
 ;msgbox, %mpass%
 if mpass = %entermpass%
@@ -75,14 +77,18 @@ if mpass = %entermpass%
 		fileappend, resetmasterpass, %a_workingdir%\config.txt
 		gui, mpass:destroy
 		gosub configcheck
+		pass =
 	}
 	gui, mpass:destroy
+	pass =
 	gosub passwordverified
 }
 else
 {
 	msgbox, You entered the wrong password.`nTry again.
 	gui, mpass:destroy
+	mpass =
+	pass =
 	gosub configcheck
 }
 exit
@@ -98,6 +104,7 @@ GUI, 1:Add, Text,,Saved usernames and passwords are encrypted with 128bit encryp
 GUI, 1:Add, Text,,All used files are stored under My Documents/AutoConnector.
 gui, 1:add, button, vButok1 gMainMenu, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
+gui, 1:add, button, gHelp, Help/things to note
 ;Option to skip intro/disclaimer
 gui, 1:add, checkbox, vskipintro, Skip this screen on next run?
 exit
@@ -109,7 +116,13 @@ gui, 1:destroy
 gosub guistart
 }
 
+Help:
+msgbox, Some things to note:`nYou can transport your saved connections simply by copying the Saved Connections folder around. Please note that all of your connections are encrypted with your master password, so if you set a master password that is different they will not load.
+gui, 1:destroy
+gosub guistart
+
 MainMenu:
+pass = %mpass%
 if rdpenabled = 1
 {
 	sshenabled = 0
