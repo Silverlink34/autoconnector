@@ -14,12 +14,78 @@ filecreatedir, %a_mydocuments%/AutoConnector
 SetWorkingDir %a_mydocuments%/AutoConnector
 
 ;Check for config.txt options
+configcheck:
 fileread, config, config.txt
+ifinstring, config, resetmasterpass
+{
+	filedelete, %a_workingdir%\config.txt
+	filedelete, %a_workingdir%\config
+	stringreplace,config,config,passisset,,all
+	stringreplace,config,config,resetmasterpass,,all
+	fileappend,%config%,%a_workingdir%\config.txt
+	gosub configcheck
+}
+ifnotinstring, config, passisset
+	gosub masterpasswordset
+else
+	gosub masterpasswordprompt
+exit
+passwordverified:
 ifinstring, config, skipenabled
 	gosub MainMenu
 else
 	gosub guistart
 return
+;set master password for application
+masterpasswordset:
+gui, setmpass:show, w587 h234, Set Master Password
+gui, setmpass:font, s14
+gui, setmpass:add, text,,Master password has not been set.
+gui, setmpass:add, text,,Please set a master password to secure this application's data.
+gui, setmpass:add, edit,password vmasterpass
+gui, setmpass:add,button,vbutsub1 gsubmitmpass,Submit
+exit
+submitmpass:
+gui, setmpass:submit, nohide
+data = %masterpass%
+gui, setmpass:destroy
+fileappend, % Encrypt(Data,Pass), %a_workingdir%\config
+run, %comspec% /c attrib +h %a_workingdir%\config
+data =
+fileappend, passisset,%a_workingdir%\config.txt
+gosub configcheck
+exit
+masterpasswordprompt:
+gui, mpass:show, w567 h234, Enter Master Password
+gui, mpass:font, s16
+gui, mpass:add,text,,Enter your master password.
+gui, mpass:add,edit,password ventermpass,
+gui, mpass:add,button,vbutsub2 gverifympass,Submit
+gui, mpass:add,checkbox,vresetmpass,Reset password after authenticated?
+exit
+verifympass:
+gui, mpass:submit
+fileread, data, %a_workingdir%\config
+mpass := Decrypt(data,pass)
+;msgbox, %mpass%
+if mpass = %entermpass%
+{
+	if resetmpass = 1
+	{
+		fileappend, resetmasterpass, %a_workingdir%\config.txt
+		gui, mpass:destroy
+		gosub configcheck
+	}
+	gui, mpass:destroy
+	gosub passwordverified
+}
+else
+{
+	msgbox, You entered the wrong password.`nTry again.
+	gui, mpass:destroy
+	gosub configcheck
+}
+exit
 
 ;Start of GUI below here
 guistart:
