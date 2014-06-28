@@ -511,7 +511,7 @@ Savessh:
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\SSH
 	if localsshport
-		FileAppend, %puttydir%\putty %sshserver% -pw %sshpass% -L %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
+		FileAppend, %puttydir%\putty %sshserver% -pw %sshpass% -R %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
 	else
 		FileAppend, %puttydir%\putty %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
