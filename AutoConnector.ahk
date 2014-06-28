@@ -23,39 +23,50 @@ else
 	gosub runupdater
 exit
 runupdater:
-ifnotexist, %a_workingdir%\updater\autoconnector-updater.ahk
+ifexist %a_workingdir%\updater\updatefailed
 {
-	progress,10,Downloading Updater..,Update was found.
-	sleep, 3000
-	filecreatedir, %a_workingdir%\updater
-	fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
-	fileinstall, unzip.exe,%a_workingdir%\programbin\unzip.exe,1
-	urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.ahk, %a_workingdir%\updater\autoconnector-updater.ahk
-	progress,50,Checking if download went smoothly..
-	sleep,5000
-	ifexist, %a_workingdir%\updater\autoconnector-updater.ahk
+	filedelete, %a_workingdir%\updater\updatefailed
+	gosub configcheck
+}
+else
+{
+	ifnotexist, %a_workingdir%\updater\autoconnector-updater.ahk
 	{
-		progress,100,Running Updater.
-		sleep,2000
-		progress,off
-		run, %a_workingdir%\updater\autoconnector-updater.ahk
+		progress,10,Downloading Updater..,Update was found.
+		sleep, 3000
+		filecreatedir, %a_workingdir%\updater
+		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
+		fileinstall, unzip.exe,%a_workingdir%\programbin\unzip.exe,1
+		urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.ahk, %a_workingdir%\updater\autoconnector-updater.ahk
+		progress,50,Checking if download went smoothly..
+		sleep,5000
+		ifexist, %a_workingdir%\updater\autoconnector-updater.ahk
+		{
+			progress,100,Running Updater.
+			sleep,2000
+			progress,off
+			fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
+			run, %a_workingdir%\updater\autoconnector-updater.ahk
+		}
+		else
+		{
+			progress,off
+				if updatefail = 1
+				{
+					msgbox, Unable to update at this time. Running AutoConnector, out of date.
+					gosub configcheck
+				}
+			msgbox, Could not download the updater in a timely manner. Re-trying 1 more time.
+			updatefail = 1
+			gosub runupdater
+		}	
 	}
 	else
 	{
-		progress,off
-			if updatefail = 1
-			{
-				msgbox, Unable to update at this time. Running AutoConnector, out of date.
-				gosub configcheck
-			}
-		msgbox, Could not download the updater in a timely manner. Re-trying 1 more time.
-		updatefail = 1
-		gosub runupdater
-	}	
-	exit
+		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
+		run, %a_workingdir%\updater\autoconnector-updater.ahk
+	}
 }
-else
-	run, %a_workingdir%\updater\autoconnector-updater.ahk
 exit
 
 ;Check for config.txt options
