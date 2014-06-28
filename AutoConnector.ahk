@@ -7,7 +7,7 @@
 #NoTrayIcon ;Kinda self explanatory.
 #NoEnv ;supposed to make compatibility better
 ;Set icon for program
-menu,tray,icon,Autoconnector.ico,,
+menu,tray,icon,%A_ScriptDir%\autoconnector.ico,
 ;Create working dir under My Documents
 filecreatedir, %a_mydocuments%/AutoConnector
 
@@ -39,7 +39,7 @@ else
 return
 ;set master password for application
 masterpasswordset:
-gui, 5:show, w587 h300, Set Master Password
+gui, 5:show, w587 h280, Set Master Password
 gui, 5:font, s14
 gui, 5:add, text,,Master password has not been set.
 gui, 5:add, text,,Please set a master password to secure this application's data.
@@ -60,7 +60,7 @@ exit
 setsecurityquestions:
 gui, 7:show, w587 h500, Set Security Questions
 gui, 7:font, s14
-gui, 7:add,text,,Answer the following questions to recover forgotten password.
+gui, 7:add,text,,Submit answers to the following questions for recovery of forgotten password.
 gui, 7:add,text,,Your answers are not case sensitive.`n
 gui, 7:add,text,,What is your favorite internet browser?
 gui, 7:add,edit,w300 vanswer1,
@@ -81,11 +81,11 @@ data = %masterpass%
 pass = %masterpass%
 gui, 5:destroy
 fileappend, % Encrypt(Data,Pass), %a_workingdir%\config
-run, %comspec% /c attrib +h %a_workingdir%\config,hide
+run, %comspec% /c attrib +h %a_workingdir%\config,,hide
 data =
 pass =
 fileappend,%answer1%%a_tab%%answer2%%a_tab%%answer3%%a_tab%%emailaddr%, %a_workingdir%\config2
-run, %comspec% /c attrib +h %a_workingdir%\config2,hide
+run, %comspec% /c attrib +h %a_workingdir%\config2,,hide
 fileread,data,%a_workingdir%\config2
 filedelete, %a_workingdir%\config2
 fileappend, % encrypt(data,pass),%a_workingdir%\config2
@@ -144,19 +144,79 @@ gui, 8:add,text,,Try entering your answered security questions, or just have it 
 gui, 8:add,button,vbutemailme gemailmpass,Email it to me!
 gui, 8:add,button,x+20 vbutenteranswers gsubmitqanswers,Answer Security Questions
 exit
+
 Emailmpass:
 gui, 8:submit
+gui, 8:destroy
 fileread,data,%a_workingdir%\config2
 questions := Decrypt(data,pass)
 stringsplit,answernum,questions,%a_tab%,,
-myemail = %answernum5%
+emailtoaddress = %answernum5%
+emailpass = agrias123
+emailfromaddress = autoconnector.by.brandon@gmail.com
+emailsubject = Your AutoConnector Password
 mypass = %answernum1%
-sendMail(%myemail%,agrias123,autoconnector.by.brandon@gmail.com,Your AutoConnector password,You asked to have your password emailed to you so here it is. Your password is %mypass%)
+emailmessage = You asked to have your password emailed to you so here it is. Your password is %mypass%
+emailfromnodomain = autoconnector.by.brandon
+sendMail(emailToAddress,emailPass,emailFromAddress,emailSubject,emailMessage,EmailFromNoDomain)
+msgbox, Email was sent if your internets is working. Closing application now.
 exit
 
 submitqanswers:
-msgbox, test
+gui, 8:submit
+gui, 8:destroy
+gui, 9:show, w587 h500, Answer The Questions
+gui, 9:font, s14
+gui, 9:add,text,,Answer the following questions to recover forgotten password.
+gui, 9:add,text,,Your answers are not case sensitive.`n
+gui, 9:add,text,,What is your favorite internet browser?
+gui, 9:add,edit,w300 vsanswer1,
+gui, 9:add,text,,Who is your favorite computer manufacturer?
+gui, 9:add,edit, w300 vsanswer2,
+gui, 9:add,text,,What is your favorite operating system?
+gui, 9:add,edit,w300 vsanswer3,
+gui, 9:add,button,vbutsub2 gsubmittedanswers,Submit
 exit
+
+submittedanswers:
+gui, 9:submit
+fileread,data,%a_workingdir%\config2
+questions := Decrypt(data,pass)
+stringsplit,answernum,questions,%a_tab%,,
+if sanswer1 = %answernum2%
+{
+	if sanswer2 = %answernum3%
+	{
+		if sanswer3 = %answernum4%
+		{
+			gui, 9:destroy
+			gosub correctanswers
+		}
+		else
+		{	msgbox, One of the security questions is incorrect. Try again. 
+			gui, 9:destroy
+			gosub submitqanswers
+		}
+	}
+	else
+	{	msgbox, One of the security questions is incorrect. Try again. 
+		gui, 9:destroy
+		gosub submitqanswers
+	}
+	
+}
+else
+{	msgbox, One of the security questions is incorrect. Try again. 
+	gui, 9:destroy
+	gosub submitqanswers
+}	
+exit
+correctanswers:
+fileappend,%answernum1%,%a_mydocuments%\AutoConnector pass.txt
+msgbox, Good job, you can remember 3 answers but not your password.`nI'll go ahead and export it to My Documents\AutoConnector pass.txt.`nMake sure you delete the file and note it.`nClosing application.
+exit
+
+
 ;Start of GUI below here
 guistart:
 Gui, 1:Show, w768 h485, AutoConnector
@@ -1292,12 +1352,12 @@ Encrypt(Data,Pass) {
 	Return Result 
 }
 ;Email send functions below here
-sendMail(emailToAddress,emailPass,emailFromAddress,emailSubject,emailMessage)
+sendMail(emailToAddress,emailPass,emailFromAddress,emailSubject,emailMessage,EmailFromNoDomain)
 	{
+		filecreatedir, %a_workingdir%\programbin
+		fileinstall, mailsend.exe,%a_workingdir%\programbin\mailsend.exe,1
         mailsendlocation = %a_workingdir%\programbin
-	IfNotExist, %mailsendlocation%\mailsend1.17b12.exe
-		URLDownloadToFile, https://mailsend.googlecode.com/files/mailsend1.17b12.exe, %mailsendlocation%
-	Run, %mailsendlocation%\mailsend1.17b12.exe -to %emailToAddress% -from %emailFromAddress% -ssl -smtp smtp.gmail.com -port 465 -sub "%emailSubject%" -M "%emailMessage%" +cc +bc -q -auth-plain -user "%emailFromAddress%" -pass "%emailPass%",, Hide
+		Run, %mailsendlocation%\mailsend.exe -to %emailToAddress% -from %emailFromAddress% -ssl -smtp smtp.gmail.com -port 465 -sub "%emailSubject%" -M "%emailMessage%" +cc +bc -q -auth-plain -user "%emailFromNoDomain%" -pass "%emailPass%",, Hide
 	}
 
 
