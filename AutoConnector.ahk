@@ -1,6 +1,8 @@
 ;GUI for auto Putty SSH connections.Created by Brandon Galiher.
 
-;encryption functions are at bottom of script.
+;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
+version = v1.0-alpha
+fileread,
 
 ;Parameters for the script listed here
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
