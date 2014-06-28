@@ -435,8 +435,9 @@ gosub createconnection
 return
 
 Createssh:
-GUI, 3:Add, Text,xs section,Connection Name
-gui, 3:add, edit,w300 vsshname,My SSH Connection
+GUI, 3:Add, Text,xs,Connection Name
+gui, 3:add,checkbox,x+226 section vchksshadv gshowsshadv,Show advanced options?
+gui, 3:add, edit,x20 w300 vsshname,My SSH Connection
 GUI, 3:Add, Text,,Username, host and port
 gui, 3:add, edit,w300 vsshserver, user@server:port
 GUI, 3:Add, Text,,SSH password
@@ -455,6 +456,28 @@ gui, 3:add, edit,w300 x+30 password vrdppass,password
 gui, 3:add, button,border x20 y74 vButsave2 gsaverdp, Save Connection
 exit
 
+showsshadv:
+gui, 3:submit,nohide
+if chksshadv = 1
+{
+	gui, 3:font,underline
+	gui, 3:add,text,xs y240,SSH Port Forward Options
+	gui, 3:font,norm
+	gui, 3:add,edit,vlocalsshport,localport
+	gui, 3:add,edit,vremotedestnport,remotelocal:port
+	gui, 3:add,button,gshowsshexample,Show Example
+	exit
+	showsshexample:
+	msgbox,localport is 2222, remotelocal:port is myotherpc:22, and ssh server is sshserver.`nWhen SSH connection is established to sshserver using connection credentials,`nusing localhost:2222 as a server:port connection automatically forwards`nyou from sshserver to another pc on it's local network.`nYou can also use remotelocal:port to specify a port on sshserver.`nAn example of this would be localport 33389 forward to sshserver:3389 for rdp over ssh.
+	return
+}
+else
+{
+	gui, 3:destroy
+	gosub, createconnection
+}
+exit
+
 crereturnmainmenu:
 gui, 2:destroy
 gui, 3:destroy
@@ -467,7 +490,10 @@ Savessh:
 	gui, 3:submit
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\SSH
-	FileAppend, %puttydir%\putty %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	if localsshport
+		FileAppend, %puttydir%\putty %sshserver% -pw %sshpass% -L %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	else
+		FileAppend, %puttydir%\putty %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
