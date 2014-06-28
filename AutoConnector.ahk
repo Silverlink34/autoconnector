@@ -447,7 +447,8 @@ exit
 
 Createrdp:
 gui, 3:add, text,xs section,Connection Name
-gui, 3:add, edit,w300 vrdpname,My RDP Connection
+gui, 3:add,checkbox,x+210 section vchkrdpadv gshowrdpadv,Show advanced options?
+gui, 3:add, edit,x20 w300 vrdpname,My RDP Connection
 gui, 3:add, text,,Server domain or public ip and port
 gui, 3:add, edit,w300 vrdpserver,server:port
 gui, 3:add, text,,Username and Password
@@ -478,6 +479,25 @@ else
 }
 exit
 
+showrdpadv:
+gui, 3:submit,nohide
+if chkrdpadv = 1
+{
+	gui, 3:font,underline
+	gui, 3:add,text,xs y240,RDP Advanced Options
+	gui, 3:font,norm
+	gui, 3:add,checkbox,venabledrives,Redirect all drives/media to remote?
+	gui, 3:add,checkbox,venablesound,Redirect sound from remote?
+	gui, 3:add,checkbox,venablefullscreen,Force full screen?
+	gui, 3:add,checkbox,vdisablewall,Force disable remote wallpaper?
+	exit
+}
+else
+{
+	gui, 3:destroy
+	gosub, createconnection
+}	
+	
 crereturnmainmenu:
 gui, 2:destroy
 gui, 3:destroy
@@ -506,11 +526,19 @@ return
 Saverdp:
 {
 	gui, 3:submit
+	if enabledrives
+		drives =  /drives
+	if enablesound
+		sound = /sound
+	if enablefullscreen
+		fullscrn = /f
+	if disablewall
+		dwall = /nowallpaper
 	filecreatedir, %a_workingdir%\programbin
 	fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\RDP
-	FileAppend, %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass%, %A_workingdir%\SavedConnections\RDP\%rdpname%
+	FileAppend, %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%, %A_workingdir%\SavedConnections\RDP\%rdpname%
 	Fileread, data, %A_workingdir%\SavedConnections\RDP\%rdpname%
 	Filedelete, %A_workingdir%\SavedConnections\RDP\%rdpname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%rdpname%
