@@ -30,23 +30,23 @@ ifexist %a_workingdir%\updater\updatefailed
 }
 else
 {
-	ifnotexist, %a_workingdir%\updater\autoconnector-updater.ahk
+	ifnotexist, %a_workingdir%\updater\autoconnector-updater.exe
 	{
 		progress,10,Downloading Updater..,Update was found.
 		sleep, 3000
 		filecreatedir, %a_workingdir%\updater
 		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
 		fileinstall, unzip.exe,%a_workingdir%\programbin\unzip.exe,1
-		urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.ahk, %a_workingdir%\updater\autoconnector-updater.ahk
+		urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.exe, %a_workingdir%\updater\autoconnector-updater.exe
 		progress,50,Checking if download went smoothly..
 		sleep,5000
-		ifexist, %a_workingdir%\updater\autoconnector-updater.ahk
+		ifexist, %a_workingdir%\updater\autoconnector-updater.exe
 		{
 			progress,100,Running Updater.
 			sleep,2000
 			progress,off
 			fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
-			run, %a_workingdir%\updater\autoconnector-updater.ahk
+			run, %a_workingdir%\updater\autoconnector-updater.exe
 		}
 		else
 		{
@@ -64,7 +64,7 @@ else
 	else
 	{
 		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
-		run, %a_workingdir%\updater\autoconnector-updater.ahk
+		run, %a_workingdir%\updater\autoconnector-updater.exe
 	}
 }
 exit
