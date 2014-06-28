@@ -18,7 +18,10 @@ urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/m
 fileread,currentversion,%a_workingdir%\currentversion
 filedelete,%a_workingdir%\currentversion
 if version = %currentversion%
+{
+	fileremovedir, %a_workingdir%\updater,1
 	gosub configcheck
+}
 else 
 	gosub runupdater
 exit
