@@ -1,9 +1,4 @@
 ;GUI for auto Putty SSH connections.Created by Brandon Galiher.
-
-;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
-version = v1.0-alpha
-fileread,
-
 ;Parameters for the script listed here
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
 #NoTrayIcon ;Kinda self explanatory.
@@ -11,10 +6,35 @@ fileread,
 ;Set icon for program
 menu,tray,icon,%A_ScriptDir%\autoconnector.ico,
 ;Create working dir under My Documents
-filecreatedir, %a_mydocuments%/AutoConnector
-
+filecreatedir, %a_mydocuments%\AutoConnector
 ;Set working directory to created dir ^^
-SetWorkingDir %a_mydocuments%/AutoConnector
+SetWorkingDir %a_mydocuments%\AutoConnector
+
+
+;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
+version = v1.0-alpha
+
+urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/currentversion, %a_workingdir%\currentversion
+fileread,currentversion,%a_workingdir%\currentversion
+filedelete,%a_workingdir%\currentversion
+if version = %currentversion%
+	gosub configcheck
+else 
+	gosub runupdater
+exit
+runupdater:
+ifnotexist, %a_workingdir%\updater\autoconnector-updater.ahk
+{
+	filecreatedir, %a_workingdir%\updater
+	fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
+	fileinstall, unzip.exe,%a_workingdir%\programbin\unzip.exe,1
+	urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.ahk, %a_workingdir%\updater
+	run, %a_workingdir%\updater\autoconnector-updater.ahk
+	exit
+}
+else
+	run, %a_workingdir%\updater\autoconnector-updater.ahk
+exit
 
 ;Check for config.txt options
 configcheck:
