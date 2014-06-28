@@ -261,7 +261,7 @@ ifequal, skipintro, 1
 {
 	fileappend, skipenabled, %a_workingdir%\config.txt
 }
-gui, 2:show, w768 h485
+gui, 2:show, w768 h520
 gui, 2:font, s16,
 GUI, 2:Add, Text,,Please create a new connection or choose a saved connection.
 ifexist C:\Program Files (x86)\PuTTY
@@ -389,8 +389,8 @@ else
 	
 createconnectionstart:
 gui, 2:submit
-gui, 3:show, w768 h485
-gui, 3:font, s16,
+gui, 3:show, w768 h520
+gui, 3:font, s14,
 GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`nCredentials are saved and encrypted immediately.
 gui, 3:add,button,border x230 vreturnmainmenu gcrereturnmainmenu,Cancel
 gui, 3:add, text,xs y103,_________________________________________________________________________________
@@ -438,11 +438,13 @@ Createssh:
 GUI, 3:Add, Text,xs,Connection Name
 gui, 3:add,checkbox,x+226 section vchksshadv gshowsshadv,Show advanced options?
 gui, 3:add, edit,x20 w300 vsshname,My SSH Connection
-GUI, 3:Add, Text,,Username, host and port
-gui, 3:add, edit,w300 vsshserver, user@server:port
+GUI, 3:Add, Text,,Username and host
+gui, 3:add, edit,w300 vsshserver, user@server
+GUI, 3:Add, Text,,Specify a port if not default port 22
+gui, 3:add, edit,w50 vsshport,22
 GUI, 3:Add, Text,,SSH password
 gui, 3:add, edit,password w240 vsshpass,
-gui, 3:add, button,border x20 y74 vButsave1 gsavessh, Save Connection
+gui, 3:add, button,border x20 y71 vButsave1 gsavessh, Save Connection
 exit
 
 Createrdp:
@@ -454,7 +456,7 @@ gui, 3:add, edit,w300 vrdpserver,server:port
 gui, 3:add, text,,Username and Password
 gui, 3:add, edit,w300 vrdpuser,username
 gui, 3:add, edit,w300 x+30 password vrdppass,password
-gui, 3:add, button,border x20 y74 vButsave2 gsaverdp, Save Connection
+gui, 3:add, button,border x20 y71 vButsave2 gsaverdp, Save Connection
 exit
 
 showsshadv:
@@ -511,9 +513,9 @@ Savessh:
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\SSH
 	if localsshport
-		FileAppend, %puttydir%\putty %sshserver% -pw %sshpass% -R %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
+		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass% -R %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
 	else
-		FileAppend, %puttydir%\putty %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
+		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
