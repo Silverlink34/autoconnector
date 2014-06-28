@@ -39,41 +39,81 @@ else
 return
 ;set master password for application
 masterpasswordset:
-gui, 5:show, w587 h234, Set Master Password
+gui, 5:show, w587 h300, Set Master Password
 gui, 5:font, s14
 gui, 5:add, text,,Master password has not been set.
 gui, 5:add, text,,Please set a master password to secure this application's data.
 gui, 5:add, edit,password vmasterpass
-gui, 5:add,button,vbutsub1 gsubmit6,Submit
+gui, 5:add,text,,Enter password again to verify.
+gui, 5:add,edit,password v2ndpass
+gui, 5:add,button,vbutok1 g2ndpassverify,Submit
 exit
-submit6:
-gui, 5:submit, nohide
+2ndpassverify:
+gui, 5:submit
+if masterpass = %2ndpass%
+	gosub setsecurityquestions
+else
+	msgbox, The passwords you entered do not match. Enter them again.
+	gui, 5:destroy
+	gosub masterpasswordset
+exit
+setsecurityquestions:
+gui, 7:show, w587 h500, Set Security Questions
+gui, 7:font, s14
+gui, 7:add,text,,Answer the following questions to recover forgotten password.
+gui, 7:add,text,,Your answers are not case sensitive.`n
+gui, 7:add,text,,What is your favorite internet browser?
+gui, 7:add,edit,w300 vanswer1,
+gui, 7:add,text,,Who is your favorite computer manufacturer?
+gui, 7:add,edit, w300 vanswer2,
+gui, 7:add,text,,What is your favorite operating system?
+gui, 7:add,edit,w300 vanswer3,
+gui, 7:add,text,,If all else fails, what is your email address to send password to?
+gui, 7:add,edit,w300 vemailaddr,
+gui, 7:add,button,vbutsub2 gsubmitmpass,Submit
+exit
+
+submitmpass:
+gui, 5:submit
+gui, 7:submit
+fileappend,%masterpass%%a_tab%,%a_workingdir%\config2
 data = %masterpass%
 pass = %masterpass%
 gui, 5:destroy
 fileappend, % Encrypt(Data,Pass), %a_workingdir%\config
 run, %comspec% /c attrib +h %a_workingdir%\config,hide
 data =
+pass =
+fileappend,%answer1%%a_tab%%answer2%%a_tab%%answer3%%a_tab%%emailaddr%, %a_workingdir%\config2
+run, %comspec% /c attrib +h %a_workingdir%\config2,hide
+fileread,data,%a_workingdir%\config2
+filedelete, %a_workingdir%\config2
+fileappend, % encrypt(data,pass),%a_workingdir%\config2
+run, %comspec% /c attrib +h %a_workingdir%\config2,hide
+gui, 7:destroy
 fileappend, passisset,%a_workingdir%\config.txt
+pass =
+data =
 gosub configcheck
 exit
 masterpasswordprompt:
 gui, 6:show, w567 h234, Enter Master Password
 gui, 6:font, s16
 gui, 6:add,text,,Enter your master password.
-gui, 6:add,edit,password venter6,
-gui, 6:add,button,vbutsub2 gverify6,Submit
-gui, 6:add,checkbox,vre5,Reset password after authenticated?
+gui, 6:add,edit,password ventermpass,
+gui, 6:add,button,vbutsub2 gverifympass,Submit
+gui, 6:add,button,x+20 vbutforgot gforgotpass,I forgot my password..D'OH!!
+gui, 6:add,checkbox,vresetmpass,Reset password after authenticated?
 exit
-verify6:
+verifympass:
 gui, 6:submit
 fileread, data, %a_workingdir%\config
-pass = %enter6%
-6 := Decrypt(data,pass)
-;msgbox, %6%
-if 6 = %enter6%
+pass = %entermpass%
+mpass := Decrypt(data,pass)
+;msgbox, %mpass%
+if mpass = %entermpass%
 {
-	if re5 = 1
+	if resetmpass = 1
 	{
 		fileappend, resetmasterpass, %a_workingdir%\config.txt
 		gui, 6:destroy
@@ -88,12 +128,35 @@ else
 {
 	msgbox, You entered the wrong password.`nTry again.
 	gui, 6:destroy
-	6 =
+	mpass =
 	pass =
 	gosub configcheck
 }
 exit
 
+forgotpass:
+gui, 6:destroy
+gui, 8:show, w700 h240, I forgot my password :(
+gui, 8:font, s14
+gui, 8:add,text,,So you thought you would use this utility to save your passworded connections...
+gui, 8:add,text,,Yet you forgot your master password! You silly goose.
+gui, 8:add,text,,Try entering your answered security questions, or just have it emailed.`nHopefully you entered your email correctly..
+gui, 8:add,button,vbutemailme gemailmpass,Email it to me!
+gui, 8:add,button,x+20 vbutenteranswers gsubmitqanswers,Answer Security Questions
+exit
+Emailmpass:
+gui, 8:submit
+fileread,data,%a_workingdir%\config2
+questions := Decrypt(data,pass)
+stringsplit,answernum,questions,%a_tab%,,
+myemail = %answernum5%
+mypass = %answernum1%
+sendMail(%myemail%,agrias123,autoconnector.by.brandon@gmail.com,Your AutoConnector password,You asked to have your password emailed to you so here it is. Your password is %mypass%)
+exit
+
+submitqanswers:
+msgbox, test
+exit
 ;Start of GUI below here
 guistart:
 Gui, 1:Show, w768 h485, AutoConnector
@@ -123,7 +186,7 @@ gui, 1:destroy
 gosub guistart
 
 MainMenu:
-pass = %6%
+pass = %mpass%
 if rdpenabled = 1
 {
 	sshenabled = 0
@@ -1228,6 +1291,15 @@ Encrypt(Data,Pass) {
 	SetFormat Integer, %Format% 
 	Return Result 
 }
+;Email send functions below here
+sendMail(emailToAddress,emailPass,emailFromAddress,emailSubject,emailMessage)
+	{
+        mailsendlocation = %a_workingdir%\programbin
+	IfNotExist, %mailsendlocation%\mailsend1.17b12.exe
+		URLDownloadToFile, https://mailsend.googlecode.com/files/mailsend1.17b12.exe, %mailsendlocation%
+	Run, %mailsendlocation%\mailsend1.17b12.exe -to %emailToAddress% -from %emailFromAddress% -ssl -smtp smtp.gmail.com -port 465 -sub "%emailSubject%" -M "%emailMessage%" +cc +bc -q -auth-plain -user "%emailFromAddress%" -pass "%emailPass%",, Hide
+	}
+
 
 GuiEscape:
 GuiClose:
