@@ -12,7 +12,7 @@ SetWorkingDir %a_mydocuments%\AutoConnector
 
 
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
-version = v1.0-alpha
+version = v1.1-alpha
 
 urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/currentversion, %a_workingdir%\currentversion
 fileread,currentversion,%a_workingdir%\currentversion
@@ -25,11 +25,33 @@ exit
 runupdater:
 ifnotexist, %a_workingdir%\updater\autoconnector-updater.ahk
 {
+	progress,10,Downloading Updater..,Update was found.
+	sleep, 3000
 	filecreatedir, %a_workingdir%\updater
 	fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
 	fileinstall, unzip.exe,%a_workingdir%\programbin\unzip.exe,1
-	urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.ahk, %a_workingdir%\updater
-	run, %a_workingdir%\updater\autoconnector-updater.ahk
+	urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.ahk, %a_workingdir%\updater\autoconnector-updater.ahk
+	progress,50,Checking if download went smoothly..
+	sleep,5000
+	ifexist, %a_workingdir%\updater\autoconnector-updater.ahk
+	{
+		progress,100,Running Updater.
+		sleep,2000
+		progress,off
+		run, %a_workingdir%\updater\autoconnector-updater.ahk
+	}
+	else
+	{
+		progress,off
+			if updatefail = 1
+			{
+				msgbox, Unable to update at this time. Running AutoConnector, out of date.
+				gosub configcheck
+			}
+		msgbox, Could not download the updater in a timely manner. Re-trying 1 more time.
+		updatefail = 1
+		gosub runupdater
+	}	
 	exit
 }
 else
