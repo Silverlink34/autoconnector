@@ -6,7 +6,8 @@
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
 #NoTrayIcon ;Kinda self explanatory.
 #NoEnv ;supposed to make compatibility better
-
+;Set icon for program
+menu,tray,icon,Autoconnector.ico,,
 ;Create working dir under My Documents
 filecreatedir, %a_mydocuments%/AutoConnector
 
@@ -38,56 +39,56 @@ else
 return
 ;set master password for application
 masterpasswordset:
-gui, setmpass:show, w587 h234, Set Master Password
-gui, setmpass:font, s14
-gui, setmpass:add, text,,Master password has not been set.
-gui, setmpass:add, text,,Please set a master password to secure this application's data.
-gui, setmpass:add, edit,password vmasterpass
-gui, setmpass:add,button,vbutsub1 gsubmitmpass,Submit
+gui, 5:show, w587 h234, Set Master Password
+gui, 5:font, s14
+gui, 5:add, text,,Master password has not been set.
+gui, 5:add, text,,Please set a master password to secure this application's data.
+gui, 5:add, edit,password vmasterpass
+gui, 5:add,button,vbutsub1 gsubmit6,Submit
 exit
-submitmpass:
-gui, setmpass:submit, nohide
+submit6:
+gui, 5:submit, nohide
 data = %masterpass%
 pass = %masterpass%
-gui, setmpass:destroy
+gui, 5:destroy
 fileappend, % Encrypt(Data,Pass), %a_workingdir%\config
-run, %comspec% /c attrib +h %a_workingdir%\config
+run, %comspec% /c attrib +h %a_workingdir%\config,hide
 data =
 fileappend, passisset,%a_workingdir%\config.txt
 gosub configcheck
 exit
 masterpasswordprompt:
-gui, mpass:show, w567 h234, Enter Master Password
-gui, mpass:font, s16
-gui, mpass:add,text,,Enter your master password.
-gui, mpass:add,edit,password ventermpass,
-gui, mpass:add,button,vbutsub2 gverifympass,Submit
-gui, mpass:add,checkbox,vresetmpass,Reset password after authenticated?
+gui, 6:show, w567 h234, Enter Master Password
+gui, 6:font, s16
+gui, 6:add,text,,Enter your master password.
+gui, 6:add,edit,password venter6,
+gui, 6:add,button,vbutsub2 gverify6,Submit
+gui, 6:add,checkbox,vre5,Reset password after authenticated?
 exit
-verifympass:
-gui, mpass:submit
+verify6:
+gui, 6:submit
 fileread, data, %a_workingdir%\config
-pass = %entermpass%
-mpass := Decrypt(data,pass)
-;msgbox, %mpass%
-if mpass = %entermpass%
+pass = %enter6%
+6 := Decrypt(data,pass)
+;msgbox, %6%
+if 6 = %enter6%
 {
-	if resetmpass = 1
+	if re5 = 1
 	{
 		fileappend, resetmasterpass, %a_workingdir%\config.txt
-		gui, mpass:destroy
+		gui, 6:destroy
 		gosub configcheck
 		pass =
 	}
-	gui, mpass:destroy
+	gui, 6:destroy
 	pass =
 	gosub passwordverified
 }
 else
 {
 	msgbox, You entered the wrong password.`nTry again.
-	gui, mpass:destroy
-	mpass =
+	gui, 6:destroy
+	6 =
 	pass =
 	gosub configcheck
 }
@@ -122,7 +123,7 @@ gui, 1:destroy
 gosub guistart
 
 MainMenu:
-pass = %mpass%
+pass = %6%
 if rdpenabled = 1
 {
 	sshenabled = 0
