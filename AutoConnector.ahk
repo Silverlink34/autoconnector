@@ -13,17 +13,38 @@ SetWorkingDir %a_mydocuments%\AutoConnector
 
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
 version = v1.1-alpha
-
+progress,10,Checking the currentversion file on GitHub..,Checking for updates..
+sleep, 1000
 urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/currentversion, %a_workingdir%\currentversion
+if errorlevel
+{
+	progress, off
+	msgbox, Could not check for updates. Your interwebs connection isn't working..Press OK to continue.
+	gosub configcheck
+}
+progress,25
 fileread,currentversion,%a_workingdir%\currentversion
+progress,50,Reading currentversion file..
+sleep,1000
 filedelete,%a_workingdir%\currentversion
+progress,75,Deleting currentversion file..
+sleep, 1000
 if version = %currentversion%
 {
+	progress,100,,AutoConnector is up-to-date.
+	sleep,1000
+	progress,off
 	fileremovedir, %a_workingdir%\updater,1
 	gosub configcheck
 }
 else 
+{
+	progress,100,,Update found. Running updater application.
+	sleep, 1000
+	progress,off
+	fileremovedir, %a_workingdir%\updater,1
 	gosub runupdater
+}
 exit
 runupdater:
 ifexist %a_workingdir%\updater\updatefailed
@@ -35,17 +56,13 @@ else
 {
 	ifnotexist, %a_workingdir%\updater\autoconnector-updater.exe
 	{
-		progress,10,Downloading Updater..,Update was found.
-		sleep, 3000
 		filecreatedir, %a_workingdir%\updater
 		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
 		fileinstall, unzip.exe,%a_workingdir%\programbin\unzip.exe,1
 		urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.exe, %a_workingdir%\updater\autoconnector-updater.exe
-		progress,50,Checking if download went smoothly..
 		sleep,5000
 		ifexist, %a_workingdir%\updater\autoconnector-updater.exe
 		{
-			progress,100,Running Updater.
 			sleep,2000
 			progress,off
 			fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
@@ -53,13 +70,12 @@ else
 		}
 		else
 		{
-			progress,off
 				if updatefail = 1
 				{
-					msgbox, Unable to update at this time. Running AutoConnector, out of date.
+					msgbox, Unable to update at this time. Running AutoConnector out of date.
 					gosub configcheck
 				}
-			msgbox, Could not download the updater in a timely manner. Re-trying 1 more time.
+			msgbox,There was a problem connecting to GitHub.com. Re-trying 1 more time.
 			updatefail = 1
 			gosub runupdater
 		}	
@@ -75,15 +91,6 @@ exit
 ;Check for config.txt options
 configcheck:
 fileread, config, config.txt
-ifinstring, config, resetmasterpass
-{
-	filedelete, %a_workingdir%\config.txt
-	filedelete, %a_workingdir%\config
-	stringreplace,config,config,passisset,,all
-	stringreplace,config,config,resetmasterpass,,all
-	fileappend,%config%,%a_workingdir%\config.txt
-	gosub configcheck
-}
 ifnotinstring, config, passisset
 	gosub masterpasswordset
 else
@@ -161,7 +168,6 @@ gui, 6:add,text,,Enter your master password.
 gui, 6:add,edit,password ventermpass,
 gui, 6:add,button,vbutsub2 gverifympass,Submit
 gui, 6:add,button,x+20 vbutforgot gforgotpass,I forgot my password..D'OH!!
-gui, 6:add,checkbox,vresetmpass,Reset password after authenticated?
 exit
 verifympass:
 gui, 6:submit
@@ -171,13 +177,6 @@ mpass := Decrypt(data,pass)
 ;msgbox, %mpass%
 if mpass = %entermpass%
 {
-	if resetmpass = 1
-	{
-		fileappend, resetmasterpass, %a_workingdir%\config.txt
-		gui, 6:destroy
-		gosub configcheck
-		pass =
-	}
 	gui, 6:destroy
 	pass =
 	gosub passwordverified
@@ -299,7 +298,7 @@ gosub guistart
 }
 
 Help:
-msgbox, Some things to note:`nYou can transport your saved connections simply by copying the Saved Connections folder around. Please note that all of your connections are encrypted with your master password, so if you set a master password that is different they will not load.
+msgbox, Some things to note:`n`n-You can transport your saved connections simply by copying the Saved Connections folder around. Please note that all of your connections are encrypted with your master password, so if you set a master password that is different they will not load.`n-Deleting config files out of the My Documents\AutoConnector WILL REMOVE your ability to recover your password. 
 gui, 1:destroy
 gosub guistart
 
