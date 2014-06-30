@@ -14,7 +14,7 @@ SetWorkingDir %a_mydocuments%\AutoConnector
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
 version = v1.1-alpha
 progress,10,Checking the currentversion file on GitHub..,Checking for updates..
-sleep, 1000
+sleep, 500
 urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/currentversion, %a_workingdir%\currentversion
 if errorlevel
 {
@@ -25,14 +25,14 @@ if errorlevel
 progress,25
 fileread,currentversion,%a_workingdir%\currentversion
 progress,50,Reading currentversion file..
-sleep,1000
+sleep, 500
 filedelete,%a_workingdir%\currentversion
 progress,75,Deleting currentversion file..
-sleep, 1000
+sleep, 500
 if version = %currentversion%
 {
 	progress,100,,AutoConnector is up-to-date.
-	sleep,1000
+	sleep, 500
 	progress,off
 	fileremovedir, %a_workingdir%\updater,1
 	gosub configcheck
@@ -40,7 +40,7 @@ if version = %currentversion%
 else 
 {
 	progress,100,,Update found. Running updater application.
-	sleep, 1000
+	sleep, 500
 	progress,off
 	fileremovedir, %a_workingdir%\updater,1
 	gosub runupdater
@@ -104,8 +104,9 @@ else
 return
 ;set master password for application
 masterpasswordset:
-gui, 5:show, w587 h280, Set Master Password
+gui, 5:show, w587 h250, Set Master Password
 gui, 5:font, s14
+guicontrol, 5:focus,masterpass
 gui, 5:add, text,,Master password has not been set.
 gui, 5:add, text,,Please set a master password to secure this application's data.
 gui, 5:add, edit,password vmasterpass
@@ -162,11 +163,12 @@ data =
 gosub configcheck
 exit
 masterpasswordprompt:
-gui, 6:show, w567 h234, Enter Master Password
+gui, 6:show, w567 h170, Enter Master Password
 gui, 6:font, s16
 gui, 6:add,text,,Enter your master password.
-gui, 6:add,edit,password ventermpass,
-gui, 6:add,button,vbutsub2 gverifympass,Submit
+gui, 6:add,edit,password ventermpass
+guicontrol, 6:focus,entermpass
+gui, 6:add,button,vbutsub2 default gverifympass,Submit
 gui, 6:add,button,x+20 vbutforgot gforgotpass,I forgot my password..D'OH!!
 exit
 verifympass:
@@ -200,7 +202,12 @@ gui, 8:add,text,,Yet you forgot your master password! You silly goose.
 gui, 8:add,text,,Try entering your answered security questions, or just have it emailed.`nHopefully you entered your email correctly..
 gui, 8:add,button,vbutemailme gemailmpass,Email it to me!
 gui, 8:add,button,x+20 vbutenteranswers gsubmitqanswers,Answer Security Questions
+gui, 8:add,button,x+20 vbutreturn2mpprompt greturn2mpprompt, Go Back
 exit
+
+return2mpprompt:
+gui, 8:destroy
+gosub masterpasswordprompt
 
 Emailmpass:
 gui, 8:submit
@@ -283,7 +290,7 @@ GUI, 1:Add, Text,,This application will quickly allow access to remote devices.
 GUI, 1:Add, Text,,Protocols supported are: SSH, RDP, Telnet and VNC.
 GUI, 1:Add, Text,,Saved usernames and passwords are encrypted with 128bit encryption method.
 GUI, 1:Add, Text,,All used files are stored under My Documents/AutoConnector.
-gui, 1:add, button, vButok1 gMainMenu, OK
+gui, 1:add, button, vButok1 gMainMenu default, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
 gui, 1:add, button, gHelp, Help/things to note
 ;Option to skip intro/disclaimer
@@ -314,6 +321,7 @@ else
 mainmenustart:
 ;msgbox, ssh=%sshenabled% rdp=%rdpenabled%
 gui, 1:submit
+gui, 1:destroy
 ifequal, skipintro, 1
 {
 	fileappend, skipenabled, %a_workingdir%\config.txt
@@ -335,31 +343,33 @@ ifnotinstring, puttydir, Program
 	puttydir = %A_WorkingDir%\programbin
 	fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
 }
-gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
-gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
-gui, 2:add, text,xs,_________________________________________________________________________________
-if sshenabled = 1
-	gui, 2:add, radio,section checked1 vsshconn gcheckssh,SSH
-else
-	gui, 2:add, radio,section vsshconn gcheckssh,SSH
-if rdpenabled = 1
-	gui, 2:add, radio,ys checked1 vrdpconn gcheckrdp,RDP
-else
-	gui, 2:add, radio,ys vrdpconn gcheckrdp,RDP
-ifequal, checkedbutton,telnet
-	gui, 2:add, radio,ys checked1 vtelnetconn,Telnet
-else
-	gui, 2:add, radio,ys vtelnetconn,Telnet
-ifequal, checkedbutton,vnc
-	gui, 2:add, radio, ys checked1 vvncconn,VNC
-else
-	gui, 2:add, radio,ys vvncconn,VNC
-gui, 2:add, text,xs section,_________________________________________________________________________________
-gui, 2:submit, nohide
-if sshenabled = 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+gui, 2:add,tab, w725 h450 vconnectionselect,SSH|RDP|Telnet|VNC
+gui, 2:add,listbox,vSSHConnections R15
+gui, 2:add,updown
+gui, 2:tab,RDP
+gui, 2:add,listbox,vRDPConnections R15
+gui, 2:add,updown
+gui, 2:tab,Telnet
+gui, 2:add,text,,This protocol has not been created yet, it is in progress.
+gui, 2:tab,VNC
+gui, 2:add,text,,This protocol has not been created yet, it is in progress.
+gui, 2:tab
+gui, 2:submit,nohide
+if connectionselect = SSH
 	gosub detectssh
-if rdpenabled = 1
-	gosub detectrdp
+;gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
+;gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
+;gui, 2:add, radio,section checked1 vsshconn gcheckssh,SSH
+;gui, 2:add, radio,section vsshconn gcheckssh,SSH
+;gui, 2:add, radio,ys checked1 vrdpconn gcheckrdp,RDP
+;gui, 2:add, radio,ys vrdpconn gcheckrdp,RDP
+;gui, 2:add, radio,ys checked1 vtelnetconn,Telnet
+;gui, 2:add, radio,ys vtelnetconn,Telnet
+;gui, 2:add, radio, ys checked1 vvncconn,VNC
+;gui, 2:add, radio,ys vvncconn,VNC
+exit
+testlabel:
+msgbox, message
 exit
 ;Detect existing/saved SSH connections and create buttons for them
 Checkssh:
@@ -385,22 +395,7 @@ ifexist %a_workingdir%\SavedConnections\SSH
 	sleep, 200
 	Loop, read, %A_workingdir%\tmp\sshlist
 	{
-		if a_index = 1
-		{
-			SSH1 = %a_loopreadline%
-			gui, 2:add, button,vbutssh1 section gSSH1, %a_loopreadline%
-			continue
-		}
-		if a_index = 6
-		{
-			SSH6 = %a_loopreadline%
-			gui, 2:add, button,vbutssh6 ys gSSH6, %a_loopreadline%
-			continue
-		}
-		SSH%a_index% = %a_loopreadline%
-		gui, 2:add, button,vbutssh%a_index% gSSH%a_index%, %a_loopreadline%
-		if a_index = 10
-			break
+		guicontrol, 2:,sshconnections,%a_loopreadline%|
 	}
 	Fileremovedir, tmp, 1	
 }
