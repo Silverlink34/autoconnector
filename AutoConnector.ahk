@@ -354,7 +354,15 @@ gui, 2:add,listbox,vSSHConnections R13
 gui, 2:add,updown,section
 gui, 2:add, Button,w225 border gCreateconnection, Create Connection
 gui, 2:add,button,ys w165 border vbutsshconn,Connect
+gui, 2:add,button,w165 vbutsshedit,Edit Connection
+gui, 2:add,button,w165 vbutsshdel,Delete Connection
+gui, 2:add,button,w165 vbutsftp,Launch SFTP FileZilla
+gui, 2:add,button,w165 vbutsshadv,Show/Hide Advanced Options
 guicontrol, 2:disable,butsshconn
+guicontrol, 2:disable,butsshedit
+guicontrol, 2:disable,butsshdel
+guicontrol, 2:disable,butsftp
+guicontrol, 2:disable,butsshadv
 gui, 2:tab,RDP
 gui, 2:add,listbox,vRDPConnections R13
 gui, 2:add,updown
