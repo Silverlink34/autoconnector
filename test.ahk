@@ -1,10 +1,20 @@
-Gui, Show, w768 h700, Test Gui
-gui,font,s16
-gui,add,tab2,,tab1|tab2
-gui, add,listbox,vmylistbox wrap,op1|op2|op3
-gui,add,updown,vmyupdown wrap
+Gui, Add, Tab2,, Tab1|Tab2|Tab3|Tab4
+
+Gui Show
+
+SetTimer, GetTab, 100
+
+Return
 
 
 
-exit
-exitapp
+GetTab:
+ControlGet, TabNumber, Tab,, SysTabControl321,A
+
+ToolTip, You are on Tab %TabNumber%.`nClick another one.
+
+Return
+
+
+
+ESC::ExitApp	; <-- Press escape to exit.

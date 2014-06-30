@@ -289,10 +289,10 @@ GUI, 1:Add, Text,,Thank you for using Brandon's AutoConnector.
 GUI, 1:Add, Text,,This application will quickly allow access to remote devices.
 GUI, 1:Add, Text,,Protocols supported are: SSH, RDP, Telnet and VNC.
 GUI, 1:Add, Text,,Saved usernames and passwords are encrypted with 128bit encryption method.
-GUI, 1:Add, Text,,All used files are stored under My Documents/AutoConnector.
 gui, 1:add, button, vButok1 gMainMenu default, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
 gui, 1:add, button, gHelp, Help/things to note
+gui, 1:add,button,gviewsource,View Source on Github
 ;Option to skip intro/disclaimer
 gui, 1:add, checkbox, vskipintro, Skip this screen on next run?
 exit
@@ -305,7 +305,13 @@ gosub guistart
 }
 
 Help:
-msgbox, Some things to note:`n`n-You can transport your saved connections simply by copying the Saved Connections folder around. Please note that all of your connections are encrypted with your master password, so if you set a master password that is different they will not load.`n-Deleting config files out of the My Documents\AutoConnector WILL REMOVE your ability to recover your password. 
+msgbox, Some things to note:`n`n-All used files are stored under My Documents/AutoConnector.`n`n-You can transport your saved connections simply by copying the Saved Connections folder around. Please note that all of your connections are encrypted with your master password, so if you set a master password that is different they will not load.`n`n-Deleting config files out of the My Documents\AutoConnector WILL REMOVE your ability to recover your password. 
+gui, 1:destroy
+gosub guistart
+
+viewsource:
+run, https://github.com/silverlink34/autoconnector
+winactivate, silverlink34/autoconnector
 gui, 1:destroy
 gosub guistart
 
@@ -343,20 +349,25 @@ ifnotinstring, puttydir, Program
 	puttydir = %A_WorkingDir%\programbin
 	fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
 }
-gui, 2:add,tab, w725 h450 vconnectionselect,SSH|RDP|Telnet|VNC
-gui, 2:add,listbox,vSSHConnections R15
+gui, 2:add,tab, w725 h450 vconnectionselect gcontrolget,SSH|RDP|Telnet|VNC
+gui, 2:add,listbox,vSSHConnections R13
 gui, 2:add,updown
+gui, 2:add, Button,w225 border gCreateconnection, Create Connection
 gui, 2:tab,RDP
-gui, 2:add,listbox,vRDPConnections R15
+gui, 2:add,listbox,vRDPConnections R13
 gui, 2:add,updown
+gui, 2:add, Button,w225 border gCreateconnection, Create Connection
 gui, 2:tab,Telnet
 gui, 2:add,text,,This protocol has not been created yet, it is in progress.
 gui, 2:tab,VNC
 gui, 2:add,text,,This protocol has not been created yet, it is in progress.
 gui, 2:tab
-gui, 2:submit,nohide
-if connectionselect = SSH
+controlget:
+ControlGet, TabNumber, Tab,, SysTabControl321,A
+if tabnumber = 1
 	gosub detectssh
+if tabnumber = 2
+	gosub detectrdp
 ;gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
 ;gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
 ;gui, 2:add, radio,section checked1 vsshconn gcheckssh,SSH
@@ -368,25 +379,7 @@ if connectionselect = SSH
 ;gui, 2:add, radio, ys checked1 vvncconn,VNC
 ;gui, 2:add, radio,ys vvncconn,VNC
 exit
-testlabel:
-msgbox, message
-exit
-;Detect existing/saved SSH connections and create buttons for them
-Checkssh:
-{
-gui, 2:destroy
-sshenabled = 1
-rdpenabled = 0
-gosub mainmenu
-}
-return
-Checkrdp:
-{
-gui, 2:destroy
-rdpenabled = 1
-gosub mainmenu
-}
-return
+
 Detectssh:
 ifexist %a_workingdir%\SavedConnections\SSH
 {	
@@ -409,22 +402,7 @@ ifexist %a_workingdir%\SavedConnections\RDP
 	sleep, 200
 	Loop, read, %A_workingdir%\tmp\rdplist
 	{
-		if a_index = 1
-		{	
-			RDP1 = %a_loopreadline%
-			gui, 2:add, button,vbutrdp1 section grdp1, %a_loopreadline%
-			continue
-		}
-		if a_index = 6
-		{
-			RDP6 = %a_loopreadline%
-			gui, 2:add, button,vbutrdp6 ys grdp6, %a_loopreadline%
-			continue
-		}
-		RDP%a_index% = %a_loopreadline%
-		gui, 2:add, button,vbutrdp%a_index% grdp%a_index%, %a_loopreadline%
-		if a_index = 10
-			break
+		guicontrol, 2:,rdpconnections,%a_loopreadline%|
 	}
 	Fileremovedir, tmp, 1	
 }
