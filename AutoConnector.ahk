@@ -351,8 +351,10 @@ ifnotinstring, puttydir, Program
 }
 gui, 2:add,tab, w725 h450 vconnectionselect gcontrolget,SSH|RDP|Telnet|VNC
 gui, 2:add,listbox,vSSHConnections R13
-gui, 2:add,updown
+gui, 2:add,updown,section
 gui, 2:add, Button,w225 border gCreateconnection, Create Connection
+gui, 2:add,button,ys w165 border vbutsshconn,Connect
+guicontrol, 2:disable,butsshconn
 gui, 2:tab,RDP
 gui, 2:add,listbox,vRDPConnections R13
 gui, 2:add,updown
@@ -382,13 +384,15 @@ exit
 
 Detectssh:
 ifexist %a_workingdir%\SavedConnections\SSH
+controlget,listedssh,list,,Listbox1,A
 {	
 	FileCreateDir, tmp
 	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\SSH > %a_workingdir%\tmp\sshlist,, hide
 	sleep, 200
 	Loop, read, %A_workingdir%\tmp\sshlist
 	{
-		guicontrol, 2:,sshconnections,%a_loopreadline%|
+		ifnotinstring, listedssh,%a_loopreadline% ;keeps listbox from duplicating entries
+			guicontrol, 2:,sshconnections,%a_loopreadline%|
 	}
 	Fileremovedir, tmp, 1	
 }
@@ -396,13 +400,15 @@ Return
 
 Detectrdp:
 ifexist %a_workingdir%\SavedConnections\RDP
+controlget,listedrdp,list,,Listbox2,A
 {	
 	FileCreateDir, tmp
 	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\RDP > %a_workingdir%\tmp\rdplist,, hide
 	sleep, 200
 	Loop, read, %A_workingdir%\tmp\rdplist
 	{
-		guicontrol, 2:,rdpconnections,%a_loopreadline%|
+		ifnotinstring,listedrdp,%a_loopreadline%
+			guicontrol, 2:,rdpconnections,%a_loopreadline%|
 	}
 	Fileremovedir, tmp, 1	
 }
