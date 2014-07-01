@@ -344,7 +344,7 @@ gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC
 gui, 2:add,listbox,vSSHConnections R13 gsshselected
 gui, 2:add,updown,section
 gui, 2:add, Button,w224 border vbutcreatessh gCreatesshconnection, Create Connection
-gui, 2:add,button,ys w165 border vbutsshconn section,Connect
+gui, 2:add,button,ys w165 border vbutsshconn gconnecttossh section,Connect
 gui, 2:add,button,w165 vbutsshedit,Edit Connection
 gui, 2:add,button,w165 vbutsshdel,Delete Connection
 gui, 2:add,button,w165 vbutsftp,Launch SFTP FileZilla
@@ -370,8 +370,8 @@ if tabnumber = 1
 if tabnumber = 2
 	gosub detectrdp
 sshselected:
-controlget,selectedssh,choice,,listbox1,A
-	if selectedssh
+controlget,sshisselected,choice,,listbox1,A
+	if sshisselected
 	{
 		guicontrol, 2:enable,butsshconn
 		guicontrol, 2:enable,butsshedit
@@ -409,7 +409,10 @@ controlget,listedssh,list,,Listbox1,A
 	Loop, read, %A_workingdir%\tmp\sshlist
 	{
 		ifnotinstring, listedssh,%a_loopreadline% ;keeps listbox from duplicating entries
+		{	
+			SSH%a_index% = %a_loopreadline%
 			guicontrol, 2:,sshconnections,%a_loopreadline%|
+		}
 	}
 	Fileremovedir, tmp, 1	
 }
@@ -443,75 +446,102 @@ guicontrol, 2:hide,butsshedit
 guicontrol, 2:hide,butsshdel
 guicontrol, 2:hide,butsftp
 guicontrol, 2:hide,butsshadv
-gui, 2:font,underline
-gui, 2:add,text, ys x420 section,New Connection
-guicontrol, 2:hide,static4
-guicontrol, 2:show,static4
-gui, 2:font,norm s14
-gui, 2:font,underline
-GUI, 2:Add, Text,xs x300,Connection Name
-gui, 2:font,norm
-guicontrol, 2:hide,static5
-guicontrol, 2:show,static5
-gui, 2:add, edit,w300  vsshname,My SSH Connection
-gui, 2:font,underline
-GUI, 2:Add, Text,,Username and host
-gui, 2:font,norm
-guicontrol, 2:hide,static6
-guicontrol, 2:show,static6
-gui, 2:add, edit,w300 vsshserver, user@server
-gui, 2:font,underline
-GUI, 2:Add, Text,,Specify a port if not default port 22
-gui, 2:font,norm
-guicontrol, 2:hide,static7
-guicontrol, 2:show,static7
-gui, 2:add, edit,w50 vsshport,22
-gui, 2:font,underline
-GUI, 2:Add, Text,,SSH password
-gui, 2:font,norm
-guicontrol, 2:hide,static8
-guicontrol, 2:show,static8
-gui, 2:add, edit,password w240 vsshpass,
-gui, 2:add, button,border x42 y430 w112 vButsave1 gsavessh, Save
-gui, 2:add, button,border x154 y430 w112 vreturnssh,Cancel
+if createsshwasclicked = 1
+{
+	guicontrol, 2:show,static4
+	guicontrol, 2:show,static5
+	guicontrol, 2:show,edit1
+	guicontrol, 2:show,static6
+	guicontrol, 2:show,edit2
+	guicontrol, 2:show,static7
+	guicontrol, 2:show,edit3
+	guicontrol, 2:show,static8
+	guicontrol, 2:show,edit4
+	guicontrol, 2:show,button7
+	guicontrol, 2:show,button8
+	guicontrol, 2:enable,static4
+	guicontrol, 2:enable,static5
+	guicontrol, 2:enable,edit1
+	guicontrol, 2:enable,static6
+	guicontrol, 2:enable,edit2
+	guicontrol, 2:enable,static7
+	guicontrol, 2:enable,edit3
+	guicontrol, 2:enable,static8
+	guicontrol, 2:enable,edit4
+	guicontrol, 2:enable,button7
+	guicontrol, 2:enable,button8
+}
+else
+{
+	gui, 2:font,underline
+	gui, 2:add,text, ys x420 section,New Connection
+	guicontrol, 2:hide,static4
+	guicontrol, 2:show,static4
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add, Text,xs x300,Connection Name
+	gui, 2:font,norm
+	guicontrol, 2:hide,static5
+	guicontrol, 2:show,static5
+	gui, 2:add, edit,w300  vsshname,My SSH Connection
+	gui, 2:font,underline
+	GUI, 2:Add, Text,,Username and host
+	gui, 2:font,norm
+	guicontrol, 2:hide,static6
+	guicontrol, 2:show,static6
+	gui, 2:add, edit,w300 vsshserver, user@server
+	gui, 2:font,underline
+	GUI, 2:Add, Text,,Specify a port if not default port 22
+	gui, 2:font,norm
+	guicontrol, 2:hide,static7
+	guicontrol, 2:show,static7
+	gui, 2:add, edit,w50 vsshport,22
+	gui, 2:font,underline
+	GUI, 2:Add, Text,,SSH password
+	gui, 2:font,norm
+	guicontrol, 2:hide,static8
+	guicontrol, 2:show,static8
+	gui, 2:add, edit,password w240 vsshpass,
+	gui, 2:add, button,border x42 y430 w112 vButsave1 gsavessh, Save
+	gui, 2:add, button,border x154 y430 w112 vreturnssh gcancelcreatessh,Cancel
+	createsshwasclicked = 1
+}
 exit
 
 cancelcreatessh:
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:hide,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-guicontrol, 2:disable,
-exit
-
-Createssh:
-GUI, 3:Add, Text,xs,Connection Name
-gui, 3:add,checkbox,x+226 section vchksshadv gshowsshadv,Show advanced options?
-gui, 3:add, edit,x20 w300 vsshname,My SSH Connection
-GUI, 3:Add, Text,,Username and host
-gui, 3:add, edit,w300 vsshserver, user@server
-GUI, 3:Add, Text,,Specify a port if not default port 22
-gui, 3:add, edit,w50 vsshport,22
-GUI, 3:Add, Text,,SSH password
-gui, 3:add, edit,password w240 vsshpass,
-gui, 3:add, button,border x20 y71 vButsave1 gsavessh, Save Connection
+guicontrol, 2:hide,static4
+guicontrol, 2:hide,static5
+guicontrol, 2:hide,edit1
+guicontrol, 2:hide,static6
+guicontrol, 2:hide,edit2
+guicontrol, 2:hide,static7
+guicontrol, 2:hide,edit3
+guicontrol, 2:hide,static8
+guicontrol, 2:hide,edit4
+guicontrol, 2:hide,button7
+guicontrol, 2:hide,button8
+guicontrol, 2:disable,static4
+guicontrol, 2:disable,static5
+guicontrol, 2:disable,edit1
+guicontrol, 2:disable,static6
+guicontrol, 2:disable,edit2
+guicontrol, 2:disable,static7
+guicontrol, 2:disable,edit3
+guicontrol, 2:disable,static8
+guicontrol, 2:disable,edit4
+guicontrol, 2:disable,button7
+guicontrol, 2:disable,button8
+sshname =
+sshserver =
+sshport =
+sshpass =
+guicontrol, 2:show,butcreatessh
+guicontrol, 2:enable,butcreatessh
+guicontrol, 2:show,butsshconn
+guicontrol, 2:show,butsshedit
+guicontrol, 2:show,butsshdel
+guicontrol, 2:show,butsftp
+guicontrol, 2:show,butsshadv
 exit
 
 Createrdp:
@@ -564,23 +594,6 @@ else
 }
 exit
 
-	;gui, 3:font,underline
-	;gui, 3:add,text,xs y240,SSH Port Forward Options
-	;gui, 3:font,norm
-	;gui, 3:add,edit,vlocalsshport,localport
-	;gui, 3:add,edit,vremotedestnport,remotelocal:port
-	;gui, 3:add,button,gshowsshexample,Show Example
-	;exit
-	;showsshexample:
-	;msgbox,localport is 2222, remotelocal:port is myotherpc:22, and ssh server is sshserver.`nWhen SSH connection is established to sshserver using connection credentials,`nusing localhost:2222 as a server:port connection automatically forwards`nyou from sshserver to another pc on it's local network.`nYou can also use remotelocal:port to specify a port on sshserver.`nAn example of this would be localport 33389 forward to sshserver:3389 for rdp over ssh.
-	;return
-
-;else
-;{
-;	gui, 3:destroy
-;	gosub, createconnection
-;}
-;exit
 
 ;showrdpadv:
 ;gui, 3:submit,nohide
@@ -600,17 +613,10 @@ exit
 ;	gui, 3:destroy
 ;	gosub, createconnection
 ;}	
-	
-crereturnmainmenu:
-gui, 2:destroy
-gui, 3:destroy
-gosub mainmenu
-exit
-
 
 Savessh:
 {
-	gui, 3:submit
+	gui, 2:submit
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\SSH
 	if localsshport
@@ -621,7 +627,6 @@ Savessh:
 	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
 	gui, 2:destroy
-	gui, 3:destroy
 	gosub MainMenu
 }
 return
@@ -798,8 +803,11 @@ gui, 4:destroy
 gosub mainmenu
 exit
 
+Connecttossh:
 
-return ;keeps the script from running Connection1 when it gets to it
+
+return
+
 SSH1:
 {
 	Gui, 2:submit
