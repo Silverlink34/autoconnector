@@ -317,15 +317,6 @@ gosub guistart
 
 MainMenu:
 pass = %mpass%
-if rdpenabled = 1
-{
-	sshenabled = 0
-	gosub mainmenustart
-}
-else
-	sshenabled = 1
-mainmenustart:
-;msgbox, ssh=%sshenabled% rdp=%rdpenabled%
 gui, 1:submit
 gui, 1:destroy
 ifequal, skipintro, 1
@@ -352,7 +343,7 @@ ifnotinstring, puttydir, Program
 gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC
 gui, 2:add,listbox,vSSHConnections R13 gsshselected
 gui, 2:add,updown,section
-gui, 2:add, Button,w225 border vbutcreatessh gCreatesshconnection, Create Connection
+gui, 2:add, Button,w224 border vbutcreatessh gCreatesshconnection, Create Connection
 gui, 2:add,button,ys w165 border vbutsshconn section,Connect
 gui, 2:add,button,w165 vbutsshedit,Edit Connection
 gui, 2:add,button,w165 vbutsshdel,Delete Connection
@@ -453,47 +444,61 @@ guicontrol, 2:hide,butsshdel
 guicontrol, 2:hide,butsftp
 guicontrol, 2:hide,butsshadv
 gui, 2:font,underline
-gui, 2:add,text,ys,New Connection
+gui, 2:add,text, ys x420 section,New Connection
+guicontrol, 2:hide,static4
+guicontrol, 2:show,static4
+gui, 2:font,norm s14
+gui, 2:font,underline
+GUI, 2:Add, Text,xs x300,Connection Name
 gui, 2:font,norm
-GUI, 2:Add, Text,xs,Connection Name
-gui, 2:add, edit,x20 w300 vsshname,My SSH Connection
+guicontrol, 2:hide,static5
+guicontrol, 2:show,static5
+gui, 2:add, edit,w300  vsshname,My SSH Connection
+gui, 2:font,underline
 GUI, 2:Add, Text,,Username and host
+gui, 2:font,norm
+guicontrol, 2:hide,static6
+guicontrol, 2:show,static6
 gui, 2:add, edit,w300 vsshserver, user@server
+gui, 2:font,underline
 GUI, 2:Add, Text,,Specify a port if not default port 22
+gui, 2:font,norm
+guicontrol, 2:hide,static7
+guicontrol, 2:show,static7
 gui, 2:add, edit,w50 vsshport,22
+gui, 2:font,underline
 GUI, 2:Add, Text,,SSH password
+gui, 2:font,norm
+guicontrol, 2:hide,static8
+guicontrol, 2:show,static8
 gui, 2:add, edit,password w240 vsshpass,
-gui, 2:add, button,border x20 y71 vButsave1 gsavessh, Save Connection
-gui, 2:add, button,border x42 y498 vreturnssh,Cancel Creation
-;createconnectionstart:
-;gui, 2:submit
-;gui, 3:show, w768 h520
-;gui, 3:font, s14,
-;GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`nCredentials are saved and encrypted immediately.
-;gui, 3:add,button,border x230 vreturnmainmenu gcrereturnmainmenu,Cancel
-;gui, 3:add, text,xs y103,_________________________________________________________________________________
-;if csshenabled = 1
-;	gui, 3:add, radio,section checked1 vcsshconn gccheckssh,SSH
-;else
-;	gui, 3:add, radio,section vcsshconn gccheckssh,SSH
-;if crdpenabled = 1
-;	gui, 3:add, radio,ys checked1 vcrdpconn gccheckrdp,RDP
-;else
-;	gui, 3:add, radio,ys vcrdpconn gccheckrdp,RDP
-;if ctelnetenabled = 1
-;	gui, 3:add, radio,ys checked1 vctelnetconn,Telnet
-;else
-;	gui, 3:add, radio,ys vctelnetconn,Telnet
-;if cvncenabled = 1
-;	gui, 3:add, radio, ys checked1 vcvncconn,VNC
-;else
-;	gui, 3:add, radio,ys vcvncconn,VNC
-;gui, 3:add, text,xs section,_________________________________________________________________________________
-;gui, 3:submit, nohide
-;if csshenabled = 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
-;	gosub createssh
-;if crdpenabled = 1
-;	gosub createrdp
+gui, 2:add, button,border x42 y430 w112 vButsave1 gsavessh, Save
+gui, 2:add, button,border x154 y430 w112 vreturnssh,Cancel
+exit
+
+cancelcreatessh:
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:hide,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
+guicontrol, 2:disable,
 exit
 
 Createssh:
