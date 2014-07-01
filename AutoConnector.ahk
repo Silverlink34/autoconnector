@@ -804,9 +804,12 @@ gosub mainmenu
 exit
 
 Connecttossh:
-
-
-return
+fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
+sshconnect := Decrypt(data,pass)
+run, %sshconnect%
+gui, 2:destroy
+gosub mainmenu
+exit
 
 SSH1:
 {
