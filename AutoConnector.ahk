@@ -349,15 +349,15 @@ ifnotinstring, puttydir, Program
 	puttydir = %A_WorkingDir%\programbin
 	fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
 }
-gui, 2:add,tab, w725 h450 vconnectionselect gcontrolget,SSH|RDP|Telnet|VNC
-gui, 2:add,listbox,vSSHConnections R13
+gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC
+gui, 2:add,listbox,vSSHConnections R13 gsshselected
 gui, 2:add,updown,section
-gui, 2:add, Button,w225 border gCreateconnection, Create Connection
-gui, 2:add,button,ys w165 border vbutsshconn,Connect
+gui, 2:add, Button,w225 border vbutcreatessh gCreatesshconnection, Create Connection
+gui, 2:add,button,ys w165 border vbutsshconn section,Connect
 gui, 2:add,button,w165 vbutsshedit,Edit Connection
 gui, 2:add,button,w165 vbutsshdel,Delete Connection
 gui, 2:add,button,w165 vbutsftp,Launch SFTP FileZilla
-gui, 2:add,button,w165 vbutsshadv,Show/Hide Advanced Options
+gui, 2:add,button,w165 vbutsshadv gshowsshadv,Show/Hide Advanced Options
 guicontrol, 2:disable,butsshconn
 guicontrol, 2:disable,butsshedit
 guicontrol, 2:disable,butsshdel
@@ -366,18 +366,36 @@ guicontrol, 2:disable,butsshadv
 gui, 2:tab,RDP
 gui, 2:add,listbox,vRDPConnections R13
 gui, 2:add,updown
-gui, 2:add, Button,w225 border gCreateconnection, Create Connection
+;gui, 2:add, Button,w225 border gCreaterdpconnection, Create Connection
 gui, 2:tab,Telnet
 gui, 2:add,text,,This protocol has not been created yet, it is in progress.
 gui, 2:tab,VNC
 gui, 2:add,text,,This protocol has not been created yet, it is in progress.
 gui, 2:tab
-controlget:
+currenttabnumber:
 ControlGet, TabNumber, Tab,, SysTabControl321,A
 if tabnumber = 1
 	gosub detectssh
 if tabnumber = 2
 	gosub detectrdp
+sshselected:
+controlget,selectedssh,choice,,listbox1,A
+	if selectedssh
+	{
+		guicontrol, 2:enable,butsshconn
+		guicontrol, 2:enable,butsshedit
+		guicontrol, 2:enable,butsshdel
+		guicontrol, 2:enable,butsftp
+		guicontrol, 2:enable,butsshadv
+	}
+	else
+	{
+		guicontrol, 2:disable,butsshconn
+		guicontrol, 2:disable,butsshedit
+		guicontrol, 2:disable,butsshdel
+		guicontrol, 2:disable,butsftp
+		guicontrol, 2:disable,butsshadv
+	}
 ;gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
 ;gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
 ;gui, 2:add, radio,section checked1 vsshconn gcheckssh,SSH
@@ -421,62 +439,62 @@ controlget,listedrdp,list,,Listbox2,A
 	Fileremovedir, tmp, 1	
 }
 return
-Createconnection:
-
-if crdpenabled = 1
-{
-	csshenabled = 0
-	gosub createconnectionstart
-}
-else
-	csshenabled = 1
-	
-createconnectionstart:
-gui, 2:submit
-gui, 3:show, w768 h520
-gui, 3:font, s14,
-GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`nCredentials are saved and encrypted immediately.
-gui, 3:add,button,border x230 vreturnmainmenu gcrereturnmainmenu,Cancel
-gui, 3:add, text,xs y103,_________________________________________________________________________________
-if csshenabled = 1
-	gui, 3:add, radio,section checked1 vcsshconn gccheckssh,SSH
-else
-	gui, 3:add, radio,section vcsshconn gccheckssh,SSH
-if crdpenabled = 1
-	gui, 3:add, radio,ys checked1 vcrdpconn gccheckrdp,RDP
-else
-	gui, 3:add, radio,ys vcrdpconn gccheckrdp,RDP
-if ctelnetenabled = 1
-	gui, 3:add, radio,ys checked1 vctelnetconn,Telnet
-else
-	gui, 3:add, radio,ys vctelnetconn,Telnet
-if cvncenabled = 1
-	gui, 3:add, radio, ys checked1 vcvncconn,VNC
-else
-	gui, 3:add, radio,ys vcvncconn,VNC
-gui, 3:add, text,xs section,_________________________________________________________________________________
-gui, 3:submit, nohide
-if csshenabled = 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
-	gosub createssh
-if crdpenabled = 1
-	gosub createrdp
+Createsshconnection:
+guicontrol, 2:disable,butcreatessh
+guicontrol, 2:disable,butsshconn
+guicontrol, 2:disable,butsshedit
+guicontrol, 2:disable,butsshdel
+guicontrol, 2:disable,butsftp
+guicontrol, 2:disable,butsshadv
+guicontrol, 2:hide,butcreatessh
+guicontrol, 2:hide,butsshconn
+guicontrol, 2:hide,butsshedit
+guicontrol, 2:hide,butsshdel
+guicontrol, 2:hide,butsftp
+guicontrol, 2:hide,butsshadv
+gui, 2:font,underline
+gui, 2:add,text,ys,New Connection
+gui, 2:font,norm
+GUI, 2:Add, Text,xs,Connection Name
+gui, 2:add, edit,x20 w300 vsshname,My SSH Connection
+GUI, 2:Add, Text,,Username and host
+gui, 2:add, edit,w300 vsshserver, user@server
+GUI, 2:Add, Text,,Specify a port if not default port 22
+gui, 2:add, edit,w50 vsshport,22
+GUI, 2:Add, Text,,SSH password
+gui, 2:add, edit,password w240 vsshpass,
+gui, 2:add, button,border x20 y71 vButsave1 gsavessh, Save Connection
+gui, 2:add, button,border x42 y498 vreturnssh,Cancel Creation
+;createconnectionstart:
+;gui, 2:submit
+;gui, 3:show, w768 h520
+;gui, 3:font, s14,
+;GUI, 3:Add, Text,,Choose a protocol type and enter connection details.`nCredentials are saved and encrypted immediately.
+;gui, 3:add,button,border x230 vreturnmainmenu gcrereturnmainmenu,Cancel
+;gui, 3:add, text,xs y103,_________________________________________________________________________________
+;if csshenabled = 1
+;	gui, 3:add, radio,section checked1 vcsshconn gccheckssh,SSH
+;else
+;	gui, 3:add, radio,section vcsshconn gccheckssh,SSH
+;if crdpenabled = 1
+;	gui, 3:add, radio,ys checked1 vcrdpconn gccheckrdp,RDP
+;else
+;	gui, 3:add, radio,ys vcrdpconn gccheckrdp,RDP
+;if ctelnetenabled = 1
+;	gui, 3:add, radio,ys checked1 vctelnetconn,Telnet
+;else
+;	gui, 3:add, radio,ys vctelnetconn,Telnet
+;if cvncenabled = 1
+;	gui, 3:add, radio, ys checked1 vcvncconn,VNC
+;else
+;	gui, 3:add, radio,ys vcvncconn,VNC
+;gui, 3:add, text,xs section,_________________________________________________________________________________
+;gui, 3:submit, nohide
+;if csshenabled = 1 ;this is here because SSH is the default radio button checked and I want it to default show ssh connections
+;	gosub createssh
+;if crdpenabled = 1
+;	gosub createrdp
 exit
-
-CCheckssh:
-{
-gui, 3:destroy
-csshenabled = 1
-crdpenabled = 0
-gosub createconnection
-}
-return
-CCheckrdp:
-{
-gui, 3:destroy
-crdpenabled = 1
-gosub createconnection
-}
-return
 
 Createssh:
 GUI, 3:Add, Text,xs,Connection Name
@@ -504,45 +522,79 @@ gui, 3:add, button,border x20 y71 vButsave2 gsaverdp, Save Connection
 exit
 
 showsshadv:
-gui, 3:submit,nohide
-if chksshadv = 1
+if sshadvshowing = 1
 {
-	gui, 3:font,underline
-	gui, 3:add,text,xs y240,SSH Port Forward Options
-	gui, 3:font,norm
-	gui, 3:add,edit,vlocalsshport,localport
-	gui, 3:add,edit,vremotedestnport,remotelocal:port
-	gui, 3:add,button,gshowsshexample,Show Example
-	exit
-	showsshexample:
-	msgbox,localport is 2222, remotelocal:port is myotherpc:22, and ssh server is sshserver.`nWhen SSH connection is established to sshserver using connection credentials,`nusing localhost:2222 as a server:port connection automatically forwards`nyou from sshserver to another pc on it's local network.`nYou can also use remotelocal:port to specify a port on sshserver.`nAn example of this would be localport 33389 forward to sshserver:3389 for rdp over ssh.
-	return
+	guicontrol, 2:disable,static4,
+	guicontrol, 2:hide,static4,
+	guicontrol, 2:disable,edit1,
+	guicontrol, 2:hide,edit1,
+	guicontrol, 2:disable,edit2,
+	guicontrol, 2:hide,edit2,
+	sshadvshowing =
+	sshadvshowagain = 1
 }
 else
 {
-	gui, 3:destroy
-	gosub, createconnection
+	if sshadvshowagain = 1
+	{
+		sshadvshowing = 1
+		guicontrol, 2:enable,static4,
+		guicontrol, 2:show,static4,
+		guicontrol, 2:enable,edit1,
+		guicontrol, 2:show,edit1,
+		guicontrol, 2:enable,edit2,
+		guicontrol, 2:show,edit2,
+	}
+	else
+	{	
+		gui, 2:font,underline
+		gui, 2:add,text,ys x490,SSH Port Forwarding
+		gui, 2:font, norm
+		guicontrol, 2:hide,static4,
+		guicontrol, 2:show,static4,
+		gui, 2:add,edit,vlocalsshport,localport
+		gui, 2:add,edit,vremotedestnport,remotelocal:port
+		sshadvshowing = 1
+	}
 }
 exit
 
-showrdpadv:
-gui, 3:submit,nohide
-if chkrdpadv = 1
-{
-	gui, 3:font,underline
-	gui, 3:add,text,xs y240,RDP Advanced Options
-	gui, 3:font,norm
-	gui, 3:add,checkbox,venabledrives,Redirect all drives/media to remote?
-	gui, 3:add,checkbox,venablesound,Redirect sound from remote?
-	gui, 3:add,checkbox,venablefullscreen,Force full screen?
-	gui, 3:add,checkbox,vdisablewall,Force disable remote wallpaper?
-	exit
-}
-else
-{
-	gui, 3:destroy
-	gosub, createconnection
-}	
+	;gui, 3:font,underline
+	;gui, 3:add,text,xs y240,SSH Port Forward Options
+	;gui, 3:font,norm
+	;gui, 3:add,edit,vlocalsshport,localport
+	;gui, 3:add,edit,vremotedestnport,remotelocal:port
+	;gui, 3:add,button,gshowsshexample,Show Example
+	;exit
+	;showsshexample:
+	;msgbox,localport is 2222, remotelocal:port is myotherpc:22, and ssh server is sshserver.`nWhen SSH connection is established to sshserver using connection credentials,`nusing localhost:2222 as a server:port connection automatically forwards`nyou from sshserver to another pc on it's local network.`nYou can also use remotelocal:port to specify a port on sshserver.`nAn example of this would be localport 33389 forward to sshserver:3389 for rdp over ssh.
+	;return
+
+;else
+;{
+;	gui, 3:destroy
+;	gosub, createconnection
+;}
+;exit
+
+;showrdpadv:
+;gui, 3:submit,nohide
+;if chkrdpadv = 1
+;{
+;	gui, 3:font,underline
+;	gui, 3:add,text,xs y240,RDP Advanced Options
+;	gui, 3:font,norm
+;	gui, 3:add,checkbox,venabledrives,Redirect all drives/media to remote?
+;	gui, 3:add,checkbox,venablesound,Redirect sound from remote?
+;	gui, 3:add,checkbox,venablefullscreen,Force full screen?
+;	gui, 3:add,checkbox,vdisablewall,Force disable remote wallpaper?
+;	exit
+;}
+;else
+;{
+;	gui, 3:destroy
+;	gosub, createconnection
+;}	
 	
 crereturnmainmenu:
 gui, 2:destroy
