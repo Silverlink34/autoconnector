@@ -446,6 +446,8 @@ guicontrol, 2:hide,butsshedit
 guicontrol, 2:hide,butsshdel
 guicontrol, 2:hide,butsftp
 guicontrol, 2:hide,butsshadv
+if gui2wasdestroyed = 1
+	createsshwasclicked =
 if createsshwasclicked = 1
 {
 	guicontrol, 2:show,static4
@@ -505,6 +507,8 @@ else
 	gui, 2:add, button,border x42 y436 w112 vButsave1 gsavessh, Save
 	gui, 2:add, button,border x154 y436 w112 vreturnssh gcancelcreatessh,Cancel
 	createsshwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
 }
 exit
 
@@ -600,9 +604,10 @@ ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\SavedConnections\SSH\%sshisselected%
 		gui, 2:destroy
-		gosub MainMenu
+		gui2wasdestroyed = 1
+		gosub mainmenu
 	}
-exit
+return
 ;showrdpadv:
 ;gui, 3:submit,nohide
 ;if chkrdpadv = 1
@@ -635,6 +640,7 @@ Savessh:
 	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
 	gui, 2:destroy
+	gui2wasdestroyed = 1
 	gosub MainMenu
 }
 return
