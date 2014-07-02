@@ -501,9 +501,7 @@ connecttossh:
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
 sshconnect := Decrypt(data,pass)
 run, %sshconnect%
-gui, 2:destroy
-gosub mainmenu
-exit
+return
 
 deletesshconnection:
 msgbox,4,,Are you sure you wish to delete connection: %sshisselected%?
