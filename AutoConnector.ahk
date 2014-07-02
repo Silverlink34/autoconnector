@@ -497,6 +497,14 @@ else
 }
 exit
 
+connecttossh:
+fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
+sshconnect := Decrypt(data,pass)
+run, %sshconnect%
+gui, 2:destroy
+gosub mainmenu
+exit
+
 deletesshconnection:
 msgbox,4,,Are you sure you wish to delete connection: %sshisselected%?
 ifmsgbox yes
@@ -544,6 +552,42 @@ else
 		sshadvshowing = 1
 	}
 }
+exit
+
+cancelcreatessh:
+guicontrol, 2:hide,static4
+guicontrol, 2:hide,static5
+guicontrol, 2:hide,edit1
+guicontrol, 2:hide,static6
+guicontrol, 2:hide,edit2
+guicontrol, 2:hide,static7
+guicontrol, 2:hide,edit3
+guicontrol, 2:hide,static8
+guicontrol, 2:hide,edit4
+guicontrol, 2:hide,button7
+guicontrol, 2:hide,button8
+guicontrol, 2:disable,static4
+guicontrol, 2:disable,static5
+guicontrol, 2:disable,edit1
+guicontrol, 2:disable,static6
+guicontrol, 2:disable,edit2
+guicontrol, 2:disable,static7
+guicontrol, 2:disable,edit3
+guicontrol, 2:disable,static8
+guicontrol, 2:disable,edit4
+guicontrol, 2:disable,button7
+guicontrol, 2:disable,button8
+sshname =
+sshserver =
+sshport =
+sshpass =
+guicontrol, 2:show,butcreatessh
+guicontrol, 2:enable,butcreatessh
+guicontrol, 2:show,butsshconn
+guicontrol, 2:show,butsshedit
+guicontrol, 2:show,butsshdel
+guicontrol, 2:show,butsftp
+guicontrol, 2:show,butsshadv
 exit
 
 Savessh:
