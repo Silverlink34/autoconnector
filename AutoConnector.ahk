@@ -503,6 +503,13 @@ sshconnect := Decrypt(data,pass)
 run, %sshconnect%
 return
 
+Editsshconnection:
+fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
+editedconnection := Decrypt(data,pass)
+
+
+return
+
 deletesshconnection:
 msgbox,4,,Are you sure you wish to delete connection: %sshisselected%?
 ifmsgbox yes
