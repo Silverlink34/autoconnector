@@ -418,21 +418,6 @@ controlget,listedssh,list,,Listbox1,A
 }
 Return
 
-Detectrdp:
-ifexist %a_workingdir%\SavedConnections\RDP
-controlget,listedrdp,list,,Listbox2,A
-{	
-	FileCreateDir, tmp
-	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\RDP > %a_workingdir%\tmp\rdplist,, hide
-	sleep, 200
-	Loop, read, %A_workingdir%\tmp\rdplist
-	{
-		ifnotinstring,listedrdp,%a_loopreadline%
-			guicontrol, 2:,rdpconnections,%a_loopreadline%|
-	}
-	Fileremovedir, tmp, 1	
-}
-return
 Createsshconnection:
 guicontrol, 2:disable,butcreatessh
 guicontrol, 2:disable,butsshconn
@@ -512,53 +497,16 @@ else
 }
 exit
 
-cancelcreatessh:
-guicontrol, 2:hide,static4
-guicontrol, 2:hide,static5
-guicontrol, 2:hide,edit1
-guicontrol, 2:hide,static6
-guicontrol, 2:hide,edit2
-guicontrol, 2:hide,static7
-guicontrol, 2:hide,edit3
-guicontrol, 2:hide,static8
-guicontrol, 2:hide,edit4
-guicontrol, 2:hide,button7
-guicontrol, 2:hide,button8
-guicontrol, 2:disable,static4
-guicontrol, 2:disable,static5
-guicontrol, 2:disable,edit1
-guicontrol, 2:disable,static6
-guicontrol, 2:disable,edit2
-guicontrol, 2:disable,static7
-guicontrol, 2:disable,edit3
-guicontrol, 2:disable,static8
-guicontrol, 2:disable,edit4
-guicontrol, 2:disable,button7
-guicontrol, 2:disable,button8
-sshname =
-sshserver =
-sshport =
-sshpass =
-guicontrol, 2:show,butcreatessh
-guicontrol, 2:enable,butcreatessh
-guicontrol, 2:show,butsshconn
-guicontrol, 2:show,butsshedit
-guicontrol, 2:show,butsshdel
-guicontrol, 2:show,butsftp
-guicontrol, 2:show,butsshadv
-exit
-
-Createrdp:
-gui, 3:add, text,xs section,Connection Name
-gui, 3:add,checkbox,x+210 section vchkrdpadv gshowrdpadv,Show advanced options?
-gui, 3:add, edit,x20 w300 vrdpname,My RDP Connection
-gui, 3:add, text,,Server domain or public ip and port
-gui, 3:add, edit,w300 vrdpserver,server:port
-gui, 3:add, text,,Username and Password
-gui, 3:add, edit,w300 vrdpuser,username
-gui, 3:add, edit,w300 x+30 password vrdppass,password
-gui, 3:add, button,border x20 y71 vButsave2 gsaverdp, Save Connection
-exit
+deletesshconnection:
+msgbox,4,,Are you sure you wish to delete connection: %sshisselected%?
+ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\SSH\%sshisselected%
+		gui, 2:destroy
+		gui2wasdestroyed = 1
+		gosub mainmenu
+	}
+return
 
 showsshadv:
 if sshadvshowing = 1
@@ -598,16 +546,54 @@ else
 }
 exit
 
-deletesshconnection:
-msgbox,4,,Are you sure you wish to delete connection: %sshisselected%?
-ifmsgbox yes
-	{
-		filedelete, %A_workingdir%\SavedConnections\SSH\%sshisselected%
-		gui, 2:destroy
-		gui2wasdestroyed = 1
-		gosub mainmenu
-	}
+Savessh:
+{
+	gui, 2:submit
+	FileCreateDir, SavedConnections
+	FileCreateDir, SavedConnections\SSH
+	if localsshport
+		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass% -R %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	else
+		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
+	gui, 2:destroy
+	gui2wasdestroyed = 1
+	gosub MainMenu
+}
 return
+
+Detectrdp:
+ifexist %a_workingdir%\SavedConnections\RDP
+controlget,listedrdp,list,,Listbox2,A
+{	
+	FileCreateDir, tmp
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\RDP > %a_workingdir%\tmp\rdplist,, hide
+	sleep, 200
+	Loop, read, %A_workingdir%\tmp\rdplist
+	{
+		ifnotinstring,listedrdp,%a_loopreadline%
+			guicontrol, 2:,rdpconnections,%a_loopreadline%|
+	}
+	Fileremovedir, tmp, 1	
+}
+return
+
+Createrdp:
+gui, 3:add, text,xs section,Connection Name
+gui, 3:add,checkbox,x+210 section vchkrdpadv gshowrdpadv,Show advanced options?
+gui, 3:add, edit,x20 w300 vrdpname,My RDP Connection
+gui, 3:add, text,,Server domain or public ip and port
+gui, 3:add, edit,w300 vrdpserver,server:port
+gui, 3:add, text,,Username and Password
+gui, 3:add, edit,w300 vrdpuser,username
+gui, 3:add, edit,w300 x+30 password vrdppass,password
+gui, 3:add, button,border x20 y71 vButsave2 gsaverdp, Save Connection
+exit
+
+
+
 ;showrdpadv:
 ;gui, 3:submit,nohide
 ;if chkrdpadv = 1
@@ -627,23 +613,7 @@ return
 ;	gosub, createconnection
 ;}	
 
-Savessh:
-{
-	gui, 2:submit
-	FileCreateDir, SavedConnections
-	FileCreateDir, SavedConnections\SSH
-	if localsshport
-		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass% -R %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
-	else
-		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
-	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
-	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
-	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
-	gui, 2:destroy
-	gui2wasdestroyed = 1
-	gosub MainMenu
-}
-return
+
 
 Saverdp:
 {
@@ -670,12 +640,7 @@ Saverdp:
 }
 return
 
-Connecttossh:
-fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
-sshconnect := Decrypt(data,pass)
-run, %sshconnect%
-sshconnect =
-return
+
 
 RDP1:
 {
