@@ -9,7 +9,8 @@ I am simply the author of the script.
 I am also not responsible for any damage to your computer, you are the user that decided to trust my program.
 
 ToDo:
-setup the following protocols-
+
+setup the following protocols:
 
 sftp with filezilla
 telnet
