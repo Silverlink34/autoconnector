@@ -359,9 +359,9 @@ gui, 2:add,listbox,vRDPConnections R13
 gui, 2:add,updown
 ;gui, 2:add, Button,w225 border gCreaterdpconnection, Create Connection
 gui, 2:tab,Telnet
-gui, 2:add,text,,This protocol has not been created yet, it is in progress.
+gui, 2:add,text,vnotavailabletelnet,This protocol has not been created yet, it is in progress.
 gui, 2:tab,VNC
-gui, 2:add,text,,This protocol has not been created yet, it is in progress.
+gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
 gui, 2:tab
 currenttabnumber:
 ControlGet, TabNumber, Tab,, SysTabControl321,A
@@ -387,16 +387,6 @@ controlget,sshisselected,choice,,listbox1,A
 		guicontrol, 2:disable,butsftp
 		guicontrol, 2:disable,butsshadv
 	}
-;gui, 2:add, Button,section border vButcreateconn gCreateconnection, Create Connection
-;gui, 2:add, button,x+60 border vButdeleteconn gDeleteconnection, Delete Connection
-;gui, 2:add, radio,section checked1 vsshconn gcheckssh,SSH
-;gui, 2:add, radio,section vsshconn gcheckssh,SSH
-;gui, 2:add, radio,ys checked1 vrdpconn gcheckrdp,RDP
-;gui, 2:add, radio,ys vrdpconn gcheckrdp,RDP
-;gui, 2:add, radio,ys checked1 vtelnetconn,Telnet
-;gui, 2:add, radio,ys vtelnetconn,Telnet
-;gui, 2:add, radio, ys checked1 vvncconn,VNC
-;gui, 2:add, radio,ys vvncconn,VNC
 exit
 
 Detectssh:
@@ -461,36 +451,36 @@ if createsshwasclicked = 1
 else
 {
 	gui, 2:font,underline
-	gui, 2:add,text, ys x420 section,New Connection
-	guicontrol, 2:hide,static4
-	guicontrol, 2:show,static4
+	gui, 2:add,text,vtxtnewsshconn ys x420 section,New Connection
+	guicontrol, 2:hide,txtnewsshconn
+	guicontrol, 2:show,txtnewsshconn
 	gui, 2:font,norm s14
 	gui, 2:font,underline
-	GUI, 2:Add, Text,xs x300,Connection Name
+	GUI, 2:Add,Text,vtxtsshname xs x300,Connection Name
 	gui, 2:font,norm
 	guicontrol, 2:hide,static5
 	guicontrol, 2:show,static5
-	gui, 2:add, edit,w300  vsshname,My SSH Connection
+	gui, 2:add, edit,w300 vsshname,My SSH Connection
 	gui, 2:font,underline
-	GUI, 2:Add, Text,,Username and host
+	GUI, 2:Add, Text,vtxtsshserver,Username and host
 	gui, 2:font,norm
 	guicontrol, 2:hide,static6
 	guicontrol, 2:show,static6
 	gui, 2:add, edit,w300 vsshserver, user@server
 	gui, 2:font,underline
-	GUI, 2:Add, Text,,Specify a port if not default port 22
+	GUI, 2:Add, Text,vtxtsshport,Specify a port if not default port 22
 	gui, 2:font,norm
 	guicontrol, 2:hide,static7
 	guicontrol, 2:show,static7
 	gui, 2:add, edit,w50 vsshport,22
 	gui, 2:font,underline
-	GUI, 2:Add, Text,,SSH password
+	GUI, 2:Add, Text,vtxtsshpass,SSH password
 	gui, 2:font,norm
 	guicontrol, 2:hide,static8
 	guicontrol, 2:show,static8
 	gui, 2:add, edit,password w240 vsshpass,
-	gui, 2:add, button,border x42 y436 w112 vButsave1 gsavessh, Save
-	gui, 2:add, button,border x154 y436 w112 vreturnssh gcancelcreatessh,Cancel
+	gui, 2:add, button,border vbutsavessh x42 y436 w112 gsavessh, Save
+	gui, 2:add, button,border vbutcancelcreatessh x154 y436 w112 gcancelcreatessh,Cancel
 	createsshwasclicked = 1
 	if gui2wasdestroyed = 1
 		gui2wasdestroyed =
@@ -514,28 +504,28 @@ Savessh:
 }
 return
 cancelcreatessh:
-guicontrol, 2:hide,static4
-guicontrol, 2:hide,static5
-guicontrol, 2:hide,edit1
-guicontrol, 2:hide,static6
-guicontrol, 2:hide,edit2
-guicontrol, 2:hide,static7
-guicontrol, 2:hide,edit3
-guicontrol, 2:hide,static8
-guicontrol, 2:hide,edit4
-guicontrol, 2:hide,button7
-guicontrol, 2:hide,button8
-guicontrol, 2:disable,static4
-guicontrol, 2:disable,static5
-guicontrol, 2:disable,edit1
-guicontrol, 2:disable,static6
-guicontrol, 2:disable,edit2
-guicontrol, 2:disable,static7
-guicontrol, 2:disable,edit3
-guicontrol, 2:disable,static8
-guicontrol, 2:disable,edit4
-guicontrol, 2:disable,button7
-guicontrol, 2:disable,button8
+guicontrol, 2:hide,txtnewsshconn
+guicontrol, 2:hide,txtsshname
+guicontrol, 2:hide,sshname
+guicontrol, 2:hide,txtsshserver
+guicontrol, 2:hide,sshserver
+guicontrol, 2:hide,txtsshport
+guicontrol, 2:hide,sshport
+guicontrol, 2:hide,txtsshpass
+guicontrol, 2:hide,sshpass
+guicontrol, 2:hide,butsavessh
+guicontrol, 2:hide,butcancelcreatessh
+guicontrol, 2:disable,txtnewsshconn
+guicontrol, 2:disable,txtsshname
+guicontrol, 2:disable,sshname
+guicontrol, 2:disable,txtsshserver
+guicontrol, 2:disable,sshserver
+guicontrol, 2:disable,txtsshport
+guicontrol, 2:disable,sshport
+guicontrol, 2:disable,txtsshpass
+guicontrol, 2:disable,sshpass
+guicontrol, 2:disable,butsavessh
+guicontrol, 2:disable,butcancelcreatessh
 sshname =
 sshserver =
 sshport =
@@ -635,8 +625,8 @@ else
 	guicontrol, 2:hide,static8
 	guicontrol, 2:show,static8
 	gui, 2:add, edit,password w240 veditsshpass,%sshcredfilter3%
-	gui, 2:add, button,border x42 y436 w112 vButsaveedit1 gsaveeditedssh, Save
-	gui, 2:add, button,border x154 y436 w112 vreturnssh gcanceleditssh,Cancel
+	gui, 2:add, button,border x42 y436 w112 gsaveeditedssh, Save
+	gui, 2:add, button,border x154 y436 w112 gcanceleditssh,Cancel
 	editsshwasclicked = 1
 	if gui2wasdestroyed = 1
 		gui2wasdestroyed =
