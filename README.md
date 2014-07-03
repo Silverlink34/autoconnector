@@ -10,11 +10,11 @@ I am also not responsible for any damage to your computer, you are the user that
 
 ToDo:
 setup the following protocols-
--
+
 sftp with filezilla
 telnet
 vnc with some vnc connector
--
+
 Setup ssh customizations such as port forwarding
 Add edit connection feature
 Add recovery questions or other failsafe for forgotten master password
