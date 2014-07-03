@@ -345,7 +345,7 @@ gui, 2:add,listbox,vSSHConnections R13 gsshselected
 gui, 2:add,updown,section
 gui, 2:add, Button,w224 border vbutcreatessh gCreatesshconnection, Create Connection
 gui, 2:add,button,ys w165 border vbutsshconn gconnecttossh section,Connect
-gui, 2:add,button,w165 vbutsshedit,Edit Connection
+gui, 2:add,button,w165 vbutsshedit geditsshconnection,Edit Connection
 gui, 2:add,button,w165 vbutsshdel gdeletesshconnection,Delete Connection
 gui, 2:add,button,w165 vbutsftp,Launch SFTP FileZilla
 gui, 2:add,button,w165 vbutsshadv gshowsshadv,Show/Hide Advanced Options
@@ -496,6 +496,58 @@ else
 		gui2wasdestroyed =
 }
 exit
+Savessh:
+{
+	gui, 2:submit
+	FileCreateDir, SavedConnections
+	FileCreateDir, SavedConnections\SSH
+	if localsshport
+		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass% -R %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	else
+		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
+	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
+	gui, 2:destroy
+	gui2wasdestroyed = 1
+	gosub MainMenu
+}
+return
+cancelcreatessh:
+guicontrol, 2:hide,static4
+guicontrol, 2:hide,static5
+guicontrol, 2:hide,edit1
+guicontrol, 2:hide,static6
+guicontrol, 2:hide,edit2
+guicontrol, 2:hide,static7
+guicontrol, 2:hide,edit3
+guicontrol, 2:hide,static8
+guicontrol, 2:hide,edit4
+guicontrol, 2:hide,button7
+guicontrol, 2:hide,button8
+guicontrol, 2:disable,static4
+guicontrol, 2:disable,static5
+guicontrol, 2:disable,edit1
+guicontrol, 2:disable,static6
+guicontrol, 2:disable,edit2
+guicontrol, 2:disable,static7
+guicontrol, 2:disable,edit3
+guicontrol, 2:disable,static8
+guicontrol, 2:disable,edit4
+guicontrol, 2:disable,button7
+guicontrol, 2:disable,button8
+sshname =
+sshserver =
+sshport =
+sshpass =
+guicontrol, 2:show,butcreatessh
+guicontrol, 2:enable,butcreatessh
+guicontrol, 2:show,butsshconn
+guicontrol, 2:show,butsshedit
+guicontrol, 2:show,butsshdel
+guicontrol, 2:show,butsftp
+guicontrol, 2:show,butsshadv
+exit
 
 connecttossh:
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
@@ -505,9 +557,145 @@ return
 
 Editsshconnection:
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
-editedconnection := Decrypt(data,pass)
-
-
+ssh2edit := Decrypt(data,pass)
+stringreplace,sshcreds,ssh2edit,%puttydir%,,1
+stringreplace,sshcreds,sshcreds,\putty,,1
+stringreplace,sshcreds,sshcreds,-P,,1
+stringreplace,sshcreds,sshcreds,%a_space%w%a_space%,%a_space%,1
+stringreplace,sshcreds,sshcreds,%a_space%%a_space%,,
+stringsplit,sshcredfilter,sshcreds,%a_space%,,
+;msgbox,Username@server:%sshcredfilter2% Password:%sshcredfilter3% Port:%sshcredfilter1%
+guicontrol, 2:disable,butcreatessh
+guicontrol, 2:disable,butsshconn
+guicontrol, 2:disable,butsshedit
+guicontrol, 2:disable,butsshdel
+guicontrol, 2:disable,butsftp
+guicontrol, 2:disable,butsshadv
+guicontrol, 2:hide,butcreatessh
+guicontrol, 2:hide,butsshconn
+guicontrol, 2:hide,butsshedit
+guicontrol, 2:hide,butsshdel
+guicontrol, 2:hide,butsftp
+guicontrol, 2:hide,butsshadv
+if gui2wasdestroyed = 1
+	editsshwasclicked =
+if editsshwasclicked = 1
+{
+	guicontrol, 2:show,static4
+	guicontrol, 2:show,static5
+	guicontrol, 2:show,edit1
+	guicontrol, 2:show,static6
+	guicontrol, 2:show,edit2
+	guicontrol, 2:show,static7
+	guicontrol, 2:show,edit3
+	guicontrol, 2:show,static8
+	guicontrol, 2:show,edit4
+	guicontrol, 2:show,button7
+	guicontrol, 2:show,button8
+	guicontrol, 2:enable,static4
+	guicontrol, 2:enable,static5
+	guicontrol, 2:enable,edit1
+	guicontrol, 2:enable,static6
+	guicontrol, 2:enable,edit2
+	guicontrol, 2:enable,static7
+	guicontrol, 2:enable,edit3
+	guicontrol, 2:enable,static8
+	guicontrol, 2:enable,edit4
+	guicontrol, 2:enable,button7
+	guicontrol, 2:enable,button8
+}
+else
+{	
+	gui, 2:font,underline
+	gui, 2:add,text, ys x420 section,Edit Connection
+	guicontrol, 2:hide,static4
+	guicontrol, 2:show,static4
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add, Text,xs x300,Connection Name
+	gui, 2:font,norm	
+	guicontrol, 2:hide,static5
+	guicontrol, 2:show,static5
+	gui, 2:add, edit,w300 veditsshname,%sshisselected%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,,Username and host
+	gui, 2:font,norm
+	guicontrol, 2:hide,static6
+	guicontrol, 2:show,static6
+	gui, 2:add, edit,w300 veditsshserver,%sshcredfilter2%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,,Specify a port if not default port 22
+	gui, 2:font,norm
+	guicontrol, 2:hide,static7
+	guicontrol, 2:show,static7
+	gui, 2:add, edit,w50 veditsshport,%sshcredfilter1%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,,SSH password
+	gui, 2:font,norm
+	guicontrol, 2:hide,static8
+	guicontrol, 2:show,static8
+	gui, 2:add, edit,password w240 veditsshpass,%sshcredfilter3%
+	gui, 2:add, button,border x42 y436 w112 vButsaveedit1 gsaveeditedssh, Save
+	gui, 2:add, button,border x154 y436 w112 vreturnssh gcanceleditssh,Cancel
+	editsshwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
+}
+return
+saveeditedssh:
+{
+	gui, 2:submit,nohide
+	msgbox,4,,Are you sure you wish to edit connection: %sshisselected%?`nIf you select yes, your provided settings will overwrite your previous settings for the connection.`n`nNOTE:`nIf you removed the password out of the password field, it will now be blank and the connection will probably fail.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\SSH\%sshisselected%
+		FileAppend, %puttydir%\putty -P %editsshport% %editsshserver% -pw %editsshpass%, %A_workingdir%\SavedConnections\SSH\%editsshname%
+		Fileread, data, %A_workingdir%\SavedConnections\SSH\%editsshname%
+		Filedelete, %A_workingdir%\SavedConnections\SSH\%editsshname%
+		FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%editsshname%
+		gui, 2:destroy
+		gui2wasdestroyed = 1
+		gosub mainmenu
+	}
+	else
+	return
+}
+return
+canceleditssh:
+guicontrol, 2:hide,static4
+guicontrol, 2:hide,static5
+guicontrol, 2:hide,edit1
+guicontrol, 2:hide,static6
+guicontrol, 2:hide,edit2
+guicontrol, 2:hide,static7
+guicontrol, 2:hide,edit3
+guicontrol, 2:hide,static8
+guicontrol, 2:hide,edit4
+guicontrol, 2:hide,button7
+guicontrol, 2:hide,button8
+guicontrol, 2:disable,static4
+guicontrol, 2:disable,static5
+guicontrol, 2:disable,edit1
+guicontrol, 2:disable,static6
+guicontrol, 2:disable,edit2
+guicontrol, 2:disable,static7
+guicontrol, 2:disable,edit3
+guicontrol, 2:disable,static8
+guicontrol, 2:disable,edit4
+guicontrol, 2:disable,button7
+guicontrol, 2:disable,button8
+editsshname =
+editsshserver =
+editsshport =
+editsshpass =
+guicontrol, 2:show,butcreatessh
+guicontrol, 2:enable,butcreatessh
+guicontrol, 2:show,butsshconn
+guicontrol, 2:show,butsshedit
+guicontrol, 2:show,butsshdel
+guicontrol, 2:show,butsftp
+guicontrol, 2:show,butsshadv
+exit
 return
 
 deletesshconnection:
@@ -558,60 +746,6 @@ else
 	}
 }
 exit
-
-cancelcreatessh:
-guicontrol, 2:hide,static4
-guicontrol, 2:hide,static5
-guicontrol, 2:hide,edit1
-guicontrol, 2:hide,static6
-guicontrol, 2:hide,edit2
-guicontrol, 2:hide,static7
-guicontrol, 2:hide,edit3
-guicontrol, 2:hide,static8
-guicontrol, 2:hide,edit4
-guicontrol, 2:hide,button7
-guicontrol, 2:hide,button8
-guicontrol, 2:disable,static4
-guicontrol, 2:disable,static5
-guicontrol, 2:disable,edit1
-guicontrol, 2:disable,static6
-guicontrol, 2:disable,edit2
-guicontrol, 2:disable,static7
-guicontrol, 2:disable,edit3
-guicontrol, 2:disable,static8
-guicontrol, 2:disable,edit4
-guicontrol, 2:disable,button7
-guicontrol, 2:disable,button8
-sshname =
-sshserver =
-sshport =
-sshpass =
-guicontrol, 2:show,butcreatessh
-guicontrol, 2:enable,butcreatessh
-guicontrol, 2:show,butsshconn
-guicontrol, 2:show,butsshedit
-guicontrol, 2:show,butsshdel
-guicontrol, 2:show,butsftp
-guicontrol, 2:show,butsshadv
-exit
-
-Savessh:
-{
-	gui, 2:submit
-	FileCreateDir, SavedConnections
-	FileCreateDir, SavedConnections\SSH
-	if localsshport
-		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass% -R %localsshport%:%remotedestnport%, %A_workingdir%\SavedConnections\SSH\%sshname%
-	else
-		FileAppend, %puttydir%\putty -P %sshport% %sshserver% -pw %sshpass%, %A_workingdir%\SavedConnections\SSH\%sshname%
-	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
-	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
-	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
-	gui, 2:destroy
-	gui2wasdestroyed = 1
-	gosub MainMenu
-}
-return
 
 Detectrdp:
 ifexist %a_workingdir%\SavedConnections\RDP
