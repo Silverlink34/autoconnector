@@ -425,28 +425,28 @@ if gui2wasdestroyed = 1
 	createsshwasclicked =
 if createsshwasclicked = 1
 {
-	guicontrol, 2:show,static4
-	guicontrol, 2:show,static5
-	guicontrol, 2:show,edit1
-	guicontrol, 2:show,static6
-	guicontrol, 2:show,edit2
-	guicontrol, 2:show,static7
-	guicontrol, 2:show,edit3
-	guicontrol, 2:show,static8
-	guicontrol, 2:show,edit4
-	guicontrol, 2:show,button7
-	guicontrol, 2:show,button8
-	guicontrol, 2:enable,static4
-	guicontrol, 2:enable,static5
-	guicontrol, 2:enable,edit1
-	guicontrol, 2:enable,static6
-	guicontrol, 2:enable,edit2
-	guicontrol, 2:enable,static7
-	guicontrol, 2:enable,edit3
-	guicontrol, 2:enable,static8
-	guicontrol, 2:enable,edit4
-	guicontrol, 2:enable,button7
-	guicontrol, 2:enable,button8
+	guicontrol, 2:show,txtnewsshconn
+	guicontrol, 2:show,txtsshname
+	guicontrol, 2:show,sshname
+	guicontrol, 2:show,txtsshserver
+	guicontrol, 2:show,sshserver
+	guicontrol, 2:show,txtsshport
+	guicontrol, 2:show,sshport
+	guicontrol, 2:show,txtsshpass
+	guicontrol, 2:show,sshpass
+	guicontrol, 2:show,butsavessh
+	guicontrol, 2:show,butcancelcreatessh
+	guicontrol, 2:enable,txtnewsshconn
+	guicontrol, 2:enable,txtsshname
+	guicontrol, 2:enable,sshname
+	guicontrol, 2:enable,txtsshserver
+	guicontrol, 2:enable,sshserver
+	guicontrol, 2:enable,txtsshport
+	guicontrol, 2:enable,sshport
+	guicontrol, 2:enable,txtsshpass
+	guicontrol, 2:enable,sshpass
+	guicontrol, 2:enable,butsavessh
+	guicontrol, 2:enable,butcancelcreatessh
 }
 else
 {
@@ -458,26 +458,26 @@ else
 	gui, 2:font,underline
 	GUI, 2:Add,Text,vtxtsshname xs x300,Connection Name
 	gui, 2:font,norm
-	guicontrol, 2:hide,static5
-	guicontrol, 2:show,static5
+	guicontrol, 2:hide,txtsshname
+	guicontrol, 2:show,txtsshname
 	gui, 2:add, edit,w300 vsshname,My SSH Connection
 	gui, 2:font,underline
 	GUI, 2:Add, Text,vtxtsshserver,Username and host
 	gui, 2:font,norm
-	guicontrol, 2:hide,static6
-	guicontrol, 2:show,static6
+	guicontrol, 2:hide,txtsshserver
+	guicontrol, 2:show,txtsshserver
 	gui, 2:add, edit,w300 vsshserver, user@server
 	gui, 2:font,underline
 	GUI, 2:Add, Text,vtxtsshport,Specify a port if not default port 22
 	gui, 2:font,norm
-	guicontrol, 2:hide,static7
-	guicontrol, 2:show,static7
+	guicontrol, 2:hide,txtsshport
+	guicontrol, 2:show,txtsshport
 	gui, 2:add, edit,w50 vsshport,22
 	gui, 2:font,underline
 	GUI, 2:Add, Text,vtxtsshpass,SSH password
 	gui, 2:font,norm
-	guicontrol, 2:hide,static8
-	guicontrol, 2:show,static8
+	guicontrol, 2:hide,txtsshpass
+	guicontrol, 2:show,txtsshpass
 	gui, 2:add, edit,password w240 vsshpass,
 	gui, 2:add, button,border vbutsavessh x42 y436 w112 gsavessh, Save
 	gui, 2:add, button,border vbutcancelcreatessh x154 y436 w112 gcancelcreatessh,Cancel
@@ -571,22 +571,22 @@ if gui2wasdestroyed = 1
 	editsshwasclicked =
 if editsshwasclicked = 1
 {
-	guicontrol, 2:show,static4
-	guicontrol, 2:show,static5
-	guicontrol, 2:show,edit1
-	guicontrol, 2:show,static6
-	guicontrol, 2:show,edit2
+	guicontrol, 2:show,txteditsshtitle
+	guicontrol, 2:show,txteditsshname
+	guicontrol, 2:show,editsshname
+	guicontrol, 2:show,txteditsshserver
+	guicontrol, 2:show,editsshserver
 	guicontrol, 2:show,static7
 	guicontrol, 2:show,edit3
 	guicontrol, 2:show,static8
 	guicontrol, 2:show,edit4
 	guicontrol, 2:show,button7
 	guicontrol, 2:show,button8
-	guicontrol, 2:enable,static4
-	guicontrol, 2:enable,static5
-	guicontrol, 2:enable,edit1
-	guicontrol, 2:enable,static6
-	guicontrol, 2:enable,edit2
+	guicontrol, 2:enable,txteditsshtitle
+	guicontrol, 2:enable,txteditsshname
+	guicontrol, 2:enable,editsshname
+	guicontrol, 2:enable,txteditsshserver
+	guicontrol, 2:enable,editsshserver
 	guicontrol, 2:enable,static7
 	guicontrol, 2:enable,edit3
 	guicontrol, 2:enable,static8
@@ -597,21 +597,21 @@ if editsshwasclicked = 1
 else
 {	
 	gui, 2:font,underline
-	gui, 2:add,text, ys x420 section,Edit Connection
-	guicontrol, 2:hide,static4
-	guicontrol, 2:show,static4
+	gui, 2:add,text,vtxteditsshtitle ys x420 section,Edit Connection
+	guicontrol, 2:hide,txteditsshtitle
+	guicontrol, 2:show,txteditsshtitle
 	gui, 2:font,norm s14
 	gui, 2:font,underline
-	GUI, 2:Add, Text,xs x300,Connection Name
+	GUI, 2:Add, Text,vtxteditsshname xs  x300,Connection Name
 	gui, 2:font,norm	
-	guicontrol, 2:hide,static5
-	guicontrol, 2:show,static5
+	guicontrol, 2:hide,txteditsshname
+	guicontrol, 2:show,txteditsshname
 	gui, 2:add, edit,w300 veditsshname,%sshisselected%
 	gui, 2:font,underline
-	GUI, 2:Add, Text,,Username and host
+	GUI, 2:Add, Text,vtxteditsshserver,Username and host
 	gui, 2:font,norm
-	guicontrol, 2:hide,static6
-	guicontrol, 2:show,static6
+	guicontrol, 2:hide,txteditsshserver
+	guicontrol, 2:show,txteditsshserver
 	gui, 2:add, edit,w300 veditsshserver,%sshcredfilter2%
 	gui, 2:font,underline
 	GUI, 2:Add, Text,,Specify a port if not default port 22
@@ -652,22 +652,22 @@ saveeditedssh:
 }
 return
 canceleditssh:
-guicontrol, 2:hide,static4
-guicontrol, 2:hide,static5
-guicontrol, 2:hide,edit1
-guicontrol, 2:hide,static6
-guicontrol, 2:hide,edit2
+guicontrol, 2:hide,txteditsshtitle
+guicontrol, 2:hide,txteditsshname
+guicontrol, 2:hide,editsshname
+guicontrol, 2:hide,txteditsshserver
+guicontrol, 2:hide,editsshserver
 guicontrol, 2:hide,static7
 guicontrol, 2:hide,edit3
 guicontrol, 2:hide,static8
 guicontrol, 2:hide,edit4
 guicontrol, 2:hide,button7
 guicontrol, 2:hide,button8
-guicontrol, 2:disable,static4
-guicontrol, 2:disable,static5
-guicontrol, 2:disable,edit1
-guicontrol, 2:disable,static6
-guicontrol, 2:disable,edit2
+guicontrol, 2:disable,txteditsshtitle
+guicontrol, 2:disable,txteditsshname
+guicontrol, 2:disable,editsshname
+guicontrol, 2:disable,txteditsshserver
+guicontrol, 2:disable,editsshserver
 guicontrol, 2:disable,static7
 guicontrol, 2:disable,edit3
 guicontrol, 2:disable,static8
