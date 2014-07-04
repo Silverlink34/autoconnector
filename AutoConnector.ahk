@@ -347,7 +347,7 @@ gui, 2:add, Button,w224 border vbutcreatessh gCreatesshconnection, Create Connec
 gui, 2:add,button,ys w165 border vbutsshconn gconnecttossh section,Connect
 gui, 2:add,button,w165 vbutsshedit geditsshconnection,Edit Connection
 gui, 2:add,button,w165 vbutsshdel gdeletesshconnection,Delete Connection
-gui, 2:add,button,w165 vbutsftp,Launch SFTP FileZilla
+gui, 2:add,button,w165 vbutsftp gusesftp,Use SFTP
 gui, 2:add,button,w165 vbutsshadv gshowsshadv,Show/Hide Advanced Options
 guicontrol, 2:disable,butsshconn
 guicontrol, 2:disable,butsshedit
@@ -421,6 +421,8 @@ guicontrol, 2:hide,butsshedit
 guicontrol, 2:hide,butsshdel
 guicontrol, 2:hide,butsftp
 guicontrol, 2:hide,butsshadv
+if gui2wasdestroyed = 1
+	createsshwasclicked =
 if sshadvfirstclick = 1 ;if user accidentally left advanced ssh options open, this closes it before createssh options are shown.
 {
 	guicontrol, 2:disable,txtsshportforwarding,
@@ -436,8 +438,6 @@ if sshadvfirstclick = 1 ;if user accidentally left advanced ssh options open, th
 	sshadvfirstclick =
 	sshadvsecondshow = 1
 }
-if gui2wasdestroyed = 1
-	createsshwasclicked =
 if createsshwasclicked = 1
 {
 	guicontrol, 2:show,txtnewsshconn
@@ -740,7 +740,44 @@ ifmsgbox yes
 	}
 return
 
+usesftp:
+guicontrol, 2:disable,butcreatessh
+guicontrol, 2:disable,butsshconn
+guicontrol, 2:disable,butsshedit
+guicontrol, 2:disable,butsshdel
+guicontrol, 2:disable,butsftp
+guicontrol, 2:disable,butsshadv
+guicontrol, 2:hide,butcreatessh
+guicontrol, 2:hide,butsshconn
+guicontrol, 2:hide,butsshedit
+guicontrol, 2:hide,butsshdel
+guicontrol, 2:hide,butsftp
+guicontrol, 2:hide,butsshadv
+if sshadvfirstclick = 1 ;if user accidentally left advanced ssh options open, this closes it before sftp options are shown.
+{
+	guicontrol, 2:disable,txtsshportforwarding,
+	guicontrol, 2:hide,txtsshportforwarding,
+	guicontrol, 2:disable,txtlocalsshport,
+	guicontrol, 2:hide,txtlocalsshport,
+	guicontrol, 2:disable,localsshport,
+	guicontrol, 2:hide,localsshport,
+	guicontrol, 2:disable,txtremotedestnport,
+	guicontrol, 2:hide,txtremotedestnport,
+	guicontrol, 2:disable,remotedestnport,
+	guicontrol, 2:hide,remotedestnport,
+	sshadvfirstclick =
+	sshadvsecondshow = 1
+}
+gui, 2:add, Button,w224 x42 y436 border vbutreturntossh greturntossh,Return to SSH
+return
+returntossh:
+gui, 2:destroy
+gosub mainmenu
+return
+
 showsshadv:
+if gui2wasdestroyed = 1
+	sshadvfirstclick =
 if sshadvfirstclick = 1
 {
 	guicontrol, 2:disable,txtsshportforwarding,
@@ -779,11 +816,11 @@ else
 		gui, 2:font, norm
 		guicontrol, 2:hide,txtsshportforwarding,
 		guicontrol, 2:show,txtsshportforwarding,
-		gui, 2:add,text,vtxtlocalsshport,Local forwarded port
+		gui, 2:add,text,vtxtlocalsshport,Local forwarded port`nExample:2022
 		guicontrol, 2:hide,txtlocalsshport,
 		guicontrol, 2:show,txtlocalsshport,
 		gui, 2:add,edit,vlocalsshport,
-		gui, 2:add,text,vtxtremotedestnport,Remote server and port
+		gui, 2:add,text,vtxtremotedestnport,Remote server and port`nExample:localhost:22
 		guicontrol, 2:hide,txtremotedestnport,
 		guicontrol, 2:show,txtremotedestnport,
 		gui, 2:add,edit,vremotedestnport,
