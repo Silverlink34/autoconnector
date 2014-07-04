@@ -10,7 +10,7 @@ filecreatedir, %a_mydocuments%\AutoConnector
 ;Set working directory to created dir ^^
 SetWorkingDir %a_mydocuments%\AutoConnector
 
-
+versioncheck:
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
 version = v1.1-alpha
 progress,10,Checking the currentversion file on GitHub..,Checking for updates..
@@ -108,7 +108,7 @@ gui, 5:show, w587 h250, Set Master Password
 gui, 5:font, s14
 guicontrol, 5:focus,masterpass
 gui, 5:add, text,,Master password has not been set.
-gui, 5:add, text,,Please set a master password to secure this application's data.
+gui, 5:add, text,,Please set a master encryption password to secure this application's data.`n`nLeaving it blank is also an option, but not recommended.
 gui, 5:add, edit,password vmasterpass
 gui, 5:add,text,,Enter password again to verify.
 gui, 5:add,edit,password v2ndpass
@@ -287,7 +287,7 @@ Gui, 1:Show, w768 h485, AutoConnector
 gui, 1:font, s14,
 GUI, 1:Add, Text,,Thank you for using Brandon's AutoConnector.
 GUI, 1:Add, Text,,This application will quickly allow access to remote devices.
-GUI, 1:Add, Text,,Protocols supported are: SSH, RDP, Telnet and VNC.
+GUI, 1:Add, Text,,Protocols supported are: SSH, SFTP, RDP, Telnet and VNC.
 GUI, 1:Add, Text,,Saved usernames and passwords are encrypted with 128bit encryption method.
 gui, 1:add, button, vButok1 gMainMenu default, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
@@ -340,7 +340,7 @@ ifnotinstring, puttydir, Program
 	puttydir = %A_WorkingDir%\programbin
 	fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
 }
-gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC
+gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC|Master Settings
 gui, 2:add,listbox,vSSHConnections R13 gsshselected
 gui, 2:add,updown,section
 gui, 2:add, Button,w224 border vbutcreatessh gCreatesshconnection, Create Connection
@@ -362,7 +362,9 @@ gui, 2:tab,Telnet
 gui, 2:add,text,vnotavailabletelnet,This protocol has not been created yet, it is in progress.
 gui, 2:tab,VNC
 gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
-gui, 2:tab
+gui, 2:tab,Master Settings
+gui, 2:add, groupbox,x239 y235
+gui, 2:add,button,x256 y275 border vbutresetmasterpass gresetmasterpassword,Reset Master Password
 currenttabnumber:
 ControlGet, TabNumber, Tab,, SysTabControl321,A
 if tabnumber = 1
@@ -844,7 +846,7 @@ controlget,listedrdp,list,,Listbox2,A
 	Fileremovedir, tmp, 1	
 }
 return
-
+/*
 Createrdp:
 gui, 3:add, text,xs section,Connection Name
 gui, 3:add,checkbox,x+210 section vchkrdpadv gshowrdpadv,Show advanced options?
@@ -856,7 +858,7 @@ gui, 3:add, edit,w300 vrdpuser,username
 gui, 3:add, edit,w300 x+30 password vrdppass,password
 gui, 3:add, button,border x20 y71 vButsave2 gsaverdp, Save Connection
 exit
-
+*/
 
 
 ;showrdpadv:
@@ -879,7 +881,7 @@ exit
 ;}	
 
 
-
+/*
 Saverdp:
 {
 	gui, 3:submit
@@ -904,168 +906,70 @@ Saverdp:
 	gosub MainMenu
 }
 return
-
-
-
-RDP1:
+*/
+resetmasterpassword:
+msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
+ifmsgbox yes
 {
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP1%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP1%
-	run, %rdpconnect%
 	gui, 2:destroy
-	rdpconnect =
+	gui, 3:show, w587 h250, Reset Master Password
+	gui, 3:font, s14
+	guicontrol, 3:focus,resetmasterpass
+	gui, 3:add, text,,Enter new password.
+	gui, 3:add, edit,password vresetmasterpass
+	gui, 3:add,text,,Enter password again to verify.
+	gui, 3:add,edit,password vreset2ndpass
+	gui, 3:add,button,vbutresetok1 greset2ndpassverify,Submit
+	exit
+	reset2ndpassverify:
+	gui, 3:submit
+	if resetmasterpass = %reset2ndpass%
+		gosub reencryptconnections
+	else
+	{
+		msgbox, The passwords you entered do not match. Enter them again.
+		gui, 3:destroy
+		gosub resetmasterpassword
+	}
+	exit
+	reencryptconnections:
+	gui, 3:submit
+	Progress,10,Reading All SSH connections...,Resetting Master Password Encryption
+	sleep,2000
+	FileCreateDir, tmp
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\SSH > %a_workingdir%\tmp\sshlist,, hide
+	sleep, 200
+	progress,50,Decrypting and Re-Encrypting SSH...
+	Loop, read, %A_workingdir%\tmp\sshlist
+	{
+	sleep,100
+	progress,5%a_index%
+	fileread,data,%a_workingdir%\SavedConnections\SSH\%a_loopreadline%
+	filedelete, %a_workingdir%\SavedConnections\SSH\%a_loopreadline%
+	ssh2reset := Decrypt(data,pass)
+	pass = %resetmasterpass%
+	data = %ssh2reset%
+	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\SSH\%a_loopreadline%
+	pass = %mpass%
+	}	
+	progress,70,SSH Connections Re-Encrypted.
+	sleep,2000
+	progress,80,Setting New Master Password...
+	sleep,2000
+	data = %resetmasterpass%
+	pass = %resetmasterpass%
+	filedelete,%a_workingdir%\config
+	fileappend, % Encrypt(Data,Pass), %a_workingdir%\config
+	run, %comspec% /c attrib +h %a_workingdir%\config,,hide
+	progress,100,,Master Password Successfully Reset. Restarting application..
+	sleep,2000
+	progress,off
+	gui, 3:destroy
+	gosub versioncheck
+	
 }
-exit
 
-RDP2:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP2%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP2%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP2%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP2%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP2%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP2%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP2%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP3:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP3%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP3%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP3%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP3%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP3%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP3%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP3%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP4:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP4%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP4%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP4%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP4%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP4%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP4%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP4%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP5:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP5%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP5%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP5%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP5%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP5%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP5%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP5%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP6:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP6%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP6%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP6%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP6%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP6%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP6%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP6%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP7:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP7%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP7%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP7%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP7%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP7%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP7%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP7%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP8:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP8%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP8%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP8%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP8%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP8%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP8%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP8%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP9:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP9%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP9%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP9%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP9%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP9%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP9%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP9%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
-
-RDP10:
-{
-	Gui, 2:submit
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP10%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%RDP10%
-	Fileappend, % Decrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP10%
-	Fileread, rdpconnect, %A_workingdir%\SavedConnections\RDP\%RDP10%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%RDP10%
-	filedelete, %A_workingdir%\SavedConnections\RDP\%RDP10%
-	fileappend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%RDP10%
-	run, %rdpconnect%
-	gui, 2:destroy
-	rdpconnect =
-}
-exit
+return
 
 ;Encrypt and Decrypt Functions listed here
 
