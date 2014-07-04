@@ -704,8 +704,12 @@ if sshadvshowing = 1
 {
 	guicontrol, 2:disable,txtsshportforwarding,
 	guicontrol, 2:hide,txtsshportforwarding,
+	guicontrol, 2:disable,txtlocalsshport,
+	guicontrol, 2:hide,txtlocalsshport,
 	guicontrol, 2:disable,localsshport,
 	guicontrol, 2:hide,localsshport,
+	guicontrol, 2:disable,txtremotedestnport,
+	guicontrol, 2:hide,txtremotedestnport,
 	guicontrol, 2:disable,remotedestnport,
 	guicontrol, 2:hide,remotedestnport,
 	sshadvshowing =
@@ -718,8 +722,12 @@ else
 		sshadvshowing = 1
 		guicontrol, 2:enable,txtsshportforwarding
 		guicontrol, 2:show,txtsshportforwarding,
+		guicontrol, 2:enable,txtlocalsshport,
+		guicontrol, 2:show,txtlocalsshport,
 		guicontrol, 2:enable,localsshport,
 		guicontrol, 2:show,localsshport,
+		guicontrol, 2:enable,txtremotedestnport,
+		guicontrol, 2:show,txtremotedestnport,
 		guicontrol, 2:enable,remotedestnport,
 		guicontrol, 2:show,remotedestnport,
 	}
@@ -730,8 +738,14 @@ else
 		gui, 2:font, norm
 		guicontrol, 2:hide,txtsshportforwarding,
 		guicontrol, 2:show,txtsshportforwarding,
-		gui, 2:add,edit,vlocalsshport,localport
-		gui, 2:add,edit,vremotedestnport,remotelocal:port
+		gui, 2:add,text,vtxtlocalport,Local forwarded port
+		guicontrol, 2:hide,txtlocalport,
+		guicontrol, 2:show,txtlocalport,
+		gui, 2:add,edit,vlocalsshport,
+		gui, 2:add,text,vtxtremotedestnport,Remote server and port
+		guicontrol, 2:hide,txtremotedestnport,
+		guicontrol, 2:show,txtremotedestnport,
+		gui, 2:add,edit,vremotedestnport,
 		sshadvshowing = 1
 	}
 }
