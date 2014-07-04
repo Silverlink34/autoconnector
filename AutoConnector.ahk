@@ -576,23 +576,23 @@ if editsshwasclicked = 1
 	guicontrol, 2:show,editsshname
 	guicontrol, 2:show,txteditsshserver
 	guicontrol, 2:show,editsshserver
-	guicontrol, 2:show,static7
-	guicontrol, 2:show,edit3
-	guicontrol, 2:show,static8
-	guicontrol, 2:show,edit4
-	guicontrol, 2:show,button7
-	guicontrol, 2:show,button8
+	guicontrol, 2:show,txteditsshport
+	guicontrol, 2:show,editsshport
+	guicontrol, 2:show,txteditsshpass
+	guicontrol, 2:show,editsshpass
+	guicontrol, 2:show,butsaveeditedssh
+	guicontrol, 2:show,butcanceleditedssh
 	guicontrol, 2:enable,txteditsshtitle
 	guicontrol, 2:enable,txteditsshname
 	guicontrol, 2:enable,editsshname
 	guicontrol, 2:enable,txteditsshserver
 	guicontrol, 2:enable,editsshserver
-	guicontrol, 2:enable,static7
-	guicontrol, 2:enable,edit3
-	guicontrol, 2:enable,static8
-	guicontrol, 2:enable,edit4
-	guicontrol, 2:enable,button7
-	guicontrol, 2:enable,button8
+	guicontrol, 2:enable,txteditsshport
+	guicontrol, 2:enable,editsshport
+	guicontrol, 2:enable,txteditsshpass
+	guicontrol, 2:enable,editsshpass
+	guicontrol, 2:enable,butsaveeditedssh
+	guicontrol, 2:enable,butcanceleditedssh
 }
 else
 {	
@@ -614,19 +614,19 @@ else
 	guicontrol, 2:show,txteditsshserver
 	gui, 2:add, edit,w300 veditsshserver,%sshcredfilter2%
 	gui, 2:font,underline
-	GUI, 2:Add, Text,,Specify a port if not default port 22
+	GUI, 2:Add, Text,vtxteditsshport,Specify a port if not default port 22
 	gui, 2:font,norm
-	guicontrol, 2:hide,static7
-	guicontrol, 2:show,static7
+	guicontrol, 2:hide,txteditsshport
+	guicontrol, 2:show,txteditsshport
 	gui, 2:add, edit,w50 veditsshport,%sshcredfilter1%
 	gui, 2:font,underline
-	GUI, 2:Add, Text,,SSH password
+	GUI, 2:Add, Text,vtxteditsshpass,SSH password
 	gui, 2:font,norm
-	guicontrol, 2:hide,static8
-	guicontrol, 2:show,static8
+	guicontrol, 2:hide,txteditsshpass
+	guicontrol, 2:show,txteditsshpass
 	gui, 2:add, edit,password w240 veditsshpass,%sshcredfilter3%
-	gui, 2:add, button,border x42 y436 w112 gsaveeditedssh, Save
-	gui, 2:add, button,border x154 y436 w112 gcanceleditssh,Cancel
+	gui, 2:add, button,border vbutsaveeditedssh x42 y436 w112 gsaveeditedssh, Save
+	gui, 2:add, button,border vbutcanceleditedssh x154 y436 w112 gcanceleditssh,Cancel
 	editsshwasclicked = 1
 	if gui2wasdestroyed = 1
 		gui2wasdestroyed =
@@ -657,23 +657,23 @@ guicontrol, 2:hide,txteditsshname
 guicontrol, 2:hide,editsshname
 guicontrol, 2:hide,txteditsshserver
 guicontrol, 2:hide,editsshserver
-guicontrol, 2:hide,static7
-guicontrol, 2:hide,edit3
-guicontrol, 2:hide,static8
-guicontrol, 2:hide,edit4
-guicontrol, 2:hide,button7
-guicontrol, 2:hide,button8
+guicontrol, 2:hide,txteditsshport
+guicontrol, 2:hide,editsshport
+guicontrol, 2:hide,txteditsshpass
+guicontrol, 2:hide,editsshpass
+guicontrol, 2:hide,butsaveeditedssh
+guicontrol, 2:hide,butcanceleditedssh
 guicontrol, 2:disable,txteditsshtitle
 guicontrol, 2:disable,txteditsshname
 guicontrol, 2:disable,editsshname
 guicontrol, 2:disable,txteditsshserver
 guicontrol, 2:disable,editsshserver
-guicontrol, 2:disable,static7
-guicontrol, 2:disable,edit3
-guicontrol, 2:disable,static8
-guicontrol, 2:disable,edit4
-guicontrol, 2:disable,button7
-guicontrol, 2:disable,button8
+guicontrol, 2:disable,txteditsshport
+guicontrol, 2:disable,editsshport
+guicontrol, 2:disable,txteditsshpass
+guicontrol, 2:disable,editsshport
+guicontrol, 2:disable,butsaveeditedssh
+guicontrol, 2:disable,butcanceleditedssh
 editsshname =
 editsshserver =
 editsshport =
@@ -702,12 +702,12 @@ return
 showsshadv:
 if sshadvshowing = 1
 {
-	guicontrol, 2:disable,static4,
-	guicontrol, 2:hide,static4,
-	guicontrol, 2:disable,edit1,
-	guicontrol, 2:hide,edit1,
-	guicontrol, 2:disable,edit2,
-	guicontrol, 2:hide,edit2,
+	guicontrol, 2:disable,txtsshportforwarding,
+	guicontrol, 2:hide,txtsshportforwarding,
+	guicontrol, 2:disable,localsshport,
+	guicontrol, 2:hide,localsshport,
+	guicontrol, 2:disable,remotedestnport,
+	guicontrol, 2:hide,remotedestnport,
 	sshadvshowing =
 	sshadvshowagain = 1
 }
@@ -716,20 +716,20 @@ else
 	if sshadvshowagain = 1
 	{
 		sshadvshowing = 1
-		guicontrol, 2:enable,static4,
-		guicontrol, 2:show,static4,
-		guicontrol, 2:enable,edit1,
-		guicontrol, 2:show,edit1,
-		guicontrol, 2:enable,edit2,
-		guicontrol, 2:show,edit2,
+		guicontrol, 2:enable,txtsshportforwarding
+		guicontrol, 2:show,txtsshportforwarding,
+		guicontrol, 2:enable,localsshport,
+		guicontrol, 2:show,localsshport,
+		guicontrol, 2:enable,remotedestnport,
+		guicontrol, 2:show,remotedestnport,
 	}
 	else
 	{	
 		gui, 2:font,underline
-		gui, 2:add,text,ys x490,SSH Port Forwarding
+		gui, 2:add,text,vtxtsshportforwarding ys x490,SSH Port Forwarding
 		gui, 2:font, norm
-		guicontrol, 2:hide,static4,
-		guicontrol, 2:show,static4,
+		guicontrol, 2:hide,txtsshportforwarding,
+		guicontrol, 2:show,txtsshportforwarding,
 		gui, 2:add,edit,vlocalsshport,localport
 		gui, 2:add,edit,vremotedestnport,remotelocal:port
 		sshadvshowing = 1
