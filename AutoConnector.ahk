@@ -421,6 +421,21 @@ guicontrol, 2:hide,butsshedit
 guicontrol, 2:hide,butsshdel
 guicontrol, 2:hide,butsftp
 guicontrol, 2:hide,butsshadv
+if sshadvfirstclick = 1 ;if user accidentally left advanced ssh options open, this closes it before createssh options are shown.
+{
+	guicontrol, 2:disable,txtsshportforwarding,
+	guicontrol, 2:hide,txtsshportforwarding,
+	guicontrol, 2:disable,txtlocalsshport,
+	guicontrol, 2:hide,txtlocalsshport,
+	guicontrol, 2:disable,localsshport,
+	guicontrol, 2:hide,localsshport,
+	guicontrol, 2:disable,txtremotedestnport,
+	guicontrol, 2:hide,txtremotedestnport,
+	guicontrol, 2:disable,remotedestnport,
+	guicontrol, 2:hide,remotedestnport,
+	sshadvfirstclick =
+	sshadvsecondshow = 1
+}
 if gui2wasdestroyed = 1
 	createsshwasclicked =
 if createsshwasclicked = 1
@@ -542,6 +557,17 @@ exit
 connecttossh:
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
 sshconnect := Decrypt(data,pass)
+gui, 2:submit,nohide
+if localsshport
+{
+	stringreplace,sshcreds,sshconnect,%puttydir%,,1
+	stringreplace,sshcreds,sshcreds,\putty,,1
+	stringreplace,sshcreds,sshcreds,-P,,1
+	stringreplace,sshcreds,sshcreds,%a_space%w%a_space%,%a_space%,1
+	stringreplace,sshcreds,sshcreds,%a_space%%a_space%,,
+	stringsplit,sshcredfilter,sshcreds,%a_space%,,
+	sshconnect = %puttydir%\putty -P %sshcredfilter1% %sshcredfilter2% -pw %sshcredfilter3% -R %localsshport%:%remotedestnport%
+}
 run, %sshconnect%
 return
 
@@ -567,6 +593,21 @@ guicontrol, 2:hide,butsshedit
 guicontrol, 2:hide,butsshdel
 guicontrol, 2:hide,butsftp
 guicontrol, 2:hide,butsshadv
+if sshadvfirstclick = 1 ;if user accidentally left advanced ssh options open, this closes it before editssh options are shown.
+{
+	guicontrol, 2:disable,txtsshportforwarding,
+	guicontrol, 2:hide,txtsshportforwarding,
+	guicontrol, 2:disable,txtlocalsshport,
+	guicontrol, 2:hide,txtlocalsshport,
+	guicontrol, 2:disable,localsshport,
+	guicontrol, 2:hide,localsshport,
+	guicontrol, 2:disable,txtremotedestnport,
+	guicontrol, 2:hide,txtremotedestnport,
+	guicontrol, 2:disable,remotedestnport,
+	guicontrol, 2:hide,remotedestnport,
+	sshadvfirstclick =
+	sshadvsecondshow = 1
+}
 if gui2wasdestroyed = 1
 	editsshwasclicked =
 if editsshwasclicked = 1
@@ -700,7 +741,7 @@ ifmsgbox yes
 return
 
 showsshadv:
-if sshadvshowing = 1
+if sshadvfirstclick = 1
 {
 	guicontrol, 2:disable,txtsshportforwarding,
 	guicontrol, 2:hide,txtsshportforwarding,
@@ -712,14 +753,14 @@ if sshadvshowing = 1
 	guicontrol, 2:hide,txtremotedestnport,
 	guicontrol, 2:disable,remotedestnport,
 	guicontrol, 2:hide,remotedestnport,
-	sshadvshowing =
-	sshadvshowagain = 1
+	sshadvfirstclick =
+	sshadvsecondshow = 1
 }
 else
 {
-	if sshadvshowagain = 1
+	if sshadvsecondshow = 1
 	{
-		sshadvshowing = 1
+		sshadvfirstclick = 1
 		guicontrol, 2:enable,txtsshportforwarding
 		guicontrol, 2:show,txtsshportforwarding,
 		guicontrol, 2:enable,txtlocalsshport,
@@ -738,15 +779,15 @@ else
 		gui, 2:font, norm
 		guicontrol, 2:hide,txtsshportforwarding,
 		guicontrol, 2:show,txtsshportforwarding,
-		gui, 2:add,text,vtxtlocalport,Local forwarded port
-		guicontrol, 2:hide,txtlocalport,
-		guicontrol, 2:show,txtlocalport,
+		gui, 2:add,text,vtxtlocalsshport,Local forwarded port
+		guicontrol, 2:hide,txtlocalsshport,
+		guicontrol, 2:show,txtlocalsshport,
 		gui, 2:add,edit,vlocalsshport,
 		gui, 2:add,text,vtxtremotedestnport,Remote server and port
 		guicontrol, 2:hide,txtremotedestnport,
 		guicontrol, 2:show,txtremotedestnport,
 		gui, 2:add,edit,vremotedestnport,
-		sshadvshowing = 1
+		sshadvfirstclick = 1
 	}
 }
 exit
