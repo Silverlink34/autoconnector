@@ -365,12 +365,14 @@ gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is i
 gui, 2:tab,Master Settings
 gui, 2:add, groupbox,x239 y235
 gui, 2:add,button,x256 y275 border vbutresetmasterpass gresetmasterpassword,Reset Master Password
+gui, 2:tab
 currenttabnumber:
 ControlGet, TabNumber, Tab,, SysTabControl321,A
 if tabnumber = 1
 	gosub detectssh
 if tabnumber = 2
 	gosub detectrdp
+gui, 2:tab,SSH
 sshselected:
 controlget,sshisselected,choice,,listbox1,A
 	if sshisselected
@@ -449,6 +451,7 @@ if createsshwasclicked = 1
 	guicontrol, 2:show,sshserver
 	guicontrol, 2:show,txtsshport
 	guicontrol, 2:show,sshport
+	
 	guicontrol, 2:show,txtsshpass
 	guicontrol, 2:show,sshpass
 	guicontrol, 2:show,butsavessh
@@ -771,6 +774,11 @@ if sshadvfirstclick = 1 ;if user accidentally left advanced ssh options open, th
 	sshadvsecondshow = 1
 }
 gui, 2:add, Button,w224 x42 y436 border vbutreturntossh greturntossh,Return to SSH
+gui, 2:font,underline
+gui, 2:add,text,vtxtsftpconnectionto ys x365 section,SFTP To: %sshisselected%
+guicontrol, 2:hide,sftpconnectionto
+guicontrol, 2:show,sftpconnectionto
+gui, 2:font,norm s14
 return
 returntossh:
 gui, 2:destroy
@@ -966,7 +974,6 @@ ifmsgbox yes
 	progress,off
 	gui, 3:destroy
 	gosub versioncheck
-	
 }
 
 return
