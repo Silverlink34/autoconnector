@@ -15,10 +15,17 @@ telnet
 vnc with some vnc connector
 
 sftp options:
+
 display current sftp connection to avoid confusion with selected items in listbox
+
 drag'n'drop filebox to specified folder
+
 open file and send to specified folder
+
 preview items in directory
+
 download files from remote directory, specify local location
+
 launch filezilla
+
 launch cli
