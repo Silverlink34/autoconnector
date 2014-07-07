@@ -12,7 +12,7 @@ SetWorkingDir %a_mydocuments%\AutoConnector
 
 versioncheck:
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
-version = v1.1-alpha
+version = 1.1-alpha
 progress,10,Checking the currentversion file on GitHub..,Checking for updates..
 sleep, 500
 urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/currentversion, %a_workingdir%\currentversion
@@ -285,7 +285,7 @@ exit
 guistart:
 Gui, 1:Show, w768 h485, AutoConnector
 gui, 1:font, s14,
-GUI, 1:Add, Text,,Thank you for using Brandon's AutoConnector.
+GUI, 1:Add, Text,,Thank you for using Brandon's AutoConnector, Version %version%.
 GUI, 1:Add, Text,,This application will quickly allow access to remote devices.
 GUI, 1:Add, Text,,Protocols supported are: SSH, SFTP, RDP, Telnet and VNC.
 GUI, 1:Add, Text,,Saved usernames and passwords are encrypted with 128bit encryption method.
@@ -375,22 +375,26 @@ if tabnumber = 2
 gui, 2:tab,SSH
 sshselected:
 controlget,sshisselected,choice,,listbox1,A
-	if sshisselected
-	{
-		guicontrol, 2:enable,butsshconn
-		guicontrol, 2:enable,butsshedit
-		guicontrol, 2:enable,butsshdel
-		guicontrol, 2:enable,butsftp
-		guicontrol, 2:enable,butsshadv
-	}
-	else
-	{
-		guicontrol, 2:disable,butsshconn
-		guicontrol, 2:disable,butsshedit
-		guicontrol, 2:disable,butsshdel
-		guicontrol, 2:disable,butsftp
-		guicontrol, 2:disable,butsshadv
-	}
+if sftpmenu = 1
+{
+	guicontrol,text,txtsftpconnectionto,SFTP To: %sshisselected%
+}
+if sshisselected
+{
+	guicontrol, 2:enable,butsshconn
+	guicontrol, 2:enable,butsshedit
+	guicontrol, 2:enable,butsshdel
+	guicontrol, 2:enable,butsftp
+	guicontrol, 2:enable,butsshadv
+}
+else
+{
+	guicontrol, 2:disable,butsshconn
+	guicontrol, 2:disable,butsshedit
+	guicontrol, 2:disable,butsshdel
+	guicontrol, 2:disable,butsftp
+	guicontrol, 2:disable,butsshadv
+}
 exit
 
 Detectssh:
@@ -746,6 +750,7 @@ ifmsgbox yes
 return
 
 usesftp:
+sftpmenu = 1
 guicontrol, 2:disable,butcreatessh
 guicontrol, 2:disable,butsshconn
 guicontrol, 2:disable,butsshedit
@@ -779,6 +784,16 @@ gui, 2:add,text,vtxtsftpconnectionto ys x365 section,SFTP To: %sshisselected%
 guicontrol, 2:hide,sftpconnectionto
 guicontrol, 2:show,sftpconnectionto
 gui, 2:font,norm s14
+gui, 2:add,button,x310 y150 section vbutlaunchfilezilla,Launch SFTP GUI`nWith FileZilla
+gui, 2:add,button,ys x+65 vbutlaunchpsftp,Launch SFTP CLI`nWith PSFTP
+gui, 2:font,underline
+gui, 2:add,text,xs y+40 vtxtsftpoptions,SFTP Options (applied to both GUI and CLI)
+gui, 2:font,s13
+gui, 2:add,text,vtxtspecifylocaldir,Specify Local Directory
+gui, 2:font,norm
+gui, 2:add,edit,vlocaldir,
+gui, 2:font,underline s14
+gui, 2:add,text,xs y+40 vtxtclioptions,CLI Options
 return
 returntossh:
 gui, 2:destroy
@@ -786,6 +801,7 @@ gosub mainmenu
 return
 
 showsshadv:
+sshmenu = 1
 if gui2wasdestroyed = 1
 	sshadvfirstclick =
 if sshadvfirstclick = 1
