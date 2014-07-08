@@ -805,6 +805,28 @@ gui, 2:destroy
 gosub mainmenu
 return
 launchfz:
+ifexist C:\Program Files (x86)\FileZilla FTP Client
+{
+	fzdir = C:\Program Files (x86)\FileZilla FTP Client
+}
+ifexist C:\Program Files\FileZilla FTP Client
+{
+	fzdir = C:\Program Files\FileZilla FTP Client
+}
+ifnotinstring, fzdir, Program
+{
+	progress,10,,Installing FileZilla to AutoConnector\programbin..
+	filecreatedir, %a_workingdir%\programbin
+	fzdir = %A_WorkingDir%\programbin\filezilla
+	progress,50,Downloading FileZilla files..
+	urldownloadtofile,https://github.com/Silverlink34/autoconnector/archive/master.zip, %a_workingdir%\programbin
+	fileinstall,7za.exe,%a_workingdir%\programbin\7za.exe
+	progress,70,Extracting FileZilla Files..
+	run,7za e autoconnector-master.zip -o.\filezilla filezilla -r -aoa,hidden
+	progress,90,Cleaning up..
+	filedelete, %a_workingdir%\autoconnector-master.zip
+	progress,100,,Done.	
+}
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
 sshconn := Decrypt(data,pass)
 stringreplace,sshconn,sshconn,%puttydir%,,1
@@ -812,11 +834,13 @@ stringreplace,sshconn,sshconn,\putty,,1
 stringreplace,sshconn,sshconn,-P,,1
 stringreplace,sshconn,sshconn,%a_space%w%a_space%,%a_space%,1
 stringreplace,sshconn,sshconn,%a_space%%a_space%,,
+stringreplace,sshconn,sshconn,@,%a_space%,
 stringsplit,sftpcreds,sshconn,%a_space%,,
-;msgbox,Username@server:%sshcredfilter2% Password:%sshcredfilter3% Port:%sshcredfilter1%
+;msgbox,port: %sftpcreds1%`nusername: %sftpcreds2%`nServer: %sftpcreds3%`nPassword: %sftpcreds4%
 if localdir
 {
 	fzconnect = %fzdir%\filezilla 
+}
 return
 
 showsshadv:
