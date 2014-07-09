@@ -815,18 +815,43 @@ ifexist C:\Program Files\FileZilla FTP Client
 }
 ifnotinstring, fzdir, Program
 {
-	progress,10,,Installing FileZilla to AutoConnector\programbin..
-	filecreatedir, %a_workingdir%\programbin
-	fzdir = %A_WorkingDir%\programbin\filezilla
-	progress,50,Downloading FileZilla files..
-	urldownloadtofile,https://github.com/Silverlink34/autoconnector/archive/master.zip, %a_workingdir%\programbin
-	fileinstall,7za.exe,%a_workingdir%\programbin\7za.exe
-	progress,70,Extracting FileZilla Files..
-	run,7za e autoconnector-master.zip -o.\filezilla filezilla -r -aoa,hidden
-	progress,90,Cleaning up..
-	filedelete, %a_workingdir%\autoconnector-master.zip
-	progress,100,,Done.	
+	ifnotexist, %a_workingdir%\programbin\filezilla
+	{
+		ifexist %a_workingdir%\programbin\autoconnector-master.zip
+		{
+			msgbox, acmasterzip found, skipping to extract.
+			gosub extractfz
+		}
+		progress,10,,Installing FileZilla to AutoConnector\programbin..
+		filecreatedir, %a_workingdir%\programbin
+		progress,50,`n`nDownloading FileZilla files..
+		urldownloadtofile,https://github.com/Silverlink34/autoconnector/archive/master.zip, %a_workingdir%\programbin\autoconnector-master.zip
+		extractfz:
+		progress,70,`n`nExtracting FileZilla Files..
+		fileinstall,7za.exe,%a_workingdir%\programbin\7za.exe
+		runwait, %comspec% /c %a_workingdir%\programbin\7za x programbin\autoconnector-master.zip -oprogrambin\filezilla filezilla -r -aoa,hide
+		sleep,1000
+		ifnotexist, %a_workingdir%\programbin\filezilla
+		{
+			progress,off
+			msgbox, filezilla did not install correctly.
+		}
+		else
+		{
+			progress,100,`n`n,Done.
+			sleep,800
+			progress,off
+			gosub runfzconnect
+		}
+	}
+	else
+		gosub runfzconnect
 }
+runfzconnect:
+gui, 2:SUBMIT,nohide
+fzdir = %A_WorkingDir%\programbin\filezilla\autoconnector-master\filezilla
+ifexist %a_workingdir%\programbin\autoconnector-master.zip
+	filedelete, %a_workingdir%\programbin\autoconnector-master.zip
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
 sshconn := Decrypt(data,pass)
 stringreplace,sshconn,sshconn,%puttydir%,,1
@@ -838,10 +863,11 @@ stringreplace,sshconn,sshconn,@,%a_space%,
 stringsplit,sftpcreds,sshconn,%a_space%,,
 ;msgbox,port: %sftpcreds1%`nusername: %sftpcreds2%`nServer: %sftpcreds3%`nPassword: %sftpcreds4%
 if localdir
-{
-	fzconnect = %fzdir%\filezilla 
-}
-return
+	fzconnect = %fzdir%\filezilla.exe "--local="%localdir%" sftp://%sftpcreds2%:%sftpcreds4%@%sftpcreds3%:%sftpcreds1%"
+else
+	fzconnect = %fzdir%\filezilla.exe "sftp://%sftpcreds2%:%sftpcreds4%@%sftpcreds3%:%sftpcreds1%"
+run, %fzconnect%
+exit
 
 showsshadv:
 sshmenu = 1
