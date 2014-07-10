@@ -326,20 +326,6 @@ ifequal, skipintro, 1
 gui, 2:show, w768 h520
 gui, 2:font, s16,
 GUI, 2:Add, Text,,Please create a new connection or choose a saved connection.
-ifexist C:\Program Files (x86)\PuTTY
-{
-	puttydir = C:\Program Files (x86)\PuTTY
-}
-ifexist C:\Program Files\PuTTY
-{
-	puttydir = C:\Program Files\PuTTY
-}
-ifnotinstring, puttydir, Program
-{
-	filecreatedir, %a_workingdir%\programbin
-	puttydir = %A_WorkingDir%\programbin
-	fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
-}
 gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC|Master Settings
 gui, 2:add,listbox,vSSHConnections R13 gsshselected
 gui, 2:add,updown,section
@@ -573,6 +559,20 @@ guicontrol, 2:show,butsshadv
 exit
 
 connecttossh:
+ifexist C:\Program Files (x86)\PuTTY
+{
+	puttydir = C:\Program Files (x86)\PuTTY
+}
+ifexist C:\Program Files\PuTTY
+{
+	puttydir = C:\Program Files\PuTTY
+}
+ifnotinstring, puttydir, Program
+{
+	filecreatedir, %a_workingdir%\programbin
+	puttydir = %A_WorkingDir%\programbin
+	fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
+}
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
 sshconnect := Decrypt(data,pass)
 gui, 2:submit,nohide
@@ -799,6 +799,7 @@ gui, 2:add,button,w167 vbutsftpclihelp gsftpclihelp,SFTP CLI`nHelp
 return
 returntossh:
 gui, 2:destroy
+gui2wasdestroyed = 1
 gosub mainmenu
 return
 launchfz:
@@ -943,7 +944,7 @@ exit
 
 gui, 2:tab,rdp
 rdpselected:
-controlget,rdpisselected,choice,,listbox1,A
+controlget,rdpisselected,choice,,listbox2,A
 if rdpisselected
 {
 	guicontrol, 2:enable,butrdpconn
@@ -1009,8 +1010,8 @@ if createrdpwasclicked = 1
 	guicontrol, 2:show,rdpname
 	guicontrol, 2:show,txtrdpserver
 	guicontrol, 2:show,rdpserver
-	guicontrol, 2:show,txtrdpport
-	guicontrol, 2:show,rdpport
+	guicontrol, 2:show,txtrdpuser
+	guicontrol, 2:show,rdpuser
 	
 	guicontrol, 2:show,txtrdppass
 	guicontrol, 2:show,rdppass
@@ -1021,8 +1022,8 @@ if createrdpwasclicked = 1
 	guicontrol, 2:enable,rdpname
 	guicontrol, 2:enable,txtrdpserver
 	guicontrol, 2:enable,rdpserver
-	guicontrol, 2:enable,txtrdpport
-	guicontrol, 2:enable,rdpport
+	guicontrol, 2:enable,txtrdpuser
+	guicontrol, 2:enable,rdpuser
 	guicontrol, 2:enable,txtrdppass
 	guicontrol, 2:enable,rdppass
 	guicontrol, 2:enable,butsaverdp
@@ -1030,6 +1031,7 @@ if createrdpwasclicked = 1
 }
 else
 {
+	gui, 2:tab,rdp
 	gui, 2:font,underline
 	gui, 2:add,text,vtxtnewrdpconn ys x420 section,New Connection
 	guicontrol, 2:hide,txtnewrdpconn
@@ -1040,7 +1042,7 @@ else
 	gui, 2:font,norm
 	guicontrol, 2:hide,txtrdpname
 	guicontrol, 2:show,txtrdpname
-	gui, 2:add, edit,w300 vrdpname,My SSH Connection
+	gui, 2:add, edit,w300 vrdpname,My RDP Connection
 	gui, 2:font,underline
 	GUI, 2:Add, Text,vtxtrdpserver,Server domain/public ip and port
 	gui, 2:font,norm
@@ -1048,11 +1050,11 @@ else
 	guicontrol, 2:show,txtrdpserver
 	gui, 2:add, edit,w300 vrdpserver, server:port
 	gui, 2:font,underline
-	GUI, 2:Add, Text,vtxtrdpuser,Specify a port if not default port 22
+	GUI, 2:Add, Text,vtxtrdpuser,Username
 	gui, 2:font,norm
 	guicontrol, 2:hide,txtrdpuser
 	guicontrol, 2:show,txtrdpuser
-	gui, 2:add, edit,w50 vrdpuser,Username
+	gui, 2:add, edit,w240 vrdpuser,
 	gui, 2:font,underline
 	GUI, 2:Add, Text,vtxtrdppass,Password
 	gui, 2:font,norm
@@ -1112,6 +1114,14 @@ guicontrol, 2:show,butrdpedit
 guicontrol, 2:show,butrdpdel
 guicontrol, 2:show,butrdpadv
 exit
+connecttordp:
+filecreatedir, %a_workingdir%\programbin
+fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
+fileread, data, %a_workingdir%\SavedConnections\rdp\%rdpisselected%
+rdpconnect := Decrypt(data,pass)
+;gui, 2:submit,nohide
+run, %rdpconnect%
+return
 /*
 Createrdp:
 gui, 3:add, text,xs section,Connection Name
