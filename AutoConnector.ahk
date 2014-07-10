@@ -355,8 +355,17 @@ guicontrol, 2:disable,butsshdel
 guicontrol, 2:disable,butsftp
 guicontrol, 2:disable,butsshadv
 gui, 2:tab,RDP
-gui, 2:add,listbox,vRDPConnections R13
-gui, 2:add,updown
+gui, 2:add,listbox,vRDPConnections R13 grdpselected
+gui, 2:add,updown,section
+gui, 2:add, Button,w224 border vbutcreaterdp gCreaterdpconnection, Create Connection
+gui, 2:add,button,ys w165 border vbutrdpconn section,Connect
+gui, 2:add,button,w165 vbutrdpedit ,Edit Connection
+gui, 2:add,button,w165 vbutrdpdel ,Delete Connection
+gui, 2:add,button,w165 vbutrdpadv,Show/Hide Advanced Options
+guicontrol, 2:disable,butrdpconn
+guicontrol, 2:disable,butrdpedit
+guicontrol, 2:disable,butrdpdel
+guicontrol, 2:disable,butrdpadv
 ;gui, 2:add, Button,w225 border gCreaterdpconnection, Create Connection
 gui, 2:tab,Telnet
 gui, 2:add,text,vnotavailabletelnet,This protocol has not been created yet, it is in progress.
@@ -877,7 +886,6 @@ sftpclihelp:
 msgbox,The SFTP command line uses Linux (bash) sftp commands. Here are the basic commands:`n`nput - transfers file from local to remote. assumes file is in current local directory unless full path specified.`nget - downloads remote file to current local directory.`nls - Lists remote directory`nlls - lists local directory`ncd - changes remote directory, type directory after "cd" to change to it.`nUsing "cd .." will go up a directory, and "cd ../dir" will go up a directory and change to a folder in that directory.`nlcd - same as cd, but changes your local directory.`nbye - exits connection.`nget and put commands accept "*" as a wildcard.
 return
 
-
 showsshadv:
 sshmenu = 1
 if gui2wasdestroyed = 1
@@ -933,6 +941,24 @@ else
 }
 exit
 
+gui, 2:tab,rdp
+rdpselected:
+controlget,rdpisselected,choice,,listbox1,A
+if rdpisselected
+{
+	guicontrol, 2:enable,butrdpconn
+	guicontrol, 2:enable,butrdpedit
+	guicontrol, 2:enable,butrdpdel
+	guicontrol, 2:enable,butrdpadv
+}
+else
+{
+	guicontrol, 2:disable,butrdpconn
+	guicontrol, 2:disable,butrdpedit
+	guicontrol, 2:disable,butrdpdel
+	guicontrol, 2:disable,butrdpadv
+}
+exit
 Detectrdp:
 ifexist %a_workingdir%\SavedConnections\RDP
 controlget,listedrdp,list,,Listbox2,A
@@ -948,12 +974,150 @@ controlget,listedrdp,list,,Listbox2,A
 	Fileremovedir, tmp, 1	
 }
 return
+Createrdpconnection:
+guicontrol, 2:disable,butcreaterdp
+guicontrol, 2:disable,butrdpconn
+guicontrol, 2:disable,butrdpedit
+guicontrol, 2:disable,butrdpdel
+guicontrol, 2:disable,butrdpadv
+guicontrol, 2:hide,butcreaterdp
+guicontrol, 2:hide,butrdpconn
+guicontrol, 2:hide,butrdpedit
+guicontrol, 2:hide,butrdpdel
+guicontrol, 2:hide,butrdpadv
+if gui2wasdestroyed = 1
+	createrdpwasclicked =
+if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, this closes it before createrdp options are shown.
+{
+	guicontrol, 2:disable,txtrdpportforwarding,
+	guicontrol, 2:hide,txtrdpportforwarding,
+	guicontrol, 2:disable,txtlocalrdpport,
+	guicontrol, 2:hide,txtlocalrdpport,
+	guicontrol, 2:disable,localrdpport,
+	guicontrol, 2:hide,localrdpport,
+	guicontrol, 2:disable,txtremotedestnport,
+	guicontrol, 2:hide,txtremotedestnport,
+	guicontrol, 2:disable,remotedestnport,
+	guicontrol, 2:hide,remotedestnport,
+	rdpadvfirstclick =
+	rdpadvsecondshow = 1
+}
+if createrdpwasclicked = 1
+{
+	guicontrol, 2:show,txtnewrdpconn
+	guicontrol, 2:show,txtrdpname
+	guicontrol, 2:show,rdpname
+	guicontrol, 2:show,txtrdpserver
+	guicontrol, 2:show,rdpserver
+	guicontrol, 2:show,txtrdpport
+	guicontrol, 2:show,rdpport
+	
+	guicontrol, 2:show,txtrdppass
+	guicontrol, 2:show,rdppass
+	guicontrol, 2:show,butsaverdp
+	guicontrol, 2:show,butcancelcreaterdp
+	guicontrol, 2:enable,txtnewrdpconn
+	guicontrol, 2:enable,txtrdpname
+	guicontrol, 2:enable,rdpname
+	guicontrol, 2:enable,txtrdpserver
+	guicontrol, 2:enable,rdpserver
+	guicontrol, 2:enable,txtrdpport
+	guicontrol, 2:enable,rdpport
+	guicontrol, 2:enable,txtrdppass
+	guicontrol, 2:enable,rdppass
+	guicontrol, 2:enable,butsaverdp
+	guicontrol, 2:enable,butcancelcreaterdp
+}
+else
+{
+	gui, 2:font,underline
+	gui, 2:add,text,vtxtnewrdpconn ys x420 section,New Connection
+	guicontrol, 2:hide,txtnewrdpconn
+	guicontrol, 2:show,txtnewrdpconn
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add,Text,vtxtrdpname xs x300,Connection Name
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtrdpname
+	guicontrol, 2:show,txtrdpname
+	gui, 2:add, edit,w300 vrdpname,My SSH Connection
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtrdpserver,Server domain/public ip and port
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtrdpserver
+	guicontrol, 2:show,txtrdpserver
+	gui, 2:add, edit,w300 vrdpserver, server:port
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtrdpuser,Specify a port if not default port 22
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtrdpuser
+	guicontrol, 2:show,txtrdpuser
+	gui, 2:add, edit,w50 vrdpuser,Username
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtrdppass,Password
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtrdppass
+	guicontrol, 2:show,txtrdppass
+	gui, 2:add, edit,password w240 vrdppass,
+	gui, 2:add, button,border vbutsaverdp x42 y436 w112 gsaverdp, Save
+	gui, 2:add, button,border vbutcancelcreaterdp x154 y436 w112 gcancelcreaterdp,Cancel
+	createrdpwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
+}
+exit
+Saverdp:
+{
+	gui, 2:submit
+	FileCreateDir, SavedConnections
+	FileCreateDir, SavedConnections\RDP
+	data = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%, %A_workingdir%\SavedConnections\rdp\%rdpname%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\rdp\%rdpname%
+	gui, 2:destroy
+	gui2wasdestroyed = 1
+	gosub MainMenu
+}
+return
+cancelcreaterdp:
+guicontrol, 2:hide,txtnewrdpconn
+guicontrol, 2:hide,txtrdpname
+guicontrol, 2:hide,rdpname
+guicontrol, 2:hide,txtrdpserver
+guicontrol, 2:hide,rdpserver
+guicontrol, 2:hide,txtrdpuser
+guicontrol, 2:hide,rdpuser
+guicontrol, 2:hide,txtrdppass
+guicontrol, 2:hide,rdppass
+guicontrol, 2:hide,butsaverdp
+guicontrol, 2:hide,butcancelcreaterdp
+guicontrol, 2:disable,txtnewrdpconn
+guicontrol, 2:disable,txtrdpname
+guicontrol, 2:disable,rdpname
+guicontrol, 2:disable,txtrdpserver
+guicontrol, 2:disable,rdpserver
+guicontrol, 2:disable,txtrdpuser
+guicontrol, 2:disable,rdpuser
+guicontrol, 2:disable,txtrdppass
+guicontrol, 2:disable,rdppass
+guicontrol, 2:disable,butsaverdp
+guicontrol, 2:disable,butcancelcreaterdp
+rdpname =
+rdpserver =
+rdpuser =
+rdppass =
+guicontrol, 2:show,butcreaterdp
+guicontrol, 2:enable,butcreaterdp
+guicontrol, 2:show,butrdpconn
+guicontrol, 2:show,butrdpedit
+guicontrol, 2:show,butrdpdel
+guicontrol, 2:show,butrdpadv
+exit
 /*
 Createrdp:
 gui, 3:add, text,xs section,Connection Name
 gui, 3:add,checkbox,x+210 section vchkrdpadv gshowrdpadv,Show advanced options?
 gui, 3:add, edit,x20 w300 vrdpname,My RDP Connection
-gui, 3:add, text,,Server domain or public ip and port
+gui, 3:add, text,,Server domain/public ip and port
 gui, 3:add, edit,w300 vrdpserver,server:port
 gui, 3:add, text,,Username and Password
 gui, 3:add, edit,w300 vrdpuser,username
