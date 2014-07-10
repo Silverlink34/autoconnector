@@ -1073,7 +1073,7 @@ Saverdp:
 	gui, 2:submit
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\RDP
-	data = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%, %A_workingdir%\SavedConnections\rdp\%rdpname%
+	data = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\rdp\%rdpname%
 	gui, 2:destroy
 	gui2wasdestroyed = 1
