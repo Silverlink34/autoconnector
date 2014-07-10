@@ -785,20 +785,8 @@ guicontrol, 2:hide,sftpconnectionto
 guicontrol, 2:show,sftpconnectionto
 gui, 2:font,norm s14
 gui, 2:add,button,x310 y150 section vbutlaunchfz glaunchfz,Launch SFTP GUI`nWith FileZilla
-gui, 2:add,button,ys x+65 vbutlaunchpsftp,Launch SFTP CLI`nWith PSFTP
-gui, 2:font,underline
-gui, 2:add,text,xs y+40 vtxtsftpoptions,SFTP Options (applied to both GUI and CLI)
-gui, 2:font,s14
-gui, 2:add,text,vtxtspecifylocaldir section,Specify Local Directory
-gui, 2:font,norm
-gui, 2:add,edit,vlocaldir,
-gui, 2:font,underline
-gui, 2:add,text,xs y+8 vtxtclioptions,CLI Options
-gui, 2:font,norm
-gui, 2:add,button,vbutsftpclihelp ys x+175,SFTP CLI`nHelp
-gui, 2:add,button,vbutloadsftpbatch xs section,Browse for SFTP`nCommand File
-if sftpcommandfilepath
-	gui, 2:add,text,vtxtloadedsftpcmd,%sftpcommandfilepath%
+gui, 2:add,button,ys x+65 vbutlaunchpsftp glaunchpsftp,Launch SFTP CLI`nWith PSFTP
+gui, 2:add,button,w167 vbutsftpclihelp,SFTP CLI`nHelp
 return
 returntossh:
 gui, 2:destroy
@@ -841,15 +829,18 @@ ifnotinstring, fzdir, Program
 			progress,100,`n`n,Done.
 			sleep,800
 			progress,off
+			fzdir = %A_WorkingDir%\programbin\filezilla\autoconnector-master\filezilla
 			gosub runfzconnect
 		}
 	}
 	else
+	{
+		fzdir = %A_WorkingDir%\programbin\filezilla\autoconnector-master\filezilla
 		gosub runfzconnect
+	}
 }
 runfzconnect:
 gui, 2:SUBMIT,nohide
-fzdir = %A_WorkingDir%\programbin\filezilla\autoconnector-master\filezilla
 ifexist %a_workingdir%\programbin\autoconnector-master.zip
 	filedelete, %a_workingdir%\programbin\autoconnector-master.zip
 fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
@@ -868,6 +859,20 @@ else
 	fzconnect = %fzdir%\filezilla.exe "sftp://%sftpcreds2%:%sftpcreds4%@%sftpcreds3%:%sftpcreds1%"
 run, %fzconnect%
 exit
+launchpsftp:
+fileinstall,psftp.exe,%a_workingdir%\programbin\psftp.exe
+fileread, data, %a_workingdir%\SavedConnections\SSH\%sshisselected%
+sshconn := Decrypt(data,pass)
+stringreplace,sshconn,sshconn,%puttydir%,,1
+stringreplace,sshconn,sshconn,\putty,,1
+stringreplace,sshconn,sshconn,-P,,1
+stringreplace,sshconn,sshconn,%a_space%w%a_space%,%a_space%,1
+stringreplace,sshconn,sshconn,%a_space%%a_space%,,
+stringsplit,sftpcreds,sshconn,%a_space%,,
+;msgbox,Username@server:%sshcredfilter2% Password:%sshcredfilter3% Port:%sshcredfilter1%
+psftpconnect =  %a_workingdir%\programbin\psftp -P %sftpcreds1% %sftpcreds2% -pw %sftpcreds3%
+run, %psftpconnect%
+return
 
 showsshadv:
 sshmenu = 1
