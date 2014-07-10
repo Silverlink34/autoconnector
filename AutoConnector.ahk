@@ -786,7 +786,7 @@ guicontrol, 2:show,sftpconnectionto
 gui, 2:font,norm s14
 gui, 2:add,button,x310 y150 section vbutlaunchfz glaunchfz,Launch SFTP GUI`nWith FileZilla
 gui, 2:add,button,ys x+65 vbutlaunchpsftp glaunchpsftp,Launch SFTP CLI`nWith PSFTP
-gui, 2:add,button,w167 vbutsftpclihelp,SFTP CLI`nHelp
+gui, 2:add,button,w167 vbutsftpclihelp gsftpclihelp,SFTP CLI`nHelp
 return
 returntossh:
 gui, 2:destroy
@@ -873,6 +873,10 @@ stringsplit,sftpcreds,sshconn,%a_space%,,
 psftpconnect =  %a_workingdir%\programbin\psftp -P %sftpcreds1% %sftpcreds2% -pw %sftpcreds3%
 run, %psftpconnect%
 return
+sftpclihelp:
+msgbox,The SFTP command line uses Linux (bash) sftp commands. Here are the basic commands:`n`nput - transfers file from local to remote. assumes file is in current local directory unless full path specified.`nget - downloads remote file to current local directory.`nls - Lists remote directory`nlls - lists local directory`ncd - changes remote directory, type directory after "cd" to change to it.`nUsing "cd .." will go up a directory, and "cd ../dir" will go up a directory and change to a folder in that directory.`nlcd - same as cd, but changes your local directory.`nbye - exits connection.`nget and put commands accept "*" as a wildcard.
+return
+
 
 showsshadv:
 sshmenu = 1
