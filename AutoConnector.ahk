@@ -344,7 +344,7 @@ gui, 2:tab,RDP
 gui, 2:add,listbox,vRDPConnections R13 grdpselected
 gui, 2:add,updown,section
 gui, 2:add, Button,w224 border vbutcreaterdp gCreaterdpconnection, Create Connection
-gui, 2:add,button,ys w165 border vbutrdpconn section,Connect
+gui, 2:add,button,ys w165 border vbutrdpconn gconnecttordp section,Connect
 gui, 2:add,button,w165 vbutrdpedit ,Edit Connection
 gui, 2:add,button,w165 vbutrdpdel ,Delete Connection
 gui, 2:add,button,w165 vbutrdpadv,Show/Hide Advanced Options
