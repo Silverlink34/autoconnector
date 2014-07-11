@@ -345,8 +345,8 @@ gui, 2:add,listbox,vRDPConnections R13 grdpselected
 gui, 2:add,updown,section
 gui, 2:add, Button,w224 border vbutcreaterdp gCreaterdpconnection, Create Connection
 gui, 2:add,button,ys w165 border vbutrdpconn gconnecttordp section,Connect
-gui, 2:add,button,w165 vbutrdpedit ,Edit Connection
-gui, 2:add,button,w165 vbutrdpdel ,Delete Connection
+gui, 2:add,button,w165 vbutrdpedit geditrdpconnection,Edit Connection
+gui, 2:add,button,w165 vbutrdpdel gdeleterdpconnection,Delete Connection
 gui, 2:add,button,w165 vbutrdpadv,Show/Hide Advanced Options
 guicontrol, 2:disable,butrdpconn
 guicontrol, 2:disable,butrdpedit
@@ -652,6 +652,10 @@ if editsshwasclicked = 1
 	guicontrol, 2:enable,editsshpass
 	guicontrol, 2:enable,butsaveeditedssh
 	guicontrol, 2:enable,butcanceleditedssh
+	guicontrol, 2:,editsshname,%sshisselected%
+	guicontrol, 2:,editsshserver,%sshcredfilter2%
+	guicontrol, 2:,editsshport,%sshcredfilter1%
+	guicontrol, 2:,editsshpass,%sshcredfilter3%
 }
 else
 {	
@@ -677,7 +681,7 @@ else
 	gui, 2:font,norm
 	guicontrol, 2:hide,txteditsshport
 	guicontrol, 2:show,txteditsshport
-	gui, 2:add, edit,w50 veditsshport,%sshcredfilter1%
+	gui, 2:add, edit,w100 veditsshport,%sshcredfilter1%
 	gui, 2:font,underline
 	GUI, 2:Add, Text,vtxteditsshpass,SSH password
 	gui, 2:font,norm
@@ -711,6 +715,10 @@ saveeditedssh:
 }
 return
 canceleditssh:
+editsshname =
+editsshserver =
+editsshport =
+editsshpass =
 guicontrol, 2:hide,txteditsshtitle
 guicontrol, 2:hide,txteditsshname
 guicontrol, 2:hide,editsshname
@@ -733,10 +741,6 @@ guicontrol, 2:disable,txteditsshpass
 guicontrol, 2:disable,editsshport
 guicontrol, 2:disable,butsaveeditedssh
 guicontrol, 2:disable,butcanceleditedssh
-editsshname =
-editsshserver =
-editsshport =
-editsshpass =
 guicontrol, 2:show,butcreatessh
 guicontrol, 2:enable,butcreatessh
 guicontrol, 2:show,butsshconn
@@ -745,7 +749,6 @@ guicontrol, 2:show,butsshdel
 guicontrol, 2:show,butsftp
 guicontrol, 2:show,butsshadv
 exit
-return
 
 deletesshconnection:
 msgbox,4,,Are you sure you wish to delete connection: %sshisselected%?
@@ -942,6 +945,7 @@ else
 }
 exit
 
+
 gui, 2:tab,rdp
 rdpselected:
 controlget,rdpisselected,choice,,listbox2,A
@@ -960,6 +964,7 @@ else
 	guicontrol, 2:disable,butrdpadv
 }
 exit
+
 Detectrdp:
 ifexist %a_workingdir%\SavedConnections\RDP
 controlget,listedrdp,list,,Listbox2,A
@@ -975,6 +980,7 @@ controlget,listedrdp,list,,Listbox2,A
 	Fileremovedir, tmp, 1	
 }
 return
+
 Createrdpconnection:
 guicontrol, 2:disable,butcreaterdp
 guicontrol, 2:disable,butrdpconn
@@ -1012,7 +1018,6 @@ if createrdpwasclicked = 1
 	guicontrol, 2:show,rdpserver
 	guicontrol, 2:show,txtrdpuser
 	guicontrol, 2:show,rdpuser
-	
 	guicontrol, 2:show,txtrdppass
 	guicontrol, 2:show,rdppass
 	guicontrol, 2:show,butsaverdp
@@ -1068,18 +1073,20 @@ else
 		gui2wasdestroyed =
 }
 exit
+
 Saverdp:
 {
 	gui, 2:submit
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\RDP
-	data = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%
+	data = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\rdp\%rdpname%
 	gui, 2:destroy
 	gui2wasdestroyed = 1
 	gosub MainMenu
 }
 return
+
 cancelcreaterdp:
 guicontrol, 2:hide,txtnewrdpconn
 guicontrol, 2:hide,txtrdpname
@@ -1114,6 +1121,7 @@ guicontrol, 2:show,butrdpedit
 guicontrol, 2:show,butrdpdel
 guicontrol, 2:show,butrdpadv
 exit
+
 connecttordp:
 filecreatedir, %a_workingdir%\programbin
 fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
@@ -1122,21 +1130,231 @@ rdpconnect := Decrypt(data,pass)
 ;gui, 2:submit,nohide
 run, %rdpconnect%
 return
-/*
-Createrdp:
-gui, 3:add, text,xs section,Connection Name
-gui, 3:add,checkbox,x+210 section vchkrdpadv gshowrdpadv,Show advanced options?
-gui, 3:add, edit,x20 w300 vrdpname,My RDP Connection
-gui, 3:add, text,,Server domain/public ip and port
-gui, 3:add, edit,w300 vrdpserver,server:port
-gui, 3:add, text,,Username and Password
-gui, 3:add, edit,w300 vrdpuser,username
-gui, 3:add, edit,w300 x+30 password vrdppass,password
-gui, 3:add, button,border x20 y71 vButsave2 gsaverdp, Save Connection
+
+Editrdpconnection:
+fileread,data,%a_workingdir%\SavedConnections\rdp\%rdpisselected%
+rdp2edit := decrypt(data,pass)
+stringreplace,rdpcreds,rdp2edit,%a_workingdir%\programbin\rdp,,1
+stringreplace,rdpcreds,rdpcreds,/v:,,
+stringreplace,rdpcreds,rdpcreds,/u:,,
+stringreplace,rdpcreds,rdpcreds,/p:,,
+stringreplace,rdpcreds,rdpcreds,%a_space%,%a_tab%,1
+stringsplit,rdpcredfilter,rdpcreds,%a_tab%,%a_tab%,
+;msgbox,server:port: %rdpcredfilter2% username: %rdpcredfilter3% password: %rdpcredfilter4%
+guicontrol, 2:disable,butcreaterdp
+guicontrol, 2:disable,butrdpconn
+guicontrol, 2:disable,butrdpedit
+guicontrol, 2:disable,butrdpdel
+guicontrol, 2:disable,butrdpadv
+guicontrol, 2:hide,butcreaterdp
+guicontrol, 2:hide,butrdpconn
+guicontrol, 2:hide,butrdpedit
+guicontrol, 2:hide,butrdpdel
+guicontrol, 2:hide,butrdpadv
+if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, this closes it before editrdp options are shown.
+{
+	guicontrol, 2:disable,txtrdpportforwarding,
+	guicontrol, 2:hide,txtrdpportforwarding,
+	guicontrol, 2:disable,txtlocalrdpport,
+	guicontrol, 2:hide,txtlocalrdpport,
+	guicontrol, 2:disable,localrdpport,
+	guicontrol, 2:hide,localrdpport,
+	guicontrol, 2:disable,txtremotedestnport,
+	guicontrol, 2:hide,txtremotedestnport,
+	guicontrol, 2:disable,remotedestnport,
+	guicontrol, 2:hide,remotedestnport,
+	rdpadvfirstclick =
+	rdpadvsecondshow = 1
+}
+if gui2wasdestroyed = 1
+	editrdpwasclicked =
+if editrdpwasclicked = 1
+{
+	guicontrol, 2:show,txteditrdptitle
+	guicontrol, 2:show,txteditrdpname
+	guicontrol, 2:show,editrdpname
+	guicontrol, 2:show,txteditrdpserver
+	guicontrol, 2:show,editrdpserver
+	guicontrol, 2:show,txteditrdpuser
+	guicontrol, 2:show,editrdpuser
+	guicontrol, 2:show,txteditrdppass
+	guicontrol, 2:show,editrdppass
+	guicontrol, 2:show,butsaveeditedrdp
+	guicontrol, 2:show,butcanceleditedrdp
+	guicontrol, 2:enable,txteditrdptitle
+	guicontrol, 2:enable,txteditrdpname
+	guicontrol, 2:enable,editrdpname
+	guicontrol, 2:enable,txteditrdpserver
+	guicontrol, 2:enable,editrdpserver
+	guicontrol, 2:enable,txteditrdpuser
+	guicontrol, 2:enable,editrdpuser
+	guicontrol, 2:enable,txteditrdppass
+	guicontrol, 2:enable,editrdppass
+	guicontrol, 2:enable,butsaveeditedrdp
+	guicontrol, 2:enable,butcanceleditedrdp
+	guicontrol, 2:,editrdpname,%rdpisselected%
+	guicontrol, 2:,editrdpserver,%rdpcredfilter2%
+	guicontrol, 2:,editrdpuser,%rdpcredfilter3%
+	guicontrol, 2:,editrdppass,%rdpcredfilter4%
+	
+}
+else
+{	
+	gui, 2:tab,rdp
+	gui, 2:font,underline
+	gui, 2:add,text,vtxteditrdptitle ys x420 section,Edit Connection
+	guicontrol, 2:hide,txteditrdptitle
+	guicontrol, 2:show,txteditrdptitle
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxteditrdpname xs  x300,Connection Name
+	gui, 2:font,norm	
+	guicontrol, 2:hide,txteditrdpname
+	guicontrol, 2:show,txteditrdpname
+	gui, 2:add, edit,w300 veditrdpname,%rdpisselected%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxteditrdpserver,Server domain/public ip 
+	gui, 2:font,norm
+	guicontrol, 2:hide,txteditrdpserver
+	guicontrol, 2:show,txteditrdpserver
+	gui, 2:add, edit,w300 veditrdpserver,%rdpcredfilter2%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxteditrdpuser,Username
+	gui, 2:font,norm
+	guicontrol, 2:hide,vtxteditrdpuser
+	guicontrol, 2:show,vtxteditrdpuser
+	gui, 2:add, edit,w300 veditrdpuser,%rdpcredfilter3%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxteditrdppass,Password
+	gui, 2:font,norm
+	guicontrol, 2:hide,txteditrdppass
+	guicontrol, 2:show,txteditrdppass
+	gui, 2:add, edit,password w240 veditrdppass,%rdpcredfilter4%
+	gui, 2:add, button,border vbutsaveeditedrdp x42 y436 w112 gsaveeditedrdp, Save
+	gui, 2:add, button,border vbutcanceleditedrdp x154 y436 w112 gcanceleditrdp,Cancel
+	editrdpwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
+}
+return
+saveeditedrdp:
+{
+	gui, 2:submit,nohide
+	msgbox,4,,Are you sure you wish to edit connection: %rdpisselected%?`nIf you select yes, your provided settings will overwrite your previous settings for the connection.`n`nNOTE:`nIf you removed the password out of the password field, it will now be blank and the connection will probably fail.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\rdp\%rdpisselected%
+		data = %a_workingdir%\programbin\rdp /v:%editrdpserver% /u:%editrdpuser% /p:%editrdppass%
+		editedrdp := Encrypt(data,pass)
+		FileAppend,%editedrdp%,%A_workingdir%\SavedConnections\rdp\%editrdpname%
+		gui, 2:destroy
+		gui2wasdestroyed = 1
+		gosub mainmenu
+	}
+	else
+	return
+}
+return
+canceleditrdp:
+guicontrol, 2:hide,txteditrdptitle
+guicontrol, 2:hide,txteditrdpname
+guicontrol, 2:hide,editrdpname
+guicontrol, 2:hide,txteditrdpserver
+guicontrol, 2:hide,editrdpserver
+guicontrol, 2:hide,txteditrdpuser
+guicontrol, 2:hide,editrdpuser
+guicontrol, 2:hide,txteditrdppass
+guicontrol, 2:hide,editrdppass
+guicontrol, 2:hide,butsaveeditedrdp
+guicontrol, 2:hide,butcanceleditedrdp
+guicontrol, 2:disable,txteditrdptitle
+guicontrol, 2:disable,txteditrdpname
+guicontrol, 2:disable,editrdpname
+guicontrol, 2:disable,txteditrdpserver
+guicontrol, 2:disable,editrdpserver
+guicontrol, 2:disable,txteditrdpuser
+guicontrol, 2:disable,editrdpuser
+guicontrol, 2:disable,txteditrdppass
+guicontrol, 2:disable,editrdppass
+guicontrol, 2:disable,butsaveeditedrdp
+guicontrol, 2:disable,butcanceleditedrdp
+editrdpname =
+editrdpserver =
+editrdpuser =
+editrdppass =
+guicontrol, 2:show,butcreaterdp
+guicontrol, 2:enable,butcreaterdp
+guicontrol, 2:show,butrdpconn
+guicontrol, 2:show,butrdpedit
+guicontrol, 2:show,butrdpdel
+guicontrol, 2:show,butrdpadv
 exit
-*/
 
+deleterdpconnection:
+msgbox,4,,Are you sure you wish to delete connection: %rdpisselected%?
+ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\rdp\%rdpisselected%
+		gui, 2:destroy
+		gui2wasdestroyed = 1
+		gosub mainmenu
+	}
+return
 
+showrdphadv:
+rdpmenu = 1
+if gui2wasdestroyed = 1
+	rdpadvfirstclick =
+if rdpadvfirstclick = 1
+{
+	guicontrol, 2:disable,txtrdpportforwarding,
+	guicontrol, 2:hide,txtrdpportforwarding,
+	guicontrol, 2:disable,txtlocalrdpport,
+	guicontrol, 2:hide,txtlocalrdpport,
+	guicontrol, 2:disable,localrdpport,
+	guicontrol, 2:hide,localrdpport,
+	guicontrol, 2:disable,txtremotedestnport,
+	guicontrol, 2:hide,txtremotedestnport,
+	guicontrol, 2:disable,remotedestnport,
+	guicontrol, 2:hide,remotedestnport,
+	rdpadvfirstclick =
+	rdpadvsecondshow = 1
+}
+else
+{
+	if rdpadvsecondshow = 1
+	{
+		rdpadvfirstclick = 1
+		guicontrol, 2:enable,txtrdpportforwarding
+		guicontrol, 2:show,txtrdpportforwarding,
+		guicontrol, 2:enable,txtlocalrdpport,
+		guicontrol, 2:show,txtlocalrdpport,
+		guicontrol, 2:enable,localrdpport,
+		guicontrol, 2:show,localrdpport,
+		guicontrol, 2:enable,txtremotedestnport,
+		guicontrol, 2:show,txtremotedestnport,
+		guicontrol, 2:enable,remotedestnport,
+		guicontrol, 2:show,remotedestnport,
+	}
+	else
+	{	
+		gui, 2:font,underline
+		gui, 2:add,text,vtxtrdpportforwarding ys x490,rdp Port Forwarding
+		gui, 2:font, norm
+		guicontrol, 2:hide,txtrdpportforwarding,
+		guicontrol, 2:show,txtrdpportforwarding,
+		gui, 2:add,text,vtxtlocalrdpport,Local forwarded port`nExample:2022
+		guicontrol, 2:hide,txtlocalrdpport,
+		guicontrol, 2:show,txtlocalrdpport,
+		gui, 2:add,edit,vlocalrdpport,
+		gui, 2:add,text,vtxtremotedestnport,Remote server and port`nExample:localhost:22
+		guicontrol, 2:hide,txtremotedestnport,
+		guicontrol, 2:show,txtremotedestnport,
+		gui, 2:add,edit,vremotedestnport,
+		rdpadvfirstclick = 1
+	}
+}
+exit
 ;showrdpadv:
 ;gui, 3:submit,nohide
 ;if chkrdpadv = 1
@@ -1156,33 +1374,6 @@ exit
 ;	gosub, createconnection
 ;}	
 
-
-/*
-Saverdp:
-{
-	gui, 3:submit
-	if enabledrives
-		drives =  /drives
-	if enablesound
-		sound = /sound
-	if enablefullscreen
-		fullscrn = /f
-	if disablewall
-		dwall = /nowallpaper
-	filecreatedir, %a_workingdir%\programbin
-	fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
-	FileCreateDir, SavedConnections
-	FileCreateDir, SavedConnections\RDP
-	FileAppend, %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%, %A_workingdir%\SavedConnections\RDP\%rdpname%
-	Fileread, data, %A_workingdir%\SavedConnections\RDP\%rdpname%
-	Filedelete, %A_workingdir%\SavedConnections\RDP\%rdpname%
-	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\RDP\%rdpname%
-	gui, 2:destroy
-	gui, 3:destroy
-	gosub MainMenu
-}
-return
-*/
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
 ifmsgbox yes
