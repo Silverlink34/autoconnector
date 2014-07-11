@@ -1302,7 +1302,6 @@ ifmsgbox yes
 return
 
 showrdphadv:
-rdpmenu = 1
 if gui2wasdestroyed = 1
 	rdpadvfirstclick =
 if rdpadvfirstclick = 1
@@ -1339,18 +1338,13 @@ else
 	else
 	{	
 		gui, 2:font,underline
-		gui, 2:add,text,vtxtrdpportforwarding ys x490,rdp Port Forwarding
+		gui, 2:add,text,vtxtrdpportforwarding ys x490,rdp RDP Settings
 		gui, 2:font, norm
 		guicontrol, 2:hide,txtrdpportforwarding,
 		guicontrol, 2:show,txtrdpportforwarding,
-		gui, 2:add,text,vtxtlocalrdpport,Local forwarded port`nExample:2022
-		guicontrol, 2:hide,txtlocalrdpport,
-		guicontrol, 2:show,txtlocalrdpport,
-		gui, 2:add,edit,vlocalrdpport,
-		gui, 2:add,text,vtxtremotedestnport,Remote server and port`nExample:localhost:22
-		guicontrol, 2:hide,txtremotedestnport,
-		guicontrol, 2:show,txtremotedestnport,
-		gui, 2:add,edit,vremotedestnport,
+		gui, 2:add,checkbox,venabledrives,Redirect all drives/media to remote?
+		gui, 2:add,checkbox,venablefullscreen,Force full screen?
+		gui, 2:add,checkbox,vdisablewall,Force disable remote wallpaper?
 		rdpadvfirstclick = 1
 	}
 }
