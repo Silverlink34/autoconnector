@@ -347,7 +347,7 @@ gui, 2:add, Button,w224 border vbutcreaterdp gCreaterdpconnection, Create Connec
 gui, 2:add,button,ys w165 border vbutrdpconn gconnecttordp section,Connect
 gui, 2:add,button,w165 vbutrdpedit geditrdpconnection,Edit Connection
 gui, 2:add,button,w165 vbutrdpdel gdeleterdpconnection,Delete Connection
-gui, 2:add,button,w165 vbutrdpadv,Show/Hide Advanced Options
+gui, 2:add,button,w165 vbutrdpadv gshowrdpadv,Show/Hide Advanced Options
 guicontrol, 2:disable,butrdpconn
 guicontrol, 2:disable,butrdpedit
 guicontrol, 2:disable,butrdpdel
@@ -1127,7 +1127,19 @@ filecreatedir, %a_workingdir%\programbin
 fileinstall, rdp.exe,%a_workingdir%\programbin\rdp.exe,1
 fileread, data, %a_workingdir%\SavedConnections\rdp\%rdpisselected%
 rdpconnect := Decrypt(data,pass)
-;gui, 2:submit,nohide
+gui, 2:submit,nohide
+if rdpadvclicked
+{
+	if enabledrives
+		drives =  /drives
+	if enablesound
+		sound = /sound
+	if enablefullscreen
+		fullscrn = /f
+	if disablewall
+		dwall = /nowallpaper
+	rdpconnect = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%
+}
 run, %rdpconnect%
 return
 
@@ -1301,7 +1313,8 @@ ifmsgbox yes
 	}
 return
 
-showrdphadv:
+showrdpadv:
+rdpadvclicked = 1
 if gui2wasdestroyed = 1
 	rdpadvfirstclick =
 if rdpadvfirstclick = 1
@@ -1337,6 +1350,7 @@ else
 	}
 	else
 	{	
+		gui, 2:tab,rdp
 		gui, 2:font,underline
 		gui, 2:add,text,vtxtrdpportforwarding ys x490,rdp RDP Settings
 		gui, 2:font, norm
