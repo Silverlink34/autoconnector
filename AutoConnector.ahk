@@ -1508,14 +1508,13 @@ ifmsgbox yes
 	gui, 3:submit
 	Progress,10,Reading All SSH connections...,Resetting Master Password Encryption
 	sleep,2000
-	FileCreateDir, tmp
+	FileCreateDir, %a_workingdir%\tmp
 	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\SSH > %a_workingdir%\tmp\sshlist,, hide
 	sleep, 200
-	progress,50,Decrypting and Re-Encrypting SSH...
+	progress,20,Decrypting and Re-Encrypting SSH...
 	Loop, read, %A_workingdir%\tmp\sshlist
 	{
 	sleep,100
-	progress,5%a_index%
 	fileread,data,%a_workingdir%\SavedConnections\SSH\%a_loopreadline%
 	filedelete, %a_workingdir%\SavedConnections\SSH\%a_loopreadline%
 	ssh2reset := Decrypt(data,pass)
@@ -1524,9 +1523,27 @@ ifmsgbox yes
 	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\SSH\%a_loopreadline%
 	pass = %mpass%
 	}	
-	progress,70,SSH Connections Re-Encrypted.
+	progress,30,SSH Connections Re-Encrypted.
 	sleep,2000
-	progress,80,Setting New Master Password...
+	Progress,40,Reading All RDP connections...
+	sleep,2000
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\rdp > %a_workingdir%\tmp\rdplist,, hide
+	sleep,200
+	progress,50,Decrypting and Re-Encrypting RDP...
+	Loop, read, %A_workingdir%\tmp\rdplist
+	{
+	sleep,100
+	fileread,data,%a_workingdir%\SavedConnections\rdp\%a_loopreadline%
+	filedelete, %a_workingdir%\SavedConnections\rdp\%a_loopreadline%
+	rdp2reset := Decrypt(data,pass)
+	pass = %resetmasterpass%
+	data = %rdp2reset%
+	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\rdp\%a_loopreadline%
+	pass = %mpass%
+	}	
+	progress,60,RDP Connections Re-Encrypted.
+	sleep,2000
+	progress,70,Resetting Initial Password..
 	sleep,2000
 	data = %resetmasterpass%
 	pass = %resetmasterpass%
