@@ -994,7 +994,7 @@ guicontrol, 2:hide,butrdpdel
 guicontrol, 2:hide,butrdpadv
 if gui2wasdestroyed = 1
 	createrdpwasclicked =
-if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, this closes it before createrdp options are shown.
+if rdpadvfirstclick = 1
 {
 	guicontrol, 2:disable,txtrdpsettings,
 	guicontrol, 2:hide,txtrdpsettings,
@@ -1004,6 +1004,14 @@ if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, th
 	guicontrol, 2:hide,enabledrives,
 	guicontrol, 2:disable,enablefullscreen,
 	guicontrol, 2:hide,enablefullscreen,
+	guicontrol, 2:disable,txtrdpahk
+	guicontrol, 2:hide,txtrdpahk
+	guicontrol, 2:disable,enablerdpahk
+	guicontrol, 2:hide,enablerdpahk
+	guicontrol, 2:hide,rdpahkpassonly
+	guicontrol, 2:disable,rdpahkpassonly
+	guicontrol, 2:hide,rdpahkhelp
+	guicontrol, 2:disable,rdpahkhelp
 	rdpadvfirstclick =
 	rdpadvsecondshow = 1
 }
@@ -1144,7 +1152,38 @@ if rdpadvclicked
 		fullscrn =
 	rdpconnect = %a_workingdir%\programbin\rdp /v:%rdpcredfilter2% /u:%rdpcredfilter3% /p:%rdpcredfilter4% %drives% %fullscrn%
 }
+if enablerdpahk = 1
+	{	
+		rdpahkcreated = 1
+		if rdpahkoff = 1
+		{
+			hotkey,^!a,,on
+			rdpahkoff =
+		}
+		hotkey,ifwinactive,%rdpcredfilter2%
+		hotkey,^!a,rdpahk
+	}
+if enablerdpahk = 0
+	if rdpahkcreated = 1
+	{
+		hotkey,^!a,off
+		rdpahkoff = 1
+	}
 run, %rdpconnect%
+return
+rdpahk:
+if rdpahkpassonly = 1
+{
+	sendraw %rdpcredfilter4%
+	send {enter}
+}
+else
+{
+	Sendraw %rdpcredfilter3%
+	send {tab}
+	sendraw %rdpcredfilter4%
+	send {enter}
+}
 return
 
 Editrdpconnection:
@@ -1167,7 +1206,7 @@ guicontrol, 2:hide,butrdpconn
 guicontrol, 2:hide,butrdpedit
 guicontrol, 2:hide,butrdpdel
 guicontrol, 2:hide,butrdpadv
-if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, this closes it before editrdp options are shown.
+if rdpadvfirstclick = 1
 {
 	guicontrol, 2:disable,txtrdpsettings,
 	guicontrol, 2:hide,txtrdpsettings,
@@ -1177,6 +1216,14 @@ if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, th
 	guicontrol, 2:hide,enabledrives,
 	guicontrol, 2:disable,enablefullscreen,
 	guicontrol, 2:hide,enablefullscreen,
+	guicontrol, 2:disable,txtrdpahk
+	guicontrol, 2:hide,txtrdpahk
+	guicontrol, 2:disable,enablerdpahk
+	guicontrol, 2:hide,enablerdpahk
+	guicontrol, 2:hide,rdpahkpassonly
+	guicontrol, 2:disable,rdpahkpassonly
+	guicontrol, 2:hide,rdpahkhelp
+	guicontrol, 2:disable,rdpahkhelp
 	rdpadvfirstclick =
 	rdpadvsecondshow = 1
 }
@@ -1329,6 +1376,14 @@ if rdpadvfirstclick = 1
 	guicontrol, 2:hide,enabledrives,
 	guicontrol, 2:disable,enablefullscreen,
 	guicontrol, 2:hide,enablefullscreen,
+	guicontrol, 2:disable,txtrdpahk
+	guicontrol, 2:hide,txtrdpahk
+	guicontrol, 2:disable,enablerdpahk
+	guicontrol, 2:hide,enablerdpahk
+	guicontrol, 2:hide,rdpahkpassonly
+	guicontrol, 2:disable,rdpahkpassonly
+	guicontrol, 2:hide,rdpahkhelp
+	guicontrol, 2:disable,rdpahkhelp
 	rdpadvfirstclick =
 	rdpadvsecondshow = 1
 }
@@ -1345,6 +1400,10 @@ else
 		guicontrol, 2:show,enabledrives,
 		guicontrol, 2:enable,enablefullscreen,
 		guicontrol, 2:show,enablefullscreen,
+		guicontrol, 2:enable,txtrdpahk
+		guicontrol, 2:show,txtrdpahk
+		guicontrol, 2:enable,enablerdpahk
+		guicontrol, 2:show,enablerdpahk
 	}
 	else
 	{	
@@ -1376,8 +1435,8 @@ if rdpahkclicked = 1
 	guicontrol, 2:disable,rdpahkpassonly
 	guicontrol, 2:hide,rdpahkhelp
 	guicontrol, 2:disable,rdpahkhelp
-	rdpahkclicked =
 	rdpahk2ndclick = 1
+	rdpahkclicked =
 }
 else
 {
@@ -1387,6 +1446,8 @@ else
 		guicontrol, 2:enable,rdpahkpassonly
 		guicontrol, 2:show,rdpahkhelp
 		guicontrol, 2:enable,rdpahkhelp
+		rdpahkclicked = 1
+		
 	}
 	else
 	{
