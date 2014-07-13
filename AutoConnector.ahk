@@ -996,16 +996,14 @@ if gui2wasdestroyed = 1
 	createrdpwasclicked =
 if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, this closes it before createrdp options are shown.
 {
-	guicontrol, 2:disable,txtrdpportforwarding,
-	guicontrol, 2:hide,txtrdpportforwarding,
-	guicontrol, 2:disable,txtlocalrdpport,
-	guicontrol, 2:hide,txtlocalrdpport,
-	guicontrol, 2:disable,localrdpport,
-	guicontrol, 2:hide,localrdpport,
-	guicontrol, 2:disable,txtremotedestnport,
-	guicontrol, 2:hide,txtremotedestnport,
-	guicontrol, 2:disable,remotedestnport,
-	guicontrol, 2:hide,remotedestnport,
+	guicontrol, 2:disable,txtrdpsettings,
+	guicontrol, 2:hide,txtrdpsettings,
+	guicontrol, 2:disable,txtenabledrives,
+	guicontrol, 2:hide,txtenabledrives,
+	guicontrol, 2:disable,enabledrives,
+	guicontrol, 2:hide,enabledrives,
+	guicontrol, 2:disable,enablefullscreen,
+	guicontrol, 2:hide,enablefullscreen,
 	rdpadvfirstclick =
 	rdpadvsecondshow = 1
 }
@@ -1130,15 +1128,21 @@ rdpconnect := Decrypt(data,pass)
 gui, 2:submit,nohide
 if rdpadvclicked
 {
-	if enabledrives
+	stringreplace,rdpcreds,rdpconnect,%a_workingdir%\programbin\rdp,,1
+	stringreplace,rdpcreds,rdpcreds,/v:,,
+	stringreplace,rdpcreds,rdpcreds,/u:,,
+	stringreplace,rdpcreds,rdpcreds,/p:,,
+	stringreplace,rdpcreds,rdpcreds,%a_space%,%a_tab%,1
+	stringsplit,rdpcredfilter,rdpcreds,%a_tab%,%a_tab%,
+	if enabledrives = 1
 		drives =  /drives
-	if enablesound
-		sound = /sound
-	if enablefullscreen
+	if enablefullscreen = 1
 		fullscrn = /f
-	if disablewall
-		dwall = /nowallpaper
-	rdpconnect = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass% %drives% %sound% %fullscrn% %dwall%
+	if enabledrives = 0
+		drives =
+	if enablefullscreen = 0
+		fullscrn =
+	rdpconnect = %a_workingdir%\programbin\rdp /v:%rdpcredfilter2% /u:%rdpcredfilter3% /p:%rdpcredfilter4% %drives% %fullscrn%
 }
 run, %rdpconnect%
 return
@@ -1165,16 +1169,14 @@ guicontrol, 2:hide,butrdpdel
 guicontrol, 2:hide,butrdpadv
 if rdpadvfirstclick = 1 ;if user accidentally left advanced rdp options open, this closes it before editrdp options are shown.
 {
-	guicontrol, 2:disable,txtrdpportforwarding,
-	guicontrol, 2:hide,txtrdpportforwarding,
-	guicontrol, 2:disable,txtlocalrdpport,
-	guicontrol, 2:hide,txtlocalrdpport,
-	guicontrol, 2:disable,localrdpport,
-	guicontrol, 2:hide,localrdpport,
-	guicontrol, 2:disable,txtremotedestnport,
-	guicontrol, 2:hide,txtremotedestnport,
-	guicontrol, 2:disable,remotedestnport,
-	guicontrol, 2:hide,remotedestnport,
+	guicontrol, 2:disable,txtrdpsettings,
+	guicontrol, 2:hide,txtrdpsettings,
+	guicontrol, 2:disable,txtenabledrives,
+	guicontrol, 2:hide,txtenabledrives,
+	guicontrol, 2:disable,enabledrives,
+	guicontrol, 2:hide,enabledrives,
+	guicontrol, 2:disable,enablefullscreen,
+	guicontrol, 2:hide,enablefullscreen,
 	rdpadvfirstclick =
 	rdpadvsecondshow = 1
 }
@@ -1319,16 +1321,14 @@ if gui2wasdestroyed = 1
 	rdpadvfirstclick =
 if rdpadvfirstclick = 1
 {
-	guicontrol, 2:disable,txtrdpportforwarding,
-	guicontrol, 2:hide,txtrdpportforwarding,
-	guicontrol, 2:disable,txtlocalrdpport,
-	guicontrol, 2:hide,txtlocalrdpport,
-	guicontrol, 2:disable,localrdpport,
-	guicontrol, 2:hide,localrdpport,
-	guicontrol, 2:disable,txtremotedestnport,
-	guicontrol, 2:hide,txtremotedestnport,
-	guicontrol, 2:disable,remotedestnport,
-	guicontrol, 2:hide,remotedestnport,
+	guicontrol, 2:disable,txtrdpsettings,
+	guicontrol, 2:hide,txtrdpsettings,
+	guicontrol, 2:disable,txtenabledrives,
+	guicontrol, 2:hide,txtenabledrives,
+	guicontrol, 2:disable,enabledrives,
+	guicontrol, 2:hide,enabledrives,
+	guicontrol, 2:disable,enablefullscreen,
+	guicontrol, 2:hide,enablefullscreen,
 	rdpadvfirstclick =
 	rdpadvsecondshow = 1
 }
@@ -1337,32 +1337,68 @@ else
 	if rdpadvsecondshow = 1
 	{
 		rdpadvfirstclick = 1
-		guicontrol, 2:enable,txtrdpportforwarding
-		guicontrol, 2:show,txtrdpportforwarding,
-		guicontrol, 2:enable,txtlocalrdpport,
-		guicontrol, 2:show,txtlocalrdpport,
-		guicontrol, 2:enable,localrdpport,
-		guicontrol, 2:show,localrdpport,
-		guicontrol, 2:enable,txtremotedestnport,
-		guicontrol, 2:show,txtremotedestnport,
-		guicontrol, 2:enable,remotedestnport,
-		guicontrol, 2:show,remotedestnport,
+		guicontrol, 2:enable,txtrdpsettings
+		guicontrol, 2:show,txtrdpsettings,
+		guicontrol, 2:enable,txtenabledrives,
+		guicontrol, 2:show,txtenabledrives,
+		guicontrol, 2:enable,enabledrives,
+		guicontrol, 2:show,enabledrives,
+		guicontrol, 2:enable,enablefullscreen,
+		guicontrol, 2:show,enablefullscreen,
 	}
 	else
 	{	
 		gui, 2:tab,rdp
 		gui, 2:font,underline
-		gui, 2:add,text,vtxtrdpportforwarding ys x490,rdp RDP Settings
+		gui, 2:add,text,vtxtrdpsettings ys x490,RDP Settings
 		gui, 2:font, norm
-		guicontrol, 2:hide,txtrdpportforwarding,
-		guicontrol, 2:show,txtrdpportforwarding,
-		gui, 2:add,checkbox,venabledrives,Redirect all drives/media to remote?
-		gui, 2:add,checkbox,venablefullscreen,Force full screen?
-		gui, 2:add,checkbox,vdisablewall,Force disable remote wallpaper?
+		guicontrol, 2:hide,txtrdpsettings,
+		guicontrol, 2:show,txtrdpsettings,
+		gui, 2:font,s14
+		gui, 2:add,checkbox,venabledrives,Redirect local drives
+		gui, 2:add,checkbox,venablefullscreen,Force full screen
+		gui, 2:font,s16 underline
+		gui, 2:add,text,vtxtrdpahk,AutoHotkey Settings
+		guicontrol, 2:hide,txtrdpahk,
+		guicontrol, 2:show,txtrdpahk,
+		gui, 2:font,norm s14
+		gui, 2:add,checkbox,venablerdpahk gshowrdpahk,Enable AutoHotkey`n(Ctrl+Alt+A)
 		rdpadvfirstclick = 1
 	}
 }
 exit
+showrdpahk:
+if gui2wasdestroyed = 1
+	rdpahkclicked =
+if rdpahkclicked = 1
+{
+	guicontrol, 2:hide,rdpahkpassonly
+	guicontrol, 2:disable,rdpahkpassonly
+	guicontrol, 2:hide,rdpahkhelp
+	guicontrol, 2:disable,rdpahkhelp
+	rdpahkclicked =
+	rdpahk2ndclick = 1
+}
+else
+{
+	if rdpahk2ndclick = 1
+	{
+		guicontrol, 2:show,rdpahkpassonly
+		guicontrol, 2:enable,rdpahkpassonly
+		guicontrol, 2:show,rdpahkhelp
+		guicontrol, 2:enable,rdpahkhelp
+	}
+	else
+	{
+		gui, 2:add,checkbox,vrdpahkpassonly,Auto Password Only`n(Type Password+(enter)
+		gui, 2:add,button,vrdpahkhelp grdpahkhelp,AutoHotkey Help
+		rdpahkclicked = 1
+	}
+}
+return
+RdpAHKHelp:
+msgbox,Enabling AutoHotkey will allow the key combination of Ctrl+Alt+A to automatically type username (tab) password (enter).`nThis is useful if an older OS doesn't let you auto login normally.`nYou may additonally enable the option to only type password (enter) for connections that already have the username field entered.
+return
 ;showrdpadv:
 ;gui, 3:submit,nohide
 ;if chkrdpadv = 1
