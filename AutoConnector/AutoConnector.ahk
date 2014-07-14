@@ -58,7 +58,7 @@ else
 	{
 		filecreatedir, %a_workingdir%\updater
 		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
-		fileinstall, unzip.exe,%a_workingdir%\programbin\unzip.exe,1
+		fileinstall,7za.exe,%a_workingdir%\programbin\7za.exe
 		urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.exe, %a_workingdir%\updater\autoconnector-updater.exe
 		sleep,5000
 		ifexist, %a_workingdir%\updater\autoconnector-updater.exe
@@ -351,7 +351,13 @@ guicontrol, 2:disable,butrdpdel
 guicontrol, 2:disable,butrdpadv
 ;gui, 2:add, Button,w225 border gCreaterdpconnection, Create Connection
 gui, 2:tab,Telnet
-gui, 2:add,text,vnotavailabletelnet,This protocol has not been created yet, it is in progress.
+gui, 2:add,listbox,vTelnetConnections R13
+gui, 2:add,updown,section
+gui, 2:add, Button,w224 border vbutcreatetelnet, Create Connection
+gui, 2:add,button,ys w165 border vbuttelnetconnsection,Connect
+gui, 2:add,button,w165 vbuttelnetedit,Edit Connection
+gui, 2:add,button,w165 vbuttelnetdel,Delete Connection
+gui, 2:add,button,w165 vbuttelnetadv,Show/Hide Advanced Options
 gui, 2:tab,VNC
 gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
 gui, 2:tab,Master Settings
