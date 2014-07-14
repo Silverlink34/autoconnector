@@ -65,7 +65,6 @@ else
 		{
 			sleep,2000
 			progress,off
-			fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
 			run, %a_workingdir%\updater\autoconnector-updater.exe
 		}
 		else
@@ -82,7 +81,6 @@ else
 	}
 	else
 	{
-		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
 		run, %a_workingdir%\updater\autoconnector-updater.exe
 	}
 }
