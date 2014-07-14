@@ -298,16 +298,13 @@ gui, 1:add, checkbox, vskipintro, Skip this screen on next run?
 exit
 
 Disclaimer:
-{
 msgbox, I do not own AutoHotkey, Putty, or any other programs this script calls upon. `nI am simply the author of the script. `n`nI am also not responsible for any damage to your computer, you are the user that decided to trust my program.
-gui, 1:destroy
-gosub guistart
-}
+return
+
 
 Help:
 msgbox, Some things to note:`n`n-All used files are stored under My Documents/AutoConnector.`n`n-You can transport your saved connections simply by copying the Saved Connections folder around. Please note that all of your connections are encrypted with your master password, so if you set a master password that is different they will not load.`n`n-Deleting config files out of the My Documents\AutoConnector WILL REMOVE your ability to recover your password. 
-gui, 1:destroy
-gosub guistart
+return
 
 viewsource:
 run, https://github.com/silverlink34/autoconnector
@@ -1004,6 +1001,8 @@ if rdpadvfirstclick = 1
 	guicontrol, 2:hide,enabledrives,
 	guicontrol, 2:disable,enablefullscreen,
 	guicontrol, 2:hide,enablefullscreen,
+	guicontrol, 2:disable,enablewindowedscreen
+	guicontrol, 2:hide,enablewindowedscreen
 	guicontrol, 2:disable,txtrdpahk
 	guicontrol, 2:hide,txtrdpahk
 	guicontrol, 2:disable,enablerdpahk
@@ -1146,11 +1145,13 @@ if rdpadvclicked
 		drives =  /drives
 	if enablefullscreen = 1
 		fullscrn = /f
+	if enablewindowedscreen
+		windowedscrn = /w:900 /h:670
 	if enabledrives = 0
 		drives =
 	if enablefullscreen = 0
 		fullscrn =
-	rdpconnect = %a_workingdir%\programbin\rdp /v:%rdpcredfilter2% /u:%rdpcredfilter3% /p:%rdpcredfilter4% %drives% %fullscrn%
+	rdpconnect = %a_workingdir%\programbin\rdp /v:%rdpcredfilter2% /u:%rdpcredfilter3% /p:%rdpcredfilter4% %drives% %fullscrn% %windowedscrn%
 }
 if enablerdpahk = 1
 	{	
@@ -1216,6 +1217,8 @@ if rdpadvfirstclick = 1
 	guicontrol, 2:hide,enabledrives,
 	guicontrol, 2:disable,enablefullscreen,
 	guicontrol, 2:hide,enablefullscreen,
+	guicontrol, 2:disable,enablewindowedscreen
+	guicontrol, 2:hide,enablewindowedscreen
 	guicontrol, 2:disable,txtrdpahk
 	guicontrol, 2:hide,txtrdpahk
 	guicontrol, 2:disable,enablerdpahk
@@ -1376,6 +1379,8 @@ if rdpadvfirstclick = 1
 	guicontrol, 2:hide,enabledrives,
 	guicontrol, 2:disable,enablefullscreen,
 	guicontrol, 2:hide,enablefullscreen,
+	guicontrol, 2:disable,enablewindowedscreen
+	guicontrol, 2:hide,enablewindowedscreen
 	guicontrol, 2:disable,txtrdpahk
 	guicontrol, 2:hide,txtrdpahk
 	guicontrol, 2:disable,enablerdpahk
@@ -1400,6 +1405,8 @@ else
 		guicontrol, 2:show,enabledrives,
 		guicontrol, 2:enable,enablefullscreen,
 		guicontrol, 2:show,enablefullscreen,
+		guicontrol, 2:enable,enablewindowedscreen
+		guicontrol, 2:show,enablewindowedscreen
 		guicontrol, 2:enable,txtrdpahk
 		guicontrol, 2:show,txtrdpahk
 		guicontrol, 2:enable,enablerdpahk
@@ -1415,7 +1422,8 @@ else
 		guicontrol, 2:show,txtrdpsettings,
 		gui, 2:font,s14
 		gui, 2:add,checkbox,venabledrives,Redirect local drives
-		gui, 2:add,checkbox,venablefullscreen,Force full screen
+		gui, 2:add,checkbox,venablefullscreen guncheckwindowedscreen,Force full screen
+		gui, 2:add,checkbox,venablewindowedscreen guncheckfullscreen,Force Windowed Screen
 		gui, 2:font,s16 underline
 		gui, 2:add,text,vtxtrdpahk,AutoHotkey Settings
 		guicontrol, 2:hide,txtrdpahk,
@@ -1426,6 +1434,32 @@ else
 	}
 }
 exit
+uncheckwindowedscreen:
+if windoweddisabled = 1
+{
+	guicontrol, 2:enable,enablewindowedscreen
+	windoweddisabled =
+}
+else
+{
+guicontrol, 2:,enablewindowedscreen,0
+guicontrol, 2:disable,enablewindowedscreen
+windoweddisabled = 1
+}
+return
+uncheckfullscreen:
+if fullscreendisabled = 1
+{
+	guicontrol, 2:enable,enablefullscreen
+	fullscreendisabled =
+}
+else
+{
+guicontrol, 2:,enablefullscreen,0
+guicontrol, 2:disable,enablefullscreen
+fullscreendisabled = 1
+}
+return
 showrdpahk:
 if gui2wasdestroyed = 1
 	rdpahkclicked =
