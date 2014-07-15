@@ -19,3 +19,6 @@ ftp
 Other Features to add:
 Setup Changelog
 
+Bugs to fix:
+disable certain characters in connection name
+fix ssh editconnection bug
