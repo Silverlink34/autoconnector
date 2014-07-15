@@ -349,13 +349,13 @@ guicontrol, 2:disable,butrdpdel
 guicontrol, 2:disable,butrdpadv
 ;gui, 2:add, Button,w225 border gCreaterdpconnection, Create Connection
 gui, 2:tab,Telnet
-gui, 2:add,listbox,vTelnetConnections R13
+gui, 2:add,listbox,vTelnetConnections gtelnetselected R13
 gui, 2:add,updown,section
-gui, 2:add, Button,w224 border vbutcreatetelnet, Create Connection
-gui, 2:add,button,ys w165 border vbuttelnetconnsection,Connect
+gui, 2:add, Button,w224 border vbutcreatetelnet gcreatetelnetconnection, Create Connection
+gui, 2:add,button,ys w165 border vbuttelnetconn section,Connect
 gui, 2:add,button,w165 vbuttelnetedit,Edit Connection
 gui, 2:add,button,w165 vbuttelnetdel,Delete Connection
-gui, 2:add,button,w165 vbuttelnetadv,Show/Hide Advanced Options
+gui, 2:add,button,w165 vbuttelnetadv,Show/Hide Cisco options
 gui, 2:tab,VNC
 gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
 gui, 2:tab,Master Settings
@@ -368,6 +368,8 @@ if tabnumber = 1
 	gosub detectssh
 if tabnumber = 2
 	gosub detectrdp
+iftabnumber = 3
+	gosub detecttelnet
 gui, 2:tab,SSH
 sshselected:
 controlget,sshisselected,choice,,listbox1,A
@@ -1498,24 +1500,142 @@ return
 RdpAHKHelp:
 msgbox,Enabling AutoHotkey will allow the key combination of Ctrl+Alt+A to automatically type username (tab) password (enter).`nThis is useful if an older OS doesn't let you auto login normally.`nYou may additonally enable the option to only type password (enter) for connections that already have the username field entered.
 return
-;showrdpadv:
-;gui, 3:submit,nohide
-;if chkrdpadv = 1
-;{
-;	gui, 3:font,underline
-;	gui, 3:add,text,xs y240,RDP Advanced Options
-;	gui, 3:font,norm
-;	gui, 3:add,checkbox,venabledrives,Redirect all drives/media to remote?
-;	gui, 3:add,checkbox,venablesound,Redirect sound from remote?
-;	gui, 3:add,checkbox,venablefullscreen,Force full screen?
-;	gui, 3:add,checkbox,vdisablewall,Force disable remote wallpaper?
-;	exit
-;}
-;else
-;{
-;	gui, 3:destroy
-;	gosub, createconnection
-;}	
+
+gui, 2:tab,telnet
+telnetselected:
+controlget,telnetisselected,choice,,listbox3,A
+if telnetisselected
+{
+	guicontrol, 2:enable,buttelnetconn
+	guicontrol, 2:enable,buttelnetedit
+	guicontrol, 2:enable,buttelnetdel
+	guicontrol, 2:enable,buttelnetadv
+}
+else
+{
+	guicontrol, 2:disable,buttelnetconn
+	guicontrol, 2:disable,buttelnetedit
+	guicontrol, 2:disable,buttelnetdel
+	guicontrol, 2:disable,buttelnetadv
+}
+exit
+
+Detecttelnet:
+ifexist %a_workingdir%\SavedConnections\telnet
+controlget,listedtelnet,list,,Listbox3,A
+{	
+	FileCreateDir, tmp
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\telnet > %a_workingdir%\tmp\telnetlist,, hide
+	sleep, 200
+	Loop, read, %A_workingdir%\tmp\telnetlist
+	{
+		ifnotinstring,listedtelnet,%a_loopreadline%
+			guicontrol, 2:,telnetconnections,%a_loopreadline%|
+	}
+	Fileremovedir, tmp, 1	
+}
+return
+Createtelnetconnection:
+guicontrol, 2:disable,butcreatetelnet
+guicontrol, 2:disable,buttelnetconn
+guicontrol, 2:disable,buttelnetedit
+guicontrol, 2:disable,buttelnetdel
+guicontrol, 2:disable,buttelnetadv
+guicontrol, 2:hide,butcreatetelnet
+guicontrol, 2:hide,buttelnetconn
+guicontrol, 2:hide,buttelnetedit
+guicontrol, 2:hide,buttelnetdel
+guicontrol, 2:hide,buttelnetadv
+if gui2wasdestroyed = 1
+	createtelnetwasclicked =
+if createtelnetwasclicked = 1
+{
+	guicontrol, 2:show,txtnewtelnetconn
+	guicontrol, 2:show,txttelnetname
+	guicontrol, 2:show,telnetname
+	guicontrol, 2:show,txttelnetserver
+	guicontrol, 2:show,telnetserver
+	guicontrol, 2:show,saveciscocreds
+	guicontrol, 2:show,butsavetelnet
+	guicontrol, 2:show,butcancelcreatetelnet
+	guicontrol, 2:enable,txtnewtelnetconn
+	guicontrol, 2:enable,txttelnetname
+	guicontrol, 2:enable,telnetname
+	guicontrol, 2:enable,txttelnetserver
+	guicontrol, 2:enable,telnetserver
+	guicontrol, 2:show,saveciscocreds
+	guicontrol, 2:enable,butsavetelnet
+	guicontrol, 2:enable,butcancelcreatetelnet
+}
+else
+{
+	gui, 2:tab,telnet
+	gui, 2:font,underline
+	gui, 2:add,text,vtxtnewtelnetconn ys x420 section,New Connection
+	guicontrol, 2:hide,txtnewtelnetconn
+	guicontrol, 2:show,txtnewtelnetconn
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add,Text,vtxttelnetname xs x300,Connection Name
+	gui, 2:font,norm
+	guicontrol, 2:hide,txttelnetname
+	guicontrol, 2:show,txttelnetname
+	gui, 2:add, edit,w300 vtelnetname,My telnet Connection
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxttelnetserver,Server domain/public ip
+	gui, 2:font,norm
+	guicontrol, 2:hide,txttelnetserver
+	guicontrol, 2:show,txttelnetserver
+	gui, 2:add, edit,w300 vtelnetserver, serverdomain\ip
+	gui, 2:add,checkbox,vsaveciscocreds,(Optional)`nSave Cisco Credentials
+	gui, 2:add, button,border vbutsavetelnet x42 y436 w112,Save
+	gui, 2:add, button,border vbutcancelcreatetelnet x154 y436 w112,Cancel
+	createtelnetwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
+}
+exit
+Savetelnet:
+{
+	gui, 2:submit
+	FileCreateDir, SavedConnections
+	FileCreateDir, SavedConnections\telnet
+	data = 
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\telnet\%telnetname%
+	gui, 2:destroy
+	gui2wasdestroyed = 1
+	gosub MainMenu
+}
+return
+
+cancelcreatetelnet:
+guicontrol, 2:hide,txtnewtelnetconn
+guicontrol, 2:hide,txttelnetname
+guicontrol, 2:hide,telnetname
+guicontrol, 2:hide,txttelnetserver
+guicontrol, 2:hide,telnetserver
+guicontrol, 2:hide,saveciscocreds
+guicontrol, 2:hide,butsavetelnet
+guicontrol, 2:hide,butcancelcreatetelnet
+guicontrol, 2:disable,txtnewtelnetconn
+guicontrol, 2:disable,txttelnetname
+guicontrol, 2:disable,telnetname
+guicontrol, 2:disable,txttelnetserver
+guicontrol, 2:disable,telnetserver
+guicontrol, 2:disable,saveciscocreds
+guicontrol, 2:disable,butsavetelnet
+guicontrol, 2:disable,butcancelcreatetelnet
+telnetname =
+telnetserver =
+guicontrol, 2:show,butcreatetelnet
+guicontrol, 2:enable,butcreatetelnet
+guicontrol, 2:show,buttelnetconn
+guicontrol, 2:show,buttelnetedit
+guicontrol, 2:show,buttelnetdel
+guicontrol, 2:show,buttelnetadv
+exit
+
+
 
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
