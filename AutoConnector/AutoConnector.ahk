@@ -1582,14 +1582,14 @@ else
 	guicontrol, 2:show,txttelnetname
 	gui, 2:add, edit,w300 vtelnetname,My telnet Connection
 	gui, 2:font,underline
-	GUI, 2:Add, Text,vtxttelnetserver,Server domain/public ip
+	GUI, 2:Add, Text,vtxttelnetserver,Server domain/public ip and Port
 	gui, 2:font,norm
 	guicontrol, 2:hide,txttelnetserver
 	guicontrol, 2:show,txttelnetserver
-	gui, 2:add, edit,w300 vtelnetserver, serverdomain\ip
+	gui, 2:add, edit,w300 vtelnetserver, serverip:port
 	gui, 2:add,checkbox,vsaveciscocreds,(Optional)`nSave Cisco Credentials
-	gui, 2:add, button,border vbutsavetelnet x42 y436 w112,Save
-	gui, 2:add, button,border vbutcancelcreatetelnet x154 y436 w112,Cancel
+	gui, 2:add, button,border vbutsavetelnet gsavetelnet x42 y436 w112,Save
+	gui, 2:add, button,border vbutcancelcreatetelnet gcancelcreatetelnet x154 y436 w112,Cancel
 	createtelnetwasclicked = 1
 	if gui2wasdestroyed = 1
 		gui2wasdestroyed =
@@ -1600,7 +1600,7 @@ Savetelnet:
 	gui, 2:submit
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\telnet
-	data = 
+	data =  %puttydir%\putty telnet://%telnetserver%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\telnet\%telnetname%
 	gui, 2:destroy
 	gui2wasdestroyed = 1
