@@ -1598,6 +1598,8 @@ exit
 Savetelnet:
 {
 	gui, 2:submit
+	if saveciscocreds = 1
+		gosub saveciscocredentials
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\telnet
 	data =  %puttydir%\putty telnet://%telnetserver%
@@ -1606,6 +1608,40 @@ Savetelnet:
 	gui2wasdestroyed = 1
 	gosub MainMenu
 }
+return
+saveciscocredentials:
+guicontrol, 2:hide,txtnewtelnetconn
+guicontrol, 2:hide,txttelnetname
+guicontrol, 2:hide,telnetname
+guicontrol, 2:hide,txttelnetserver
+guicontrol, 2:hide,telnetserver
+guicontrol, 2:hide,saveciscocreds
+guicontrol, 2:hide,butsavetelnet
+guicontrol, 2:hide,butcancelcreatetelnet
+guicontrol, 2:disable,txtnewtelnetconn
+guicontrol, 2:disable,txttelnetname
+guicontrol, 2:disable,telnetname
+guicontrol, 2:disable,txttelnetserver
+guicontrol, 2:disable,telnetserver
+guicontrol, 2:disable,saveciscocreds
+guicontrol, 2:disable,butsavetelnet
+guicontrol, 2:disable,butcancelcreatetelnet
+gui, 2:add,text,vtxtciscocreds ys x420 section,Cisco Credentials
+guicontrol, 2:hide,txtciscocreds
+guicontrol, 2:show,txtciscocreds
+gui, 2:font,underline
+GUI, 2:Add,Text,vtxtinituser xs x300,Username
+guicontrol, 2:hide,txtinituser
+guicontrol, 2:show,txtinituser
+gui, 2:font,norm s14
+gui, 2:edit,vinituser w300
+gui, 2:font,underline
+GUI, 2:Add,Text,vtxtinitpass,Password
+
+
+guicontrol, 2:hide,txtinitpass
+guicontrol, 2:show,txtinitpass
+
 return
 
 cancelcreatetelnet:
