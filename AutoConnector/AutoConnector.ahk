@@ -352,7 +352,7 @@ gui, 2:tab,Telnet
 gui, 2:add,listbox,vTelnetConnections gtelnetselected R13
 gui, 2:add,updown,section
 gui, 2:add, Button,w224 border vbutcreatetelnet gcreatetelnetconnection, Create Connection
-gui, 2:add,button,ys w165 border vbuttelnetconn section,Connect
+gui, 2:add,button,ys w165 border vbuttelnetconn gconnecttotelnet section,Connect
 gui, 2:add,button,w165 vbuttelnetedit,Edit Connection
 gui, 2:add,button,w165 vbuttelnetdel,Delete Connection
 gui, 2:add,button,w165 vbuttelnetadv,Show/Hide Cisco options
@@ -1587,7 +1587,7 @@ else
 	guicontrol, 2:hide,txttelnetserver
 	guicontrol, 2:show,txttelnetserver
 	gui, 2:add, edit,w300 vtelnetserver, serverip:port
-	gui, 2:add,checkbox,vsaveciscocreds,(Optional)`nSave Cisco Credentials
+	gui, 2:add,checkbox,vsaveciscocreds,Use Cisco Router Credentials
 	gui, 2:add, button,border vbutsavetelnet gsavetelnet x42 y436 w112,Save
 	gui, 2:add, button,border vbutcancelcreatetelnet gcancelcreatetelnet x154 y436 w112,Cancel
 	createtelnetwasclicked = 1
@@ -1597,11 +1597,28 @@ else
 exit
 Savetelnet:
 {
-	gui, 2:submit
+	if ciscosaved
+		ciscosaved =
+	else
+		gui, 2:submit,nohide
 	if saveciscocreds = 1
 		gosub saveciscocredentials
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\telnet
+	ifexist C:\Program Files (x86)\PuTTY
+	{
+		puttydir = C:\Program Files (x86)\PuTTY
+	}
+	ifexist C:\Program Files\PuTTY
+	{
+		puttydir = C:\Program Files\PuTTY
+	}
+	ifnotinstring, puttydir, Program
+	{
+		filecreatedir, %a_workingdir%\programbin
+		puttydir = %A_WorkingDir%\programbin
+		fileinstall, putty.exe,%a_workingdir%\programbin\putty.exe,1
+	}
 	data =  %puttydir%\putty telnet://%telnetserver%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\telnet\%telnetname%
 	gui, 2:destroy
@@ -1626,23 +1643,55 @@ guicontrol, 2:disable,telnetserver
 guicontrol, 2:disable,saveciscocreds
 guicontrol, 2:disable,butsavetelnet
 guicontrol, 2:disable,butcancelcreatetelnet
+gui, 2:font,underline
 gui, 2:add,text,vtxtciscocreds ys x420 section,Cisco Credentials
 guicontrol, 2:hide,txtciscocreds
 guicontrol, 2:show,txtciscocreds
-gui, 2:font,underline
+gui, 2:font,s14
 GUI, 2:Add,Text,vtxtinituser xs x300,Username
 guicontrol, 2:hide,txtinituser
 guicontrol, 2:show,txtinituser
 gui, 2:font,norm s14
-gui, 2:edit,vinituser w300
+gui, 2:add,edit,vinituser w260
 gui, 2:font,underline
 GUI, 2:Add,Text,vtxtinitpass,Password
-
-
 guicontrol, 2:hide,txtinitpass
 guicontrol, 2:show,txtinitpass
+gui, 2:font,norm
+gui, 2:add,edit,vinitpass w260
+gui, 2:font,underline
+GUI, 2:Add,Text,vtxtenablecreds xs,Enable Credentials
+guicontrol, 2:hide,txtenablecreds
+guicontrol, 2:show,txtenablecreds
+GUI, 2:Add,Text,vtxtenableuser xs x300,Username
+guicontrol, 2:hide,txtenableuser
+guicontrol, 2:show,txtenableuser
+gui, 2:font,norm
+gui, 2:add,edit,venableuser w260
+gui, 2:font,underline
+GUI, 2:Add,Text,vtxtenablepass,Password
+guicontrol, 2:hide,txtenablepass
+guicontrol, 2:show,txtenablepass
+gui, 2:font,norm
+gui, 2:add,edit,venablepass w260
+gui, 2:add, button,border vbutsavecisco gsavecisco x42 y436 w112,Save
+gui, 2:add, button,border vbutcancelcisco gcancelcisco x154 y436 w112,Cancel
+exit
+savecisco:
+gui, 2:submit
+FileCreateDir, SavedConnections
+FileCreateDir, SavedConnections\cisco
+data = %inituser%%a_tab%%initpass%%a_tab%%enableuser%%a_tab%%enablepass%
+FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%telnetname%
+saveciscocreds =
+ciscosaved = 1
+gosub savetelnet
+exit
 
-return
+cancelcisco:
+gui, 2:destroy
+gui2wasdestroyed = 1
+gosub MainMenu
 
 cancelcreatetelnet:
 guicontrol, 2:hide,txtnewtelnetconn
@@ -1671,8 +1720,27 @@ guicontrol, 2:show,buttelnetdel
 guicontrol, 2:show,buttelnetadv
 exit
 
-
-
+connecttotelnet:
+fileread, data, %a_workingdir%\SavedConnections\telnet\%telnetisselected%
+telnetconnect := Decrypt(data,pass)
+msgbox, %telnetconnect%
+;run, %telnetconnect%
+ifexist %a_workingdir%\SavedConnections\cisco\%telnetisselected%
+{
+	fileread,data,%a_workingdir%\SavedConnections\cisco\%telnetisselected%
+	ciscocreds := Decrypt(data,pass)
+	stringsplit,ciscocredfilter,ciscocreds,%a_tab%
+	msgbox,%ciscocredfilter1%`n%ciscocredfilter2%`n%ciscocredfilter3%`n%ciscocredfilter4%
+}
+	/*
+	winwaitactive,%telnetserver%
+	sleep,3000
+	sendraw,%inituser%
+	send,{enter}
+	sleep,2000
+	sendraw,%initpass%
+*/
+return
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
 ifmsgbox yes
