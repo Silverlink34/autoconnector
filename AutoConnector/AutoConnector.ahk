@@ -355,7 +355,6 @@ gui, 2:add, Button,w224 border vbutcreatetelnet gcreatetelnetconnection, Create 
 gui, 2:add,button,ys w165 border vbuttelnetconn gconnecttotelnet section,Connect
 gui, 2:add,button,w165 vbuttelnetedit,Edit Connection
 gui, 2:add,button,w165 vbuttelnetdel,Delete Connection
-gui, 2:add,button,w165 vbuttelnetadv,Show/Hide Cisco options
 gui, 2:tab,VNC
 gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
 gui, 2:tab,Master Settings
@@ -1658,22 +1657,13 @@ GUI, 2:Add,Text,vtxtinitpass,Password
 guicontrol, 2:hide,txtinitpass
 guicontrol, 2:show,txtinitpass
 gui, 2:font,norm
-gui, 2:add,edit,vinitpass w260
+gui, 2:add,edit,vinitpass password w260
 gui, 2:font,underline
-GUI, 2:Add,Text,vtxtenablecreds xs,Enable Credentials
-guicontrol, 2:hide,txtenablecreds
-guicontrol, 2:show,txtenablecreds
-GUI, 2:Add,Text,vtxtenableuser xs x300,Username
-guicontrol, 2:hide,txtenableuser
-guicontrol, 2:show,txtenableuser
-gui, 2:font,norm
-gui, 2:add,edit,venableuser w260
-gui, 2:font,underline
-GUI, 2:Add,Text,vtxtenablepass,Password
+GUI, 2:Add,Text,vtxtenablecreds xs,Enable Password
 guicontrol, 2:hide,txtenablepass
 guicontrol, 2:show,txtenablepass
 gui, 2:font,norm
-gui, 2:add,edit,venablepass w260
+gui, 2:add,edit,venablepass password w260 xs x300
 gui, 2:add, button,border vbutsavecisco gsavecisco x42 y436 w112,Save
 gui, 2:add, button,border vbutcancelcisco gcancelcisco x154 y436 w112,Cancel
 exit
@@ -1681,7 +1671,7 @@ savecisco:
 gui, 2:submit
 FileCreateDir, SavedConnections
 FileCreateDir, SavedConnections\cisco
-data = %inituser%%a_tab%%initpass%%a_tab%%enableuser%%a_tab%%enablepass%
+data = %inituser%%a_tab%%initpass%%a_tab%%enablepass%
 FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%telnetname%
 saveciscocreds =
 ciscosaved = 1
@@ -1729,23 +1719,187 @@ ifexist %a_workingdir%\SavedConnections\cisco\%telnetisselected%
 	fileread,data,%a_workingdir%\SavedConnections\cisco\%telnetisselected%
 	ciscocreds := Decrypt(data,pass)
 	stringsplit,ciscocredfilter,ciscocreds,%a_tab%
-	;msgbox,%ciscocredfilter1%`n%ciscocredfilter2%`n%ciscocredfilter3%`n%ciscocredfilter4%
 	winwaitactive,%telnetserver%
-	sleep,3000
+	sleep,1000
 	sendraw,%ciscocredfilter1%
 	send,{enter}
-	sleep,2000
+	sleep,200
 	sendraw,%ciscocredfilter2%
-	sleep,2000
+	send,{enter}
+	sleep,200
 	sendraw,en
 	send,{enter}
 	sleep,200
 	sendraw,%ciscocredfilter3%
 	send,{enter}
-	sendraw,%ciscocredfilter4%
 }
 return
-
+Edittelnetconnection:
+fileread,data,%a_workingdir%\SavedConnections\telnet\%telnetisselected%
+telnet2edit := decrypt(data,pass)
+stringreplace,telnetcreds,telnet2edit,%a_workingdir%\programbin\telnet,,1
+stringreplace,telnetcreds,telnetcreds,/v:,,
+stringreplace,telnetcreds,telnetcreds,/u:,,
+stringreplace,telnetcreds,telnetcreds,/p:,,
+stringreplace,telnetcreds,telnetcreds,%a_space%,%a_tab%,1
+stringsplit,telnetcredfilter,telnetcreds,%a_tab%,%a_tab%,
+;msgbox,server:port: %telnetcredfilter2% username: %telnetcredfilter3% password: %telnetcredfilter4%
+guicontrol, 2:disable,butcreatetelnet
+guicontrol, 2:disable,buttelnetconn
+guicontrol, 2:disable,buttelnetedit
+guicontrol, 2:disable,buttelnetdel
+guicontrol, 2:disable,buttelnetadv
+guicontrol, 2:hide,butcreatetelnet
+guicontrol, 2:hide,buttelnetconn
+guicontrol, 2:hide,buttelnetedit
+guicontrol, 2:hide,buttelnetdel
+guicontrol, 2:hide,buttelnetadv
+if telnetadvfirstclick = 1
+{
+	guicontrol, 2:disable,txttelnetsettings,
+	guicontrol, 2:hide,txttelnetsettings,
+	guicontrol, 2:disable,txtenabledrives,
+	guicontrol, 2:hide,txtenabledrives,
+	guicontrol, 2:disable,enabledrives,
+	guicontrol, 2:hide,enabledrives,
+	guicontrol, 2:disable,enablefullscreen,
+	guicontrol, 2:hide,enablefullscreen,
+	guicontrol, 2:disable,enablewindowedscreen
+	guicontrol, 2:hide,enablewindowedscreen
+	guicontrol, 2:disable,txttelnetahk
+	guicontrol, 2:hide,txttelnetahk
+	guicontrol, 2:disable,enabletelnetahk
+	guicontrol, 2:hide,enabletelnetahk
+	guicontrol, 2:hide,telnetahkpassonly
+	guicontrol, 2:disable,telnetahkpassonly
+	guicontrol, 2:hide,telnetahkhelp
+	guicontrol, 2:disable,telnetahkhelp
+	telnetadvfirstclick =
+	telnetadvsecondshow = 1
+}
+if gui2wasdestroyed = 1
+	edittelnetwasclicked =
+if edittelnetwasclicked = 1
+{
+	guicontrol, 2:show,txtedittelnettitle
+	guicontrol, 2:show,txtedittelnetname
+	guicontrol, 2:show,edittelnetname
+	guicontrol, 2:show,txtedittelnetserver
+	guicontrol, 2:show,edittelnetserver
+	guicontrol, 2:show,txtedittelnetuser
+	guicontrol, 2:show,edittelnetuser
+	guicontrol, 2:show,txtedittelnetpass
+	guicontrol, 2:show,edittelnetpass
+	guicontrol, 2:show,butsaveeditedtelnet
+	guicontrol, 2:show,butcanceleditedtelnet
+	guicontrol, 2:enable,txtedittelnettitle
+	guicontrol, 2:enable,txtedittelnetname
+	guicontrol, 2:enable,edittelnetname
+	guicontrol, 2:enable,txtedittelnetserver
+	guicontrol, 2:enable,edittelnetserver
+	guicontrol, 2:enable,txtedittelnetuser
+	guicontrol, 2:enable,edittelnetuser
+	guicontrol, 2:enable,txtedittelnetpass
+	guicontrol, 2:enable,edittelnetpass
+	guicontrol, 2:enable,butsaveeditedtelnet
+	guicontrol, 2:enable,butcanceleditedtelnet
+	guicontrol, 2:,edittelnetname,%telnetisselected%
+	guicontrol, 2:,edittelnetserver,%telnetcredfilter2%
+	guicontrol, 2:,edittelnetuser,%telnetcredfilter3%
+	guicontrol, 2:,edittelnetpass,%telnetcredfilter4%
+	
+}
+else
+{	
+	gui, 2:tab,telnet
+	gui, 2:font,underline
+	gui, 2:add,text,vtxtedittelnettitle ys x420 section,Edit Connection
+	guicontrol, 2:hide,txtedittelnettitle
+	guicontrol, 2:show,txtedittelnettitle
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtedittelnetname xs  x300,Connection Name
+	gui, 2:font,norm	
+	guicontrol, 2:hide,txtedittelnetname
+	guicontrol, 2:show,txtedittelnetname
+	gui, 2:add, edit,w300 vedittelnetname,%telnetisselected%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtedittelnetserver,Server domain/public ip 
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtedittelnetserver
+	guicontrol, 2:show,txtedittelnetserver
+	gui, 2:add, edit,w300 vedittelnetserver,%telnetcredfilter2%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtedittelnetuser,Username
+	gui, 2:font,norm
+	guicontrol, 2:hide,vtxtedittelnetuser
+	guicontrol, 2:show,vtxtedittelnetuser
+	gui, 2:add, edit,w300 vedittelnetuser,%telnetcredfilter3%
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtedittelnetpass,Password
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtedittelnetpass
+	guicontrol, 2:show,txtedittelnetpass
+	gui, 2:add, edit,password w240 vedittelnetpass,%telnetcredfilter4%
+	gui, 2:add, button,border vbutsaveeditedtelnet x42 y436 w112 gsaveeditedtelnet, Save
+	gui, 2:add, button,border vbutcanceleditedtelnet x154 y436 w112 gcanceledittelnet,Cancel
+	edittelnetwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
+}
+return
+saveeditedtelnet:
+{
+	gui, 2:submit,nohide
+	msgbox,4,,Are you sure you wish to edit connection: %telnetisselected%?`nIf you select yes, your provided settings will overwrite your previous settings for the connection.`n`nNOTE:`nIf you removed the password out of the password field, it will now be blank and the connection will probably fail.
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\telnet\%telnetisselected%
+		data = %a_workingdir%\programbin\telnet /v:%edittelnetserver% /u:%edittelnetuser% /p:%edittelnetpass%
+		editedtelnet := Encrypt(data,pass)
+		FileAppend,%editedtelnet%,%A_workingdir%\SavedConnections\telnet\%edittelnetname%
+		gui, 2:destroy
+		gui2wasdestroyed = 1
+		gosub mainmenu
+	}
+	else
+	return
+}
+return
+canceledittelnet:
+guicontrol, 2:hide,txtedittelnettitle
+guicontrol, 2:hide,txtedittelnetname
+guicontrol, 2:hide,edittelnetname
+guicontrol, 2:hide,txtedittelnetserver
+guicontrol, 2:hide,edittelnetserver
+guicontrol, 2:hide,txtedittelnetuser
+guicontrol, 2:hide,edittelnetuser
+guicontrol, 2:hide,txtedittelnetpass
+guicontrol, 2:hide,edittelnetpass
+guicontrol, 2:hide,butsaveeditedtelnet
+guicontrol, 2:hide,butcanceleditedtelnet
+guicontrol, 2:disable,txtedittelnettitle
+guicontrol, 2:disable,txtedittelnetname
+guicontrol, 2:disable,edittelnetname
+guicontrol, 2:disable,txtedittelnetserver
+guicontrol, 2:disable,edittelnetserver
+guicontrol, 2:disable,txtedittelnetuser
+guicontrol, 2:disable,edittelnetuser
+guicontrol, 2:disable,txtedittelnetpass
+guicontrol, 2:disable,edittelnetpass
+guicontrol, 2:disable,butsaveeditedtelnet
+guicontrol, 2:disable,butcanceleditedtelnet
+edittelnetname =
+edittelnetserver =
+edittelnetuser =
+edittelnetpass =
+guicontrol, 2:show,butcreatetelnet
+guicontrol, 2:enable,butcreatetelnet
+guicontrol, 2:show,buttelnetconn
+guicontrol, 2:show,buttelnetedit
+guicontrol, 2:show,buttelnetdel
+guicontrol, 2:show,buttelnetadv
+exit
 
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.

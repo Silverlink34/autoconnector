@@ -1,95 +1,44 @@
-; The following is a working script that is more elaborate than the one near the top of this page.
-; It creates and displays a TreeView containing all folders in the all-users Start Menu.  When the
-; user selects a folder, its contents are shown in a ListView to the right (like Windows Explorer).
-; In addition, a StatusBar control shows information about the currently selected folder.
-
-; The following folder will be the root folder for the TreeView. Note that loading might take a long
-; time if an entire drive such as C:\ is specified:
-TreeRoot = %A_StartMenuCommon%
-TreeViewWidth := 280
-ListViewWidth := A_ScreenWidth - TreeViewWidth - 30
-
-; Allow the user to maximize or drag-resize the window:
-Gui +Resize
-
-; Create an ImageList and put some standard system icons into it:
-ImageListID := IL_Create(5)
-Loop 5  ; Below omits the DLL's path so that it works on Windows 9x too:
-    IL_Add(ImageListID, "shell32.dll", A_Index)
-
-; Create a TreeView and a ListView side-by-side to behave like Windows Explorer:
-Gui, Add, TreeView, vMyTree r20 w%TreeViewWidth% gMyTree ImageList%ImageListID%
-Gui, Add, ListView, vMyList r20 w%ListViewWidth% x+10, Name|Modified
-
-; Set the ListView's column widths (this is optional):
-Col2Width = 70  ; Narrow to reveal only the YYYYMMDD part.
-LV_ModifyCol(1, ListViewWidth - Col2Width - 30)  ; Allows room for vertical scrollbar.
-LV_ModifyCol(2, Col2Width)
-
-; Create a Status Bar to give info about the number of files and their total size:
-Gui, Add, StatusBar
-SB_SetParts(60, 85)  ; Create three parts in the bar (the third part fills all the remaining width).
-
-; Add folders and their subfolders to the tree. Display the status in case loading takes a long time:
-SplashTextOn, 200, 25, TreeView and StatusBar Example, Loading the tree...
-AddSubFoldersToTree(TreeRoot)
-SplashTextOff
-
-; Display the window and return. The OS will notify the script whenever the user performs an eligible action:
-Gui, Show,, %TreeRoot%  ; Display the source directory (TreeRoot) in the title bar.
+SetWorkingDir %a_mydocuments%\AutoConnector
+fileread,data,%a_workingdir%\config2
+questions := Decrypt(data,pass)
+stringsplit,answernum,questions,%a_tab%,,
+pass = %answernum1%
+^!c::
+fileread,data,%a_workingdir%\SavedConnections\cisco\Windstream Modem
+ciscocreds := Decrypt(data,pass)
+stringsplit,ciscocredfilter,ciscocreds,%a_tab%
+sendraw,%ciscocredfilter1%
+send,{enter}
+sleep,200
+sendraw,%ciscocredfilter2%
+send,{enter}
+sleep,200
+sendraw,en
+send,{enter}
+sleep,200
+sendraw,%ciscocredfilter3%
+send,{enter}
 return
+!^q::
+exitapp
 
-AddSubFoldersToTree(Folder, ParentItemID = 0)
-{
-    ; This function adds to the TreeView all subfolders in the specified folder.
-    ; It also calls itself recursively to gather nested folders to any depth.
-    Loop %Folder%\*.*, 2  ; Retrieve all of Folder's sub-folders.
-        AddSubFoldersToTree(A_LoopFileFullPath, TV_Add(A_LoopFileName, ParentItemID, "Icon4"))
+Decrypt(Data,Pass) {
+	b := 0, j := 0, x := "0x"
+	VarSetCapacity(Result,StrLen(Data)//2)
+	Loop 256
+		a := A_Index - 1
+		,Key%a% := Asc(SubStr(Pass, Mod(a,StrLen(Pass))+1, 1)) 
+		,sBox%a% := a
+	Loop 256
+		a := A_Index - 1
+		,b := b + sBox%a% + Key%a%  & 255
+		,sBox%a% := (sBox%b%+0, sBox%b% := sBox%a%) ; SWAP(a,b)
+	Loop % StrLen(Data)//2
+		i := A_Index  & 255
+		,j := sBox%i% + j  & 255
+		,k := sBox%i% + sBox%j%  & 255
+		,sBox%i% := (sBox%j%+0, sBox%j% := sBox%i%) ; SWAP(i,j)
+		,Result .= Chr((x . SubStr(Data,2*A_Index-1,2)) ^ sBox%k%)
+   	Return Result
 }
-
-MyTree:  ; This subroutine handles user actions (such as clicking).
-if A_GuiEvent <> S  ; i.e. an event other than "select new tree item".
-    return  ; Do nothing.
-; Otherwise, populate the ListView with the contents of the selected folder.
-; First determine the full path of the selected folder:
-TV_GetText(SelectedItemText, A_EventInfo)
-ParentID := A_EventInfo
-Loop  ; Build the full path to the selected folder.
-{
-    ParentID := TV_GetParent(ParentID)
-    if not ParentID  ; No more ancestors.
-        break
-    TV_GetText(ParentText, ParentID)
-    SelectedItemText = %ParentText%\%SelectedItemText%
-}
-SelectedFullPath = %TreeRoot%\%SelectedItemText%
-
-; Put the files into the ListView:
-LV_Delete()  ; Clear all rows.
-GuiControl, -Redraw, MyListView  ; Improve performance by disabling redrawing during load.
-FileCount = 0  ; Init prior to loop below.
-TotalSize = 0
-Loop %SelectedFullPath%\*.*  ; For simplicity, this omits folders so that only files are shown in the ListView.
-{
-    LV_Add("", A_LoopFileName, A_LoopFileTimeModified)
-    FileCount += 1
-    TotalSize += A_LoopFileSize
-}
-GuiControl, +Redraw, MyListView
-
-; Update the three parts of the status bar to show info about the currently selected folder:
-SB_SetText(FileCount . " files", 1)
-SB_SetText(Round(TotalSize / 1024, 1) . " KB", 2)
-SB_SetText(SelectedFullPath, 3)
-return
-
-GuiSize:  ; Expand/shrink the ListView and TreeView in response to user's resizing of window.
-if A_EventInfo = 1  ; The window has been minimized.  No action needed.
-    return
-; Otherwise, the window has been resized or maximized. Resize the controls to match.
-GuiControl, Move, MyTree, % "H" . (A_GuiHeight - 30)  ; -30 for StatusBar and margins.
-GuiControl, Move, MyList, % "H" . (A_GuiHeight - 30) . " W" . (A_GuiWidth - TreeViewWidth - 30)
-return
-
-GuiClose:  ; Exit the script when the user closes the TreeView's GUI window.
-ExitApp
+Return
