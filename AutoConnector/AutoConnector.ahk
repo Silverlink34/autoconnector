@@ -1723,24 +1723,30 @@ exit
 connecttotelnet:
 fileread, data, %a_workingdir%\SavedConnections\telnet\%telnetisselected%
 telnetconnect := Decrypt(data,pass)
-msgbox, %telnetconnect%
-;run, %telnetconnect%
+run, %telnetconnect%
 ifexist %a_workingdir%\SavedConnections\cisco\%telnetisselected%
 {
 	fileread,data,%a_workingdir%\SavedConnections\cisco\%telnetisselected%
 	ciscocreds := Decrypt(data,pass)
 	stringsplit,ciscocredfilter,ciscocreds,%a_tab%
-	msgbox,%ciscocredfilter1%`n%ciscocredfilter2%`n%ciscocredfilter3%`n%ciscocredfilter4%
-}
-	/*
+	;msgbox,%ciscocredfilter1%`n%ciscocredfilter2%`n%ciscocredfilter3%`n%ciscocredfilter4%
 	winwaitactive,%telnetserver%
 	sleep,3000
-	sendraw,%inituser%
+	sendraw,%ciscocredfilter1%
 	send,{enter}
 	sleep,2000
-	sendraw,%initpass%
-*/
+	sendraw,%ciscocredfilter2%
+	sleep,2000
+	sendraw,en
+	send,{enter}
+	sleep,200
+	sendraw,%ciscocredfilter3%
+	send,{enter}
+	sendraw,%ciscocredfilter4%
+}
 return
+
+
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
 ifmsgbox yes
