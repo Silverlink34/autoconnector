@@ -354,7 +354,9 @@ gui, 2:add,updown,section
 gui, 2:add, Button,w224 border vbutcreatetelnet gcreatetelnetconnection, Create Connection
 gui, 2:add,button,ys w165 border vbuttelnetconn gconnecttotelnet section,Connect
 gui, 2:add,button,w165 vbuttelnetedit gedittelnetconnection,Edit Connection
-gui, 2:add,button,w165 vbuttelnetdel,Delete Connection
+gui, 2:add,button,w165 vbuttelnetdel gdeletetelnetconnection,Delete Connection
+gui, 2:font,s14
+gui, 2:add,checkbox,vcustciscoauto gshowciscoautotype,Customize Cisco AutoType
 gui, 2:tab,VNC
 gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
 gui, 2:tab,Master Settings
@@ -1508,14 +1510,19 @@ if telnetisselected
 	guicontrol, 2:enable,buttelnetconn
 	guicontrol, 2:enable,buttelnetedit
 	guicontrol, 2:enable,buttelnetdel
-	guicontrol, 2:enable,buttelnetadv
+	guicontrol, 2:enable,custciscoauto
+	ifnotexist, %a_workingdir%\SavedConnections\cisco\%telnetisselected%
+	{
+		guicontrol, 2:disable,custciscoauto
+		
+	}
 }
 else
 {
 	guicontrol, 2:disable,buttelnetconn
 	guicontrol, 2:disable,buttelnetedit
 	guicontrol, 2:disable,buttelnetdel
-	guicontrol, 2:disable,buttelnetadv
+	guicontrol, 2:disable,custciscoauto
 }
 exit
 
@@ -1539,12 +1546,12 @@ guicontrol, 2:disable,butcreatetelnet
 guicontrol, 2:disable,buttelnetconn
 guicontrol, 2:disable,buttelnetedit
 guicontrol, 2:disable,buttelnetdel
-guicontrol, 2:disable,buttelnetadv
+guicontrol, 2:disable,custciscoauto
 guicontrol, 2:hide,butcreatetelnet
 guicontrol, 2:hide,buttelnetconn
 guicontrol, 2:hide,buttelnetedit
 guicontrol, 2:hide,buttelnetdel
-guicontrol, 2:hide,buttelnetadv
+guicontrol, 2:hide,custciscoauto
 if gui2wasdestroyed = 1
 	createtelnetwasclicked =
 if createtelnetwasclicked = 1
@@ -1707,7 +1714,7 @@ guicontrol, 2:enable,butcreatetelnet
 guicontrol, 2:show,buttelnetconn
 guicontrol, 2:show,buttelnetedit
 guicontrol, 2:show,buttelnetdel
-guicontrol, 2:show,buttelnetadv
+guicontrol, 2:show,custciscoauto
 exit
 
 connecttotelnet:
@@ -1757,6 +1764,8 @@ guicontrol, 2:disable,butcreatetelnet
 guicontrol, 2:disable,buttelnetconn
 guicontrol, 2:disable,buttelnetedit
 guicontrol, 2:disable,buttelnetdel
+guicontrol, 2:disable,custciscoauto
+guicontrol, 2:hide,custciscoauto
 guicontrol, 2:hide,butcreatetelnet
 guicontrol, 2:hide,buttelnetconn
 guicontrol, 2:hide,buttelnetedit
@@ -1770,17 +1779,30 @@ if edittelnetwasclicked = 1
 	guicontrol, 2:show,edittelnetname
 	guicontrol, 2:show,txtedittelnetserver
 	guicontrol, 2:show,edittelnetserver
+	guicontrol, 2:show,buteditcisco
+	guicontrol, 2:show,butaddcisco
+	guicontrol, 2:show,butdelcisco
 	guicontrol, 2:show,butsaveeditedtelnet
-	guicontrol, 2:show,butcanceleditedtelnet
+	guicontrol, 2:show,butcanceledittelnet
 	guicontrol, 2:enable,txtedittelnettitle
 	guicontrol, 2:enable,txtedittelnetname
 	guicontrol, 2:enable,edittelnetname
 	guicontrol, 2:enable,txtedittelnetserver
 	guicontrol, 2:enable,edittelnetserver
+	guicontrol, 2:enable,buteditcisco
+	guicontrol, 2:enable,butaddcisco
+	guicontrol, 2:enable,butdelcisco
 	guicontrol, 2:enable,butsaveeditedtelnet
-	guicontrol, 2:enable,butcanceleditedtelnet
+	guicontrol, 2:enable,butcanceledittelnet
 	guicontrol, 2:,edittelnetname,%telnetisselected%
-	guicontrol, 2:,edittelnetserver,%telnetserver%	
+	guicontrol, 2:,edittelnetserver,%telnetserver%
+	ifnotexist, %a_workingdir%\SavedConnections\cisco\%telnetisselected%
+	{
+		guicontrol, 2:disable,buteditcisco
+		guicontrol, 2:disable,butdelcisco
+	}
+	else
+		guicontrol, 2:disable,butaddcisco
 }
 else
 {	
@@ -1802,11 +1824,18 @@ else
 	guicontrol, 2:hide,txtedittelnetserver
 	guicontrol, 2:show,txtedittelnetserver
 	gui, 2:add, edit,w300 vedittelnetserver,%telnetserver%
+	gui, 2:add,button,vbutaddcisco gsaveciscocredentials,Create Cisco Credentials
 	gui, 2:add,button,vbuteditcisco geditciscocreds,Edit Cisco Credentials
+	gui, 2:add,button,vbutdelcisco gdeleteciscocreds,Delete Cisco Credentials
 	ifnotexist, %a_workingdir%\SavedConnections\cisco\%telnetisselected%
-		guicontrol, 2:disable,vbuteditcisco
+	{
+		guicontrol, 2:disable,buteditcisco
+		guicontrol, 2:disable,butdelcisco
+	}
+	else
+		guicontrol, 2:disable,butaddcisco
 	gui, 2:add, button,border vbutsaveeditedtelnet x42 y436 w112 gsaveeditedtelnet, Save
-	gui, 2:add, button,border vbutcanceleditedtelnet x154 y436 w112 gcanceledittelnet,Cancel
+	gui, 2:add, button,border vbutcanceledittelnet x154 y436 w112 gcanceledittelnet,Cancel
 	edittelnetwasclicked = 1
 	if gui2wasdestroyed = 1
 		gui2wasdestroyed =
@@ -1823,7 +1852,7 @@ guicontrol, 2:hide,txtedittelnetserver
 guicontrol, 2:hide,edittelnetserver
 guicontrol, 2:hide,buteditcisco
 guicontrol, 2:hide,butsaveeditedtelnet
-guicontrol, 2:hide,butcancelededitedtelnet
+guicontrol, 2:hide,butcanceledittelnet
 guicontrol, 2:disable,txtedittelnetconn
 guicontrol, 2:disable,txtedittelnetname
 guicontrol, 2:disable,edittelnetname
@@ -1831,7 +1860,7 @@ guicontrol, 2:disable,txtedittelnetserver
 guicontrol, 2:disable,edittelnetserver
 guicontrol, 2:disable,buteditcisco
 guicontrol, 2:disable,butsaveeditedtelnet
-guicontrol, 2:disable,butcancelededitedtelnet
+guicontrol, 2:disable,butcanceledittelnet
 gui, 2:font,underline
 gui, 2:add,text,vtxteditciscocreds ys x420 section,Edit Cisco Credentials
 guicontrol, 2:hide,txteditciscocreds
@@ -1856,28 +1885,51 @@ gui, 2:font,norm
 gui, 2:add,edit,veditenablepass password w260 xs x300,%ciscocredfilter3%
 gui, 2:add, button,border vbutsaveeditcisco gsaveeditcisco x42 y436 w112,Save
 gui, 2:add, button,border vbutcanceleditcisco gcanceleditcisco x154 y436 w112,Cancel
+guicontrol, 2:,editinituser,%ciscocredfilter1%
+guicontrol, 2:,editinitpass,%ciscocredfilter2%
+guicontrol, 2:,editenanblepass,%ciscocredfilter3%
 return
 
 saveeditcisco:
-gui, 2:submit
+gui, 2:submit,nohide
 data = %editinituser%%a_tab%%editinitpass%%a_tab%%editenablepass%
-filedelete,%A_workingdir%\SavedConnections\cisco\%telnetname%
-FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%telnetname%
-guicontrol, 2:show,txtedittelnetconn
-guicontrol, 2:show,txtedittelnetname
-guicontrol, 2:show,edittelnetname
-guicontrol, 2:show,txtedittelnetserver
-guicontrol, 2:show,edittelnetserver
-guicontrol, 2:show,buteditcisco
-guicontrol, 2:show,butsaveeditedtelnet
-guicontrol, 2:show,butcancelededitedtelnet
-return
-
-canceleditcisco:
-msgbox,clicky
+filedelete,%A_workingdir%\SavedConnections\cisco\%telnetisselected%
+FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%edittelnetname%
+ciscocredfilter1 =
+ciscocredfilter2 =
+ciscocredfilter3 =
 gui, 2:destroy
 gui2wasdestroyed = 1
 gosub MainMenu
+return
+
+canceleditcisco:
+gui, 2:destroy
+gui2wasdestroyed = 1
+gosub MainMenu
+return
+
+deleteciscocreds:
+msgbox,4,,Are you sure you wish to delete Cisco credentials for: %telnetisselected%?
+	ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\cisco\%telnetisselected%
+		gui, 2:destroy
+		gui2wasdestroyed = 1
+		gosub mainmenu
+	}
+	else
+	return
+
+deletetelnetconnection:
+msgbox,4,,Are you sure you wish to delete connection: %telnetisselected%?
+ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\telnet\%telnetisselected%
+		gui, 2:destroy
+		gui2wasdestroyed = 1
+		gosub mainmenu
+	}
 return
 
 saveeditedtelnet:
@@ -1905,14 +1957,20 @@ guicontrol, 2:hide,edittelnetname
 guicontrol, 2:hide,txtedittelnetserver
 guicontrol, 2:hide,edittelnetserver
 guicontrol, 2:hide,butsaveeditedtelnet
-guicontrol, 2:hide,butcanceleditedtelnet
+guicontrol, 2:hide,butcanceledittelnet
+guicontrol, 2:hide,buteditcisco
+guicontrol, 2:hide,butaddcisco
+guicontrol, 2:hide,butdelcisco
 guicontrol, 2:disable,txtedittelnettitle
 guicontrol, 2:disable,txtedittelnetname
 guicontrol, 2:disable,edittelnetname
 guicontrol, 2:disable,txtedittelnetserver
 guicontrol, 2:disable,edittelnetserver
+guicontrol, 2:disable,buteditcisco
+guicontrol, 2:disable,butaddcisco
+guicontrol, 2:disable,butdelcisco
 guicontrol, 2:disable,butsaveeditedtelnet
-guicontrol, 2:disable,butcanceleditedtelnet
+guicontrol, 2:disable,butcanceledittelnet
 edittelnetname =
 edittelnetserver =
 guicontrol, 2:show,butcreatetelnet
@@ -1921,7 +1979,49 @@ guicontrol, 2:show,buttelnetconn
 guicontrol, 2:show,buttelnetedit
 guicontrol, 2:show,buttelnetdel
 guicontrol, 2:show,buttelnetadv
+guicontrol, 2:show,custciscoauto
 exit
+
+showciscoautotype:
+if ciscoautotypeclicked = 1
+{
+	guicontrol, 2:hide,autotypeuser
+	guicontrol, 2:hide,autotypepass
+	guicontrol, 2:hide,autotypeenpass
+	guicontrol, 2:hide,butsaveciscoauto
+	guicontrol, 2:disable,autotypeuser
+	guicontrol, 2:disable,autotypepass
+	guicontrol, 2:disable,autotypeenpass
+	guicontrol, 2:disable,butsaveciscoauto
+	ciscoautotypeclicked =
+	ciscoautotype2ndclick = 1
+}
+else
+{
+	if ciscoautotype2ndclick = 1
+	{
+		guicontrol, 2:show,autotypeuser
+		guicontrol, 2:show,autotypepass
+		guicontrol, 2:show,autotypeenpass
+		guicontrol, 2:show,butsaveciscoauto
+		guicontrol, 2:enable,autotypeuser
+		guicontrol, 2:enable,autotypepass
+		guicontrol, 2:enable,autotypeenpass
+		guicontrol, 2:enable,butsaveciscoauto
+		ciscoautotypeclicked = 1
+	}
+	else
+	{
+		gui, 2:tab,telnet
+		gui, 2:add,checkbox, xs x302 y315 vautotypeuser,Type Username
+		gui, 2:add,checkbox,vautotypepass,Type Password
+		gui, 2:add,checkbox,vautotypeenpass,Type Enable Password
+		gui, 2:add,button,vbutsaveciscoauto,Save Customized AutoType`nSettings
+		ciscoautotypeclicked = 1
+	}
+}
+return
+
 
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
@@ -2000,7 +2100,6 @@ ifmsgbox yes
 	gui, 3:destroy
 	gosub versioncheck
 }
-
 return
 
 ;Encrypt and Decrypt Functions listed here
