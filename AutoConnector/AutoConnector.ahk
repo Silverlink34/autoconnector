@@ -1722,6 +1722,7 @@ fileread, data, %a_workingdir%\SavedConnections\telnet\%telnetisselected%
 telnetconnect := Decrypt(data,pass)
 run, %telnetconnect%
 ifexist %a_workingdir%\SavedConnections\cisco\%telnetisselected%
+custciscoauto
 {
 	fileread,data,%a_workingdir%\SavedConnections\cisco\%telnetisselected%
 	ciscocreds := Decrypt(data,pass)
