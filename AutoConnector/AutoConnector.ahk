@@ -1704,14 +1704,19 @@ savecisco:
 gui, 2:submit
 FileCreateDir, SavedConnections
 FileCreateDir, SavedConnections\cisco
+data = %inituser%%a_tab%%initpass%%a_tab%%enablepass%
 if aftertelsaved = 1
 {
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%telnetisselected%
+	aftertelsaved = 0
+	edittelnetwasclicked = 1
 }
-data = %inituser%%a_tab%%initpass%%a_tab%%enablepass%
-FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%telnetname%
+else
+{
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%telnetname%
+}
 saveciscocreds =
 ciscosaved = 1
-aftertelsaved = 0
 gosub savetelnet
 exit
 
