@@ -356,7 +356,7 @@ gui, 2:add,button,ys w165 border vbuttelnetconn gconnecttotelnet section,Connect
 gui, 2:add,button,w165 vbuttelnetedit gedittelnetconnection,Edit Connection
 gui, 2:add,button,w165 vbuttelnetdel gdeletetelnetconnection,Delete Connection
 gui, 2:font,s14
-gui, 2:add,checkbox,vcustciscoauto gshowciscoautotype,Customize Cisco AutoType
+;gui, 2:add,checkbox,vcustciscoauto gshowciscoautotype,Customize Cisco AutoType
 gui, 2:tab,VNC
 gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
 gui, 2:tab,Master Settings
@@ -1632,6 +1632,9 @@ Savetelnet:
 	gosub MainMenu
 }
 return
+createciscocredentials:
+aftertelsaved = 1
+gosub saveciscocredentials
 saveciscocredentials:
 guicontrol, 2:hide,txtnewtelnetconn
 guicontrol, 2:hide,txttelnetname
@@ -1649,6 +1652,29 @@ guicontrol, 2:disable,telnetserver
 guicontrol, 2:disable,saveciscocreds
 guicontrol, 2:disable,butsavetelnet
 guicontrol, 2:disable,butcancelcreatetelnet
+if aftertelsaved = 1
+{
+	guicontrol, 2:hide,txtedittelnetconn
+	guicontrol, 2:hide,txtedittelnetname
+	guicontrol, 2:hide,edittelnetname
+	guicontrol, 2:hide,txtedittelnetserver
+	guicontrol, 2:hide,edittelnetserver
+	guicontrol, 2:hide,butsaveeditedtelnet
+	guicontrol, 2:hide,butcanceledittelnet
+	guicontrol, 2:hide,buteditcisco
+	guicontrol, 2:hide,butaddcisco
+	guicontrol, 2:hide,butdelcisco
+	guicontrol, 2:disable,txtedittelnettitle
+	guicontrol, 2:disable,txtedittelnetname
+	guicontrol, 2:disable,edittelnetname
+	guicontrol, 2:disable,txtedittelnetserver
+	guicontrol, 2:disable,edittelnetserver
+	guicontrol, 2:disable,buteditcisco
+	guicontrol, 2:disable,butaddcisco
+	guicontrol, 2:disable,butdelcisco
+	guicontrol, 2:disable,butsaveeditedtelnet
+	guicontrol, 2:disable,butcanceledittelnet
+}
 gui, 2:font,underline
 gui, 2:add,text,vtxtciscocreds ys x420 section,Cisco Credentials
 guicontrol, 2:hide,txtciscocreds
@@ -1678,10 +1704,14 @@ savecisco:
 gui, 2:submit
 FileCreateDir, SavedConnections
 FileCreateDir, SavedConnections\cisco
+if aftertelsaved = 1
+{
+}
 data = %inituser%%a_tab%%initpass%%a_tab%%enablepass%
 FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%telnetname%
 saveciscocreds =
 ciscosaved = 1
+aftertelsaved = 0
 gosub savetelnet
 exit
 
@@ -1825,7 +1855,7 @@ else
 	guicontrol, 2:hide,txtedittelnetserver
 	guicontrol, 2:show,txtedittelnetserver
 	gui, 2:add, edit,w300 vedittelnetserver,%telnetserver%
-	gui, 2:add,button,vbutaddcisco gsaveciscocredentials,Create Cisco Credentials
+	gui, 2:add,button,vbutaddcisco gcreateciscocredentials,Create Cisco Credentials
 	gui, 2:add,button,vbuteditcisco geditciscocreds,Edit Cisco Credentials
 	gui, 2:add,button,vbutdelcisco gdeleteciscocreds,Delete Cisco Credentials
 	ifnotexist, %a_workingdir%\SavedConnections\cisco\%telnetisselected%
@@ -1851,7 +1881,9 @@ guicontrol, 2:hide,txtedittelnetname
 guicontrol, 2:hide,edittelnetname
 guicontrol, 2:hide,txtedittelnetserver
 guicontrol, 2:hide,edittelnetserver
+guicontrol, 2:hide,butaddcisco
 guicontrol, 2:hide,buteditcisco
+guicontrol, 2:hide,butdelcisco
 guicontrol, 2:hide,butsaveeditedtelnet
 guicontrol, 2:hide,butcanceledittelnet
 guicontrol, 2:disable,txtedittelnetconn
@@ -1859,7 +1891,9 @@ guicontrol, 2:disable,txtedittelnetname
 guicontrol, 2:disable,edittelnetname
 guicontrol, 2:disable,txtedittelnetserver
 guicontrol, 2:disable,edittelnetserver
+guicontrol, 2:disable,butaddcisco
 guicontrol, 2:disable,buteditcisco
+guicontrol, 2:disable,butdelcisco
 guicontrol, 2:disable,butsaveeditedtelnet
 guicontrol, 2:disable,butcanceledittelnet
 gui, 2:font,underline
@@ -1983,7 +2017,7 @@ guicontrol, 2:show,buttelnetadv
 guicontrol, 2:show,custciscoauto
 exit
 
-showciscoautotype:
+/*showciscoautotype:
 if ciscoautotypeclicked = 1
 {
 	guicontrol, 2:hide,autotypeuser
@@ -2022,7 +2056,7 @@ else
 	}
 }
 return
-
+*/
 
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
