@@ -897,7 +897,11 @@ return
 showsshadv:
 sshmenu = 1
 if gui2wasdestroyed = 1
+{
 	sshadvfirstclick =
+	sshadvsecondshow =
+	gui2wasdestroyed =
+}
 if sshadvfirstclick = 1
 {
 	guicontrol, 2:disable,txtsshportforwarding,
@@ -1375,7 +1379,11 @@ return
 showrdpadv:
 rdpadvclicked = 1
 if gui2wasdestroyed = 1
+{
 	rdpadvfirstclick =
+	rdpadvsecondshow =
+	gui2wasdestroyed =
+}
 if rdpadvfirstclick = 1
 {
 	guicontrol, 2:disable,txtrdpsettings,
