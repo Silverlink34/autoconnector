@@ -318,7 +318,14 @@ ifequal, skipintro, 1
 {
 	fileappend, skipenabled, %a_workingdir%\config.txt
 }
-gui, 2:show, w768 h520
+if possaved = 1
+{
+	xandypos = x%x% y%y%
+	possaved =
+}
+else
+	xandypos = center
+gui, 2:show, w768 h520 %xandypos%
 gui, 2:font, s16,
 GUI, 2:Add, Text,,Please create a new connection or choose a saved connection.
 gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC|Master Settings
@@ -531,9 +538,7 @@ Savessh:
 	Fileread, data, %A_workingdir%\SavedConnections\SSH\%sshname%
 	Filedelete, %A_workingdir%\SavedConnections\SSH\%sshname%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%sshname%
-	gui, 2:destroy
-	gui2wasdestroyed = 1
-	gosub MainMenu
+	gosub guidestroykeeppos
 }
 return
 cancelcreatessh:
@@ -720,9 +725,7 @@ saveeditedssh:
 		Fileread, data, %A_workingdir%\SavedConnections\SSH\%editsshname%
 		Filedelete, %A_workingdir%\SavedConnections\SSH\%editsshname%
 		FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\SSH\%editsshname%
-		gui, 2:destroy
-		gui2wasdestroyed = 1
-		gosub mainmenu
+		gosub guidestroykeeppos
 	}
 	else
 	return
@@ -769,9 +772,7 @@ msgbox,4,,Are you sure you wish to delete connection: %sshisselected%?
 ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\SavedConnections\SSH\%sshisselected%
-		gui, 2:destroy
-		gui2wasdestroyed = 1
-		gosub mainmenu
+		gosub guidestroykeeppos
 	}
 return
 
@@ -815,9 +816,7 @@ gui, 2:add,button,ys x+65 vbutlaunchpsftp glaunchpsftp,Launch SFTP CLI`nWith PSF
 gui, 2:add,button,w167 vbutsftpclihelp gsftpclihelp,SFTP CLI`nHelp
 return
 returntossh:
-gui, 2:destroy
-gui2wasdestroyed = 1
-gosub mainmenu
+gosub guidestroykeeppos
 return
 launchfz:
 ifexist C:\Program Files (x86)\FileZilla FTP Client
@@ -1107,10 +1106,8 @@ Saverdp:
 	FileCreateDir, SavedConnections\RDP
 	data = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\rdp\%rdpname%
-	gui, 2:destroy
 	selectrdptab = 1
-	gui2wasdestroyed = 1
-	gosub MainMenu
+	gosub guidestroykeeppos
 }
 return
 
@@ -1333,10 +1330,8 @@ saveeditedrdp:
 		data = %a_workingdir%\programbin\rdp /v:%editrdpserver% /u:%editrdpuser% /p:%editrdppass%
 		editedrdp := Encrypt(data,pass)
 		FileAppend,%editedrdp%,%A_workingdir%\SavedConnections\rdp\%editrdpname%
-		gui, 2:destroy
 		selectrdptab = 1
-		gui2wasdestroyed = 1
-		gosub mainmenu
+		gosub guidestroykeeppos
 	}
 	else
 	return
@@ -1382,10 +1377,8 @@ msgbox,4,,Are you sure you wish to delete connection: %rdpisselected%?
 ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\SavedConnections\rdp\%rdpisselected%
-		gui, 2:destroy
 		selectrdptab = 1
-		gui2wasdestroyed = 1
-		gosub mainmenu
+		gosub guidestroykeeppos
 	}
 return
 
@@ -1648,10 +1641,9 @@ Savetelnet:
 	}
 	data =  %puttydir%\putty telnet://%telnetserver%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\telnet\%telnetname%
-	gui, 2:destroy
+
 	selecttelnettab = 1
-	gui2wasdestroyed = 1
-	gosub MainMenu
+	gosub guidestroykeeppos
 }
 return
 createciscocredentials:
@@ -1743,10 +1735,8 @@ gosub savetelnet
 exit
 
 cancelcisco:
-gui, 2:destroy
 selecttelnettab = 1
-gui2wasdestroyed = 1
-gosub MainMenu
+gosub guidestroykeeppos
 
 cancelcreatetelnet:
 guicontrol, 2:hide,txtnewtelnetconn
@@ -1961,17 +1951,14 @@ FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\cisco\%edittel
 ciscocredfilter1 =
 ciscocredfilter2 =
 ciscocredfilter3 =
-gui, 2:destroy
 selecttelnettab = 1
-gui2wasdestroyed = 1
-gosub MainMenu
+gosub guidestroykeeppos
 return
 
 canceleditcisco:
-gui, 2:destroy
+
 selecttelnettab = 1
-gui2wasdestroyed = 1
-gosub MainMenu
+gosub guidestroykeeppos
 return
 
 deleteciscocreds:
@@ -1979,10 +1966,8 @@ msgbox,4,,Are you sure you wish to delete Cisco credentials for: %telnetisselect
 	ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\SavedConnections\cisco\%telnetisselected%
-		gui, 2:destroy
 		selecttelnettab = 1
-		gui2wasdestroyed = 1
-		gosub mainmenu
+		gosub guidestroykeeppos
 	}
 	else
 	return
@@ -2008,11 +1993,9 @@ saveeditedtelnet:
 		filedelete, %A_workingdir%\SavedConnections\telnet\%telnetisselected%
 		data = %puttydir%\putty telnet://%edittelnetserver%
 		editedtelnet := Encrypt(data,pass)
-		FileAppend,%editedtelnet%,%A_workingdir%\SavedConnections\telnet\%edittelnetname%
-		gui, 2:destroy
+		FileAppend,%editedtelnet%,%A_workingdir%\SavedConnections\telnet\%edittelnetname%		
 		selecttelnettab = 1
-		gui2wasdestroyed = 1
-		gosub mainmenu
+		gosub guidestroykeeppos
 	}
 	else
 	return
@@ -2199,6 +2182,15 @@ ifmsgbox yes
 	gosub versioncheck
 }
 return
+
+;Use this label to have window keep its position after being destroyed
+guidestroykeeppos:
+WinGetPos,x,y
+;MsgBox %x% %y%
+gui2wasdestroyed = 1
+possaved = 1
+gui, 2:destroy
+gosub mainmenu
 
 ;Encrypt and Decrypt Functions listed here
 
