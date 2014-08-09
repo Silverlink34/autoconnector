@@ -2155,7 +2155,37 @@ ifmsgbox yes
 	}	
 	progress,60,RDP Connections Re-Encrypted.
 	sleep,2000
-	progress,70,Resetting Initial Password..
+	Progress,70,Reading All Telnet/Cisco connections...
+	sleep,2000
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\Telnet > %a_workingdir%\tmp\Telnetlist,, hide
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\cisco > %a_workingdir%\tmp\ciscolist,, hide
+	sleep,200
+	progress,75,Decrypting and Re-Encrypting Telnet&Cisco
+	Loop, read, %A_workingdir%\tmp\Telnetlist
+	{
+	sleep,100
+	fileread,data,%a_workingdir%\SavedConnections\Telnet\%a_loopreadline%
+	filedelete, %a_workingdir%\SavedConnections\Telnet\%a_loopreadline%
+	Telnet2reset := Decrypt(data,pass)
+	pass = %resetmasterpass%
+	data = %Telnet2reset%
+	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\Telnet\%a_loopreadline%
+	pass = %mpass%
+	}
+	Loop, read, %A_workingdir%\tmp\ciscolist
+	{
+	sleep,100
+	fileread,data,%a_workingdir%\SavedConnections\cisco\%a_loopreadline%
+	filedelete, %a_workingdir%\SavedConnections\cisco\%a_loopreadline%
+	cisco2reset := Decrypt(data,pass)
+	pass = %resetmasterpass%
+	data = %cisco2reset%
+	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\cisco\%a_loopreadline%
+	pass = %mpass%
+	}	
+	progress,80,Telnet/Cisco Connections Re-Encrypted.
+	sleep,2000
+	progress,85,Resetting Initial Password..
 	sleep,2000
 	data = %resetmasterpass%
 	pass = %resetmasterpass%
