@@ -2183,7 +2183,7 @@ ifmsgbox yes
 	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\cisco\%a_loopreadline%
 	pass = %mpass%
 	}	
-	progress,80,Telnet/Cisco Connections Re-Encrypted.
+	progress,80,Telnet/Cisco Re-Encrypted.
 	sleep,2000
 	progress,85,Resetting Initial Password..
 	sleep,2000
