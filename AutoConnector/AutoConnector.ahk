@@ -1,10 +1,9 @@
 ;GUI for auto Putty SSH connections.Created by Brandon Galiher.
 ;Parameters for the script listed here
 #SingleInstance, Force ;if the script is ran and it was already running, this will cause it to reload itself.
-#NoTrayIcon ;Kinda self explanatory.
 #NoEnv ;supposed to make compatibility better
 ;Set icon for program
-menu,tray,icon,%A_ScriptDir%\autoconnector\autoconnector.ico,
+;menu,tray,icon,%A_ScriptDir%\autoconnector.ico,
 ;Create working dir under My Documents
 filecreatedir, %a_mydocuments%\AutoConnector
 ;Set working directory to created dir ^^
