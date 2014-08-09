@@ -4,7 +4,7 @@
 #NoTrayIcon ;Kinda self explanatory.
 #NoEnv ;supposed to make compatibility better
 ;Set icon for program
-menu,tray,icon,%A_ScriptDir%\autoconnector.ico,
+menu,tray,icon,%A_ScriptDir%\autoconnector\autoconnector.ico,
 ;Create working dir under My Documents
 filecreatedir, %a_mydocuments%\AutoConnector
 ;Set working directory to created dir ^^
