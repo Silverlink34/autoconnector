@@ -16,7 +16,7 @@ menu,tray,add,Exit,rcexit
 
 versioncheck:
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
-version = 1.1-alpha
+version = 1.0-beta
 progress,10,Checking the currentversion file on GitHub..,Checking for updates..
 sleep, 500
 urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/currentversion, %a_workingdir%\currentversion
