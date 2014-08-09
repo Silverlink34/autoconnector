@@ -12,12 +12,13 @@ If you bought this script/exe somewhere, you have been scammed and did not recei
 ToDo:
 
 setup the following protocols:
-telnet
 vnc
 ftp
 
 Other Features to add:
 Setup Changelog
+import keepass entries
+autotype for websites with keepass
 
 Bugs to fix:
 disable certain characters in connection name
