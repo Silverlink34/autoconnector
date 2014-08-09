@@ -8,6 +8,11 @@
 filecreatedir, %a_mydocuments%\AutoConnector
 ;Set working directory to created dir ^^
 SetWorkingDir %a_mydocuments%\AutoConnector
+;Tray Icon Right-Click Menu
+Menu,tray,nostandard
+menu,tray,add
+menu,tray,add,Show AutoConnector,showac
+menu,tray,add,Exit,rcexit
 
 versioncheck:
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
@@ -324,7 +329,7 @@ if possaved = 1
 }
 else
 	xandypos = center
-gui, 2:show, w768 h520 %xandypos%
+gui, 2:show, w768 h520 %xandypos%, AutoConnector
 gui, 2:font, s16,
 GUI, 2:Add, Text,,Please create a new connection or choose a saved connection.
 gui, 2:add,tab, w725 h450 vconnectionselect gcurrenttabnumber,SSH|RDP|Telnet|VNC|Master Settings
@@ -2246,6 +2251,12 @@ sendMail(emailToAddress,emailPass,emailFromAddress,emailSubject,emailMessage,Ema
 		Run, %mailsendlocation%\mailsend.exe -to %emailToAddress% -from %emailFromAddress% -ssl -smtp smtp.gmail.com -port 465 -sub "%emailSubject%" -M "%emailMessage%" +cc +bc -q -auth-plain -user "%emailFromNoDomain%" -pass "%emailPass%",, Hide
 	}
 
+showac:
+Winactivate, AutoConnector ahk_class AutoHotkeyGUI
+return
+rcexit:
+gosub GuiClose
+return
 
 GuiEscape:
 GuiClose:
