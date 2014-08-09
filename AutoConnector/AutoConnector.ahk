@@ -2251,6 +2251,10 @@ GuiEscape:
 GuiClose:
 2guiclose:
 3guiclose:
-4guiclose:
+5guiclose:
+6guiclose:
+7guiclose:
+8guiclose:
+9guiclose:
 ExitApp
 
