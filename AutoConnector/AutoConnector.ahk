@@ -363,13 +363,23 @@ gui, 2:tab,Master Settings
 gui, 2:add, groupbox,x239 y235
 gui, 2:add,button,x256 y275 border vbutresetmasterpass gresetmasterpassword,Reset Master Password
 gui, 2:tab
+if selectrdptab = 1
+{
+	guicontrol, choosestring, SysTabControl321,|RDP
+	selectrdptab =
+}
+if selecttelnettab = 1
+{
+	guicontrol, choosestring, SysTabControl321,|Telnet
+	selecttelnettab =
+}
 currenttabnumber:
 ControlGet, TabNumber, Tab,, SysTabControl321,A
 if tabnumber = 1
 	gosub detectssh
 if tabnumber = 2
 	gosub detectrdp
-iftabnumber = 3
+if tabnumber = 3
 	gosub detecttelnet
 gui, 2:tab,SSH
 sshselected:
@@ -1098,6 +1108,7 @@ Saverdp:
 	data = %a_workingdir%\programbin\rdp /v:%rdpserver% /u:%rdpuser% /p:%rdppass%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\rdp\%rdpname%
 	gui, 2:destroy
+	selectrdptab = 1
 	gui2wasdestroyed = 1
 	gosub MainMenu
 }
@@ -1323,6 +1334,7 @@ saveeditedrdp:
 		editedrdp := Encrypt(data,pass)
 		FileAppend,%editedrdp%,%A_workingdir%\SavedConnections\rdp\%editrdpname%
 		gui, 2:destroy
+		selectrdptab = 1
 		gui2wasdestroyed = 1
 		gosub mainmenu
 	}
@@ -1371,6 +1383,7 @@ ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\SavedConnections\rdp\%rdpisselected%
 		gui, 2:destroy
+		selectrdptab = 1
 		gui2wasdestroyed = 1
 		gosub mainmenu
 	}
@@ -1636,6 +1649,7 @@ Savetelnet:
 	data =  %puttydir%\putty telnet://%telnetserver%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\telnet\%telnetname%
 	gui, 2:destroy
+	selecttelnettab = 1
 	gui2wasdestroyed = 1
 	gosub MainMenu
 }
@@ -1730,6 +1744,7 @@ exit
 
 cancelcisco:
 gui, 2:destroy
+selecttelnettab = 1
 gui2wasdestroyed = 1
 gosub MainMenu
 
@@ -1947,12 +1962,14 @@ ciscocredfilter1 =
 ciscocredfilter2 =
 ciscocredfilter3 =
 gui, 2:destroy
+selecttelnettab = 1
 gui2wasdestroyed = 1
 gosub MainMenu
 return
 
 canceleditcisco:
 gui, 2:destroy
+selecttelnettab = 1
 gui2wasdestroyed = 1
 gosub MainMenu
 return
@@ -1963,6 +1980,7 @@ msgbox,4,,Are you sure you wish to delete Cisco credentials for: %telnetisselect
 	{
 		filedelete, %A_workingdir%\SavedConnections\cisco\%telnetisselected%
 		gui, 2:destroy
+		selecttelnettab = 1
 		gui2wasdestroyed = 1
 		gosub mainmenu
 	}
@@ -1975,6 +1993,7 @@ ifmsgbox yes
 	{
 		filedelete, %A_workingdir%\SavedConnections\telnet\%telnetisselected%
 		gui, 2:destroy
+		selecttelnettab = 1
 		gui2wasdestroyed = 1
 		gosub mainmenu
 	}
@@ -1991,6 +2010,7 @@ saveeditedtelnet:
 		editedtelnet := Encrypt(data,pass)
 		FileAppend,%editedtelnet%,%A_workingdir%\SavedConnections\telnet\%edittelnetname%
 		gui, 2:destroy
+		selecttelnettab = 1
 		gui2wasdestroyed = 1
 		gosub mainmenu
 	}
