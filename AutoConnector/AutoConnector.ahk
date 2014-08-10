@@ -75,6 +75,7 @@ else
 			sleep,2000
 			progress,off
 			run, %a_workingdir%\updater\autoconnector-updater.exe
+			ExitApp
 		}
 		else
 		{
@@ -91,6 +92,7 @@ else
 	else
 	{
 		run, %a_workingdir%\updater\autoconnector-updater.exe
+		ExitApp
 	}
 }
 exit
