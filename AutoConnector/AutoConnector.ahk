@@ -46,6 +46,7 @@ else
 	progress,100,,Update found. Running updater application.
 	fileread, config, config.txt
 	stringreplace, config,config,`nchangelogshown,,1
+	stringreplace, config,config,`r,,1
 	filedelete, %a_workingdir%\config.txt
 	fileappend,%config%,%a_workingdir%\config.txt
 	sleep, 500

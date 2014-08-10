@@ -1,1 +1,21 @@
-insert changes made here
+-8/10/2014 1:48PM-
+--Version 1.0-Beta--
+First Release!! Thanks for testing and letting me know the bugs/things you don't like.
+Still in beta because not all features I want are included. Here's the real changelog:
+
+Nothing changed...it's the first release.
+
+--Things to do--
+
+setup the following protocols:
+vnc
+ftp
+
+Other Features to add:
+Setup Changelog
+import keepass entries
+autotype for websites with keepass
+
+Bugs to fix:
+disable certain characters in connection name
+fix ssh editconnection bug
