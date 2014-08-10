@@ -16,7 +16,6 @@ vnc
 ftp
 
 Other Features to add:
-Setup Changelog
 import keepass entries
 autotype for websites with keepass
 
