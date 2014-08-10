@@ -16,6 +16,7 @@ vnc
 ftp
 
 Other Features to add:
+automatically remember rdp advanced settings per connection
 import keepass entries
 autotype for websites with keepass
 
