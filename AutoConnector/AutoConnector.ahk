@@ -44,6 +44,10 @@ if version = %currentversion%
 else 
 {
 	progress,100,,Update found. Running updater application.
+	fileread, config, config.txt
+	stringreplace, config,config,`nchangelogshown,,1
+	filedelete, %a_workingdir%\config.txt
+	fileappend,%config%,%a_workingdir%\config.txt
 	sleep, 500
 	progress,off
 	fileremovedir, %a_workingdir%\updater,1
@@ -61,6 +65,7 @@ else
 	ifnotexist, %a_workingdir%\updater\autoconnector-updater.exe
 	{
 		filecreatedir, %a_workingdir%\updater
+		filecreatedir, %a_workingdir%\programbin
 		fileappend,%a_scriptdir%,%a_workingdir%\updater\autoconnectordir
 		fileinstall,7za.exe,%a_workingdir%\programbin\7za.exe
 		urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector-updater/master/autoconnector-updater.exe, %a_workingdir%\updater\autoconnector-updater.exe
@@ -93,6 +98,13 @@ exit
 ;Check for config.txt options
 configcheck:
 fileread, config, config.txt
+ifnotinstring, config, changelogshown
+{
+	urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/changelog, %a_workingdir%\changelog
+	fileread,changelog, %a_workingdir%\changelog
+	fileappend,`nchangelogshown,%a_workingdir%\config.txt
+	msgbox,,Changelog,%changelog%
+}
 ifnotinstring, config, passisset
 	gosub masterpasswordset
 else
@@ -294,6 +306,7 @@ GUI, 1:Add, Text,,Saved usernames and passwords are encrypted with 128bit encryp
 gui, 1:add, button, vButok1 gMainMenu default, OK
 gui, 1:add, button, vButrddisc gDisclaimer, Read Disclaimer
 gui, 1:add, button, gHelp, Help/things to note
+gui, 1:add, button, gviewchangelog, View Changelog
 gui, 1:add,button,gviewsource,View Source on Github
 ;Option to skip intro/disclaimer
 gui, 1:add, checkbox, vskipintro, Skip this screen on next run?
@@ -311,8 +324,13 @@ return
 viewsource:
 run, https://github.com/silverlink34/autoconnector
 winactivate, silverlink34/autoconnector
-gui, 1:destroy
-gosub guistart
+return
+
+Viewchangelog:
+urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/changelog, %a_workingdir%\changelog
+fileread,changelog, %a_workingdir%\changelog
+msgbox,,Changelog,%changelog%
+return
 
 MainMenu:
 pass = %mpass%
