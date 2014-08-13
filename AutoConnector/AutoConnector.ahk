@@ -16,7 +16,7 @@ menu,tray,add,Exit,rcexit
 
 versioncheck:
 ;Version Settings here, these will call on updater to update if necessary. The program's current version is set here.
-version = 1.0-beta
+version = 1.1-beta
 progress,10,Checking the currentversion file on GitHub..,Checking for updates..
 sleep, 500
 urldownloadtofile,https://raw.githubusercontent.com/Silverlink34/autoconnector/master/currentversion, %a_workingdir%\currentversion
@@ -387,7 +387,7 @@ gui, 2:add, Button,w224 border vbutcreatetelnet gcreatetelnetconnection, Create 
 gui, 2:add,button,ys w165 border vbuttelnetconn gconnecttotelnet section,Connect
 gui, 2:add,button,w165 vbuttelnetedit gedittelnetconnection,Edit Connection
 gui, 2:add,button,w165 vbuttelnetdel gdeletetelnetconnection,Delete Connection
-gui, 2:font,s14
+gui, 2:add,button,w165 vbutciscohelp gciscohelp,Cisco Commandline`nHelp
 ;gui, 2:add,checkbox,vcustciscoauto gshowciscoautotype,Customize Cisco AutoType
 gui, 2:tab,VNC
 gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
@@ -2058,6 +2058,11 @@ guicontrol, 2:show,buttelnetadv
 guicontrol, 2:show,custciscoauto
 exit
 
+ciscohelp:
+{
+	msgbox,Cisco Commandline Help`nHere are some basic commands, I am only listing a few for reference. For a full list of Cisco Commands, do a Google Search.`n`nView Logged in users:`nshow user`nSpecify user search:`nshow user | include typetheusernamehere`n`nView VPC/VCI's logged in:`nshow vpdn`n`n--ADVANCED--`n`nUse caution, and when done use the "un all" command to undo running monitors.`n`nShow incoming authentications: -Turn off other debugging monitors first-`ndebug ppp neg`nTurn on the monitor after this to see:`nterm mon`n`nShow incoming vpi/vci's -Turn off other debugging monitors first-`ndebug pppoe events`nTurn on the monitor after this to see:`nterm mon`n`nAGAIN make sure to use un all command to turn off debugging monitors.
+	return
+}
 /*showciscoautotype:
 if ciscoautotypeclicked = 1
 {
