@@ -390,7 +390,13 @@ gui, 2:add,button,w165 vbuttelnetdel gdeletetelnetconnection,Delete Connection
 gui, 2:add,button,w165 vbutciscohelp gciscohelp,Cisco Commandline`nHelp
 ;gui, 2:add,checkbox,vcustciscoauto gshowciscoautotype,Customize Cisco AutoType
 gui, 2:tab,VNC
-gui, 2:add,text,vnotavailablevnc,This protocol has not been created yet, it is in progress.
+gui, 2:add,listbox,vVNCConnections gvncselected R13
+gui, 2:add,updown,section
+gui, 2:add, Button,w224 border vbutcreatevnc gcreatevncconnection, Create Connection
+gui, 2:add,button,ys w165 border vbutvncconn gconnecttovnc section,Connect
+gui, 2:add,button,w165 vbutvncedit geditvncconnection,Edit Connection
+gui, 2:add,button,w165 vbutvncdel gdeletevncconnection,Delete Connection
+gui, 2:add,button,w165 vbutvncwake,Wake Up Connection
 gui, 2:tab,Master Settings
 gui, 2:add, groupbox,x239 y235
 gui, 2:add,button,x256 y275 border vbutresetmasterpass gresetmasterpassword,Reset Master Password
@@ -405,6 +411,11 @@ if selecttelnettab = 1
 	guicontrol, choosestring, SysTabControl321,|Telnet
 	selecttelnettab =
 }
+if selectvnctab = 1
+{
+	guicontrol, choosestring, SysTabControl321,|VNC
+	selectvnctab =
+}
 currenttabnumber:
 ControlGet, TabNumber, Tab,, SysTabControl321,A
 if tabnumber = 1
@@ -413,6 +424,8 @@ if tabnumber = 2
 	gosub detectrdp
 if tabnumber = 3
 	gosub detecttelnet
+if tabnumber = 4
+	gosub detectvnc
 gui, 2:tab,SSH
 sshselected:
 controlget,sshisselected,choice,,listbox1,A
@@ -2063,46 +2076,119 @@ ciscohelp:
 	msgbox,Cisco Commandline Help`nHere are some basic commands, I am only listing a few for reference. For a full list of Cisco Commands, do a Google Search.`n`nView Logged in users:`nshow user`nSpecify user search:`nshow user | include typetheusernamehere`n`nView VPC/VCI's logged in:`nshow vpdn`n`n--ADVANCED--`n`nUse caution, and when done use the "un all" command to undo running monitors.`n`nShow incoming authentications: -Turn off other debugging monitors first-`ndebug ppp neg`nTurn on the monitor after this to see:`nterm mon`n`nShow incoming vpi/vci's -Turn off other debugging monitors first-`ndebug pppoe events`nTurn on the monitor after this to see:`nterm mon`n`nAGAIN make sure to use un all command to turn off debugging monitors.
 	return
 }
-/*showciscoautotype:
-if ciscoautotypeclicked = 1
+
+
+gui, 2:tab,vnc
+vncselected:
+controlget,vncisselected,choice,,listbox4,A
+if vncisselected
 {
-	guicontrol, 2:hide,autotypeuser
-	guicontrol, 2:hide,autotypepass
-	guicontrol, 2:hide,autotypeenpass
-	guicontrol, 2:hide,butsaveciscoauto
-	guicontrol, 2:disable,autotypeuser
-	guicontrol, 2:disable,autotypepass
-	guicontrol, 2:disable,autotypeenpass
-	guicontrol, 2:disable,butsaveciscoauto
-	ciscoautotypeclicked =
-	ciscoautotype2ndclick = 1
+	guicontrol, 2:enable,butvncconn
+	guicontrol, 2:enable,butvncedit
+	guicontrol, 2:enable,butvncdel
+	guicontrol, 2:enable,butvncwake
 }
 else
 {
-	if ciscoautotype2ndclick = 1
+	guicontrol, 2:disable,butvncconn
+	guicontrol, 2:disable,butvncedit
+	guicontrol, 2:disable,butvncdel
+	guicontrol, 2:disable,butvncwake
+}
+exit
+Detectvnc:
+ifexist %a_workingdir%\SavedConnections\vnc
+controlget,listedvnc,list,,Listbox4,A
+{	
+	FileCreateDir, tmp
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\vnc > %a_workingdir%\tmp\vnclist,, hide
+	sleep, 200
+	Loop, read, %A_workingdir%\tmp\vnclist
 	{
-		guicontrol, 2:show,autotypeuser
-		guicontrol, 2:show,autotypepass
-		guicontrol, 2:show,autotypeenpass
-		guicontrol, 2:show,butsaveciscoauto
-		guicontrol, 2:enable,autotypeuser
-		guicontrol, 2:enable,autotypepass
-		guicontrol, 2:enable,autotypeenpass
-		guicontrol, 2:enable,butsaveciscoauto
-		ciscoautotypeclicked = 1
+		ifnotinstring,listedvnc,%a_loopreadline%
+			guicontrol, 2:,vncconnections,%a_loopreadline%|
 	}
-	else
-	{
-		gui, 2:tab,telnet
-		gui, 2:add,checkbox, xs x302 y315 vautotypeuser,Type Username
-		gui, 2:add,checkbox,vautotypepass,Type Password
-		gui, 2:add,checkbox,vautotypeenpass,Type Enable Password
-		gui, 2:add,button,vbutsaveciscoauto,Save Customized AutoType`nSettings
-		ciscoautotypeclicked = 1
-	}
+	Fileremovedir, tmp, 1	
 }
 return
-*/
+Createvncconnection:
+guicontrol, 2:disable,butvncconn
+guicontrol, 2:disable,butvncedit
+guicontrol, 2:disable,butvncdel
+guicontrol, 2:disable,butvncwake
+guicontrol, 2:hide,butvncconn
+guicontrol, 2:hide,butvncedit
+guicontrol, 2:hide,butvncdel
+guicontrol, 2:hide,butvncwake
+if gui2wasdestroyed = 1
+	createtelnetwasclicked =
+if createtelnetwasclicked = 1
+{
+	guicontrol, 2:show,txtnewvncconn
+	guicontrol, 2:show,txtvncname
+	guicontrol, 2:show,vncname
+	guicontrol, 2:show,txtvncserver
+	guicontrol, 2:show,vncserver
+	guicontrol, 2:show,txtvncpass
+	guicontrol, 2:show,vncpass
+	guicontrol, 2:show,butsavevnc
+	guicontrol, 2:show,butcancelcreatevnc
+	guicontrol, 2:enable,txtnewvncconn
+	guicontrol, 2:enable,txtvncname
+	guicontrol, 2:enable,vncname
+	guicontrol, 2:enable,txtvncserver
+	guicontrol, 2:enable,vncserver
+	guicontrol, 2:enable,txtvncpass
+	guicontrol, 2:enable,vncpass
+	guicontrol, 2:enable,butsavevnc
+	guicontrol, 2:enable,butcancelcreatevnc
+}
+else
+{
+	gui, 2:tab,vnc
+	gui, 2:font,underline
+	gui, 2:add,text,vtxtnewvncconn ys x420 section,New Connection
+	guicontrol, 2:hide,txtnewvncconn
+	guicontrol, 2:show,txtnewvncconn
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add,Text,vtxtvncname xs x300,Connection Name
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtvncname
+	guicontrol, 2:show,txtvncname
+	gui, 2:add, edit,w300 vvncname,My VNC Connection
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtvncserver,Server ip and Port
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtvncserver
+	guicontrol, 2:show,txtvncserver
+	gui, 2:add, edit,w300 vvncserver, serverip::port
+	GUI, 2:Add, Text,vtxtvncpass,Password
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtvncpass
+	guicontrol, 2:show,txtvncpass
+	gui, 2:add, edit,w300 password vvncpass
+	gui, 2:add, button,border vbutsavevnc gsavevnc x42 y436 w112,Save
+	gui, 2:add, button,border vbutcancelcreatevnc gcancelcreatevnc x154 y436 w112,Cancel
+	createvncwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
+}
+exit
+Savevnc:
+{
+	gui, 2:submit
+	FileCreateDir, SavedConnections
+	FileCreateDir, SavedConnections\vnc
+	data = %a_workingdir%\programbin\tvnviewer %vncserver% -password %vncpass%
+	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\vnc\%vncname%
+	selectvnctab = 1
+	gosub guidestroykeeppos
+}
+return
+cancelcreatevnc:
+
+
 
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
