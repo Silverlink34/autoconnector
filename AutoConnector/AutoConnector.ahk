@@ -2187,8 +2187,48 @@ Savevnc:
 }
 return
 cancelcreatevnc:
-
-
+guicontrol, 2:hide,txtnewvncconn
+guicontrol, 2:hide,txtvncname
+guicontrol, 2:hide,vncname
+guicontrol, 2:hide,txtvncserver
+guicontrol, 2:hide,vncserver
+guicontrol, 2:hide,txtvncpass
+guicontrol, 2:hide,vncpass
+guicontrol, 2:hide,butsavevnc
+guicontrol, 2:hide,butcancelcreatevnc
+guicontrol, 2:disable,txtnewvncconn
+guicontrol, 2:disable,txtvncname
+guicontrol, 2:disable,vncname
+guicontrol, 2:disable,txtvncserver
+guicontrol, 2:disable,vncserver
+guicontrol, 2:disable,txtvncpass
+guicontrol, 2:disable,vncpass
+guicontrol, 2:disable,butsavevnc
+guicontrol, 2:disable,butcancelcreatevnc
+vncname =
+vncserver =
+vncpass =
+guicontrol, 2:show,butvncconn
+guicontrol, 2:show,butvncedit
+guicontrol, 2:show,butvncdel
+guicontrol, 2:show,butvncwake
+exit
+connecttovnc:
+filecreatedir, %a_workingdir%\programbin
+fileinstall,tvnviewer.exe,%a_workingdir%\programbin\tvnviewer.exe,1
+fileread, data, %a_workingdir%\SavedConnections\VNC\%vncisselected%
+vncconnect := Decrypt(data,pass)
+gui, 2:submit,nohide
+run, %vncconnect%
+return
+Editvncconnection:
+fileread,data,%a_workingdir%\SavedConnections\vnc\%vncisselected%
+vnc2edit := decrypt(data,pass)
+stringreplace,vnccreds,vnc2edit,%a_workingdir%\programbin\tvnviewer,,
+msgbox,%vnccreds%
+return
+deletevncconnection:
+return
 
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
