@@ -2123,7 +2123,7 @@ guicontrol, 2:hide,butvncdel
 guicontrol, 2:hide,butvncwake
 guicontrol, 2:hide,butcreatevnc
 if gui2wasdestroyed = 1
-	createtelnetwasclicked =
+	createvncwasclicked =
 if createtelnetwasclicked = 1
 {
 	guicontrol, 2:show,txtnewvncconn
@@ -2230,7 +2230,53 @@ vnc2edit := decrypt(data,pass)
 stringreplace,vnccreds,vnc2edit,%a_workingdir%\programbin\tvnviewer,,
 stringreplace,vnccreds,vnccreds,-password=,,
 stringsplit,vnccredfilter,vnccreds,%a_space%,,
-msgbox,server:%vnccredfilter2% password:%vnccredfilter3%
+;msgbox,server:%vnccredfilter2% password:%vnccredfilter3%
+guicontrol, 2:disable,butvncconn
+guicontrol, 2:disable,butvncedit
+guicontrol, 2:disable,butvncdel
+guicontrol, 2:disable,butvncwake
+guicontrol, 2:disable,butcreatevnc
+guicontrol, 2:hide,butvncconn
+guicontrol, 2:hide,butvncedit
+guicontrol, 2:hide,butvncdel
+guicontrol, 2:hide,butvncwake
+guicontrol, 2:hide,butcreatevnc
+if gui2wasdestroyed = 1
+	editvncwasclicked =
+if editvncwasclicked = 1
+{
+
+}
+else
+{
+	gui, 2:tab,vnc
+	gui, 2:font,underline
+	gui, 2:add,text,vtxteditvncconn ys x420 section,Edit Connection
+	guicontrol, 2:hide,txteditvncconn
+	guicontrol, 2:show,txteditvncconn
+	gui, 2:font,norm s14
+	gui, 2:font,underline
+	GUI, 2:Add,Text,vtxtvncname xs x300,Connection Name
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtvncname
+	guicontrol, 2:show,txtvncname
+	gui, 2:add, edit,w300 vvncname,My VNC Connection
+	gui, 2:font,underline
+	GUI, 2:Add, Text,vtxtvncserver,Server ip and Port
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtvncserver
+	guicontrol, 2:show,txtvncserver
+	gui, 2:add, edit,w300 vvncserver, serverip::port
+	GUI, 2:Add, Text,vtxtvncpass,Password
+	gui, 2:font,norm
+	guicontrol, 2:hide,txtvncpass
+	guicontrol, 2:show,txtvncpass
+	gui, 2:add, edit,w300 password vvncpass
+	gui, 2:add, button,border vbutsavevnc gsavevnc x42 y436 w112,Save
+	gui, 2:add, button,border vbutcancelcreatevnc gcancelcreatevnc x154 y436 w112,Cancel
+	createvncwasclicked = 1
+	if gui2wasdestroyed = 1
+		gui2wasdestroyed =
 return
 deletevncconnection:
 return
