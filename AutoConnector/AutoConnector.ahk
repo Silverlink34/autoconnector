@@ -2116,10 +2116,12 @@ guicontrol, 2:disable,butvncconn
 guicontrol, 2:disable,butvncedit
 guicontrol, 2:disable,butvncdel
 guicontrol, 2:disable,butvncwake
+guicontrol, 2:disable,butcreatevnc
 guicontrol, 2:hide,butvncconn
 guicontrol, 2:hide,butvncedit
 guicontrol, 2:hide,butvncdel
 guicontrol, 2:hide,butvncwake
+guicontrol, 2:hide,butcreatevnc
 if gui2wasdestroyed = 1
 	createtelnetwasclicked =
 if createtelnetwasclicked = 1
@@ -2180,7 +2182,7 @@ Savevnc:
 	gui, 2:submit
 	FileCreateDir, SavedConnections
 	FileCreateDir, SavedConnections\vnc
-	data = %a_workingdir%\programbin\tvnviewer %vncserver% -password %vncpass%
+	data = %a_workingdir%\programbin\tvnviewer %vncserver% -password=%vncpass%
 	FileAppend, % Encrypt(Data,Pass), %A_workingdir%\SavedConnections\vnc\%vncname%
 	selectvnctab = 1
 	gosub guidestroykeeppos
@@ -2212,20 +2214,23 @@ guicontrol, 2:show,butvncconn
 guicontrol, 2:show,butvncedit
 guicontrol, 2:show,butvncdel
 guicontrol, 2:show,butvncwake
+guicontrol, 2:show,butcreatevnc
+guicontrol, 2:enable,butcreatevnc
 exit
 connecttovnc:
 filecreatedir, %a_workingdir%\programbin
 fileinstall,tvnviewer.exe,%a_workingdir%\programbin\tvnviewer.exe,1
 fileread, data, %a_workingdir%\SavedConnections\VNC\%vncisselected%
 vncconnect := Decrypt(data,pass)
-gui, 2:submit,nohide
 run, %vncconnect%
 return
 Editvncconnection:
 fileread,data,%a_workingdir%\SavedConnections\vnc\%vncisselected%
 vnc2edit := decrypt(data,pass)
 stringreplace,vnccreds,vnc2edit,%a_workingdir%\programbin\tvnviewer,,
-msgbox,%vnccreds%
+stringreplace,vnccreds,vnccreds,-password=,,
+stringsplit,vnccredfilter,vnccreds,%a_space%,,
+msgbox,server:%vnccredfilter2% password:%vnccredfilter3%
 return
 deletevncconnection:
 return
