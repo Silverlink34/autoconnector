@@ -396,7 +396,7 @@ gui, 2:add, Button,w224 border vbutcreatevnc gcreatevncconnection, Create Connec
 gui, 2:add,button,ys w165 border vbutvncconn gconnecttovnc section,Connect
 gui, 2:add,button,w165 vbutvncedit geditvncconnection,Edit Connection
 gui, 2:add,button,w165 vbutvncdel gdeletevncconnection,Delete Connection
-gui, 2:add,button,w165 vbutvncwake,Wake Up Connection
+gui, 2:add,button,w165 vbutvncwake gwakeconnection,Wake Up Connection
 gui, 2:tab,Master Settings
 gui, 2:add, groupbox,x239 y235
 gui, 2:add,button,x256 y275 border vbutresetmasterpass gresetmasterpassword,Reset Master Password
@@ -2077,7 +2077,6 @@ ciscohelp:
 	return
 }
 
-
 gui, 2:tab,vnc
 vncselected:
 controlget,vncisselected,choice,,listbox4,A
@@ -2245,7 +2244,24 @@ if gui2wasdestroyed = 1
 	editvncwasclicked =
 if editvncwasclicked = 1
 {
-
+guicontrol, 2:show,txteditvncconn
+guicontrol, 2:show,txteditvncname
+guicontrol, 2:show,editvncname
+guicontrol, 2:show,txteditvncserver
+guicontrol, 2:show,editvncserver
+guicontrol, 2:show,txteditvncpass
+guicontrol, 2:show,editvncpass
+guicontrol, 2:show,butsaveeditedvnc
+guicontrol, 2:show,butcanceleditedvnc
+guicontrol, 2:enable,txteditvncconn
+guicontrol, 2:enable,txteditvncname
+guicontrol, 2:enable,editvncname
+guicontrol, 2:enable,txteditvncserver
+guicontrol, 2:enable,editvncserver
+guicontrol, 2:enable,txteditvncpass
+guicontrol, 2:enable,editvncpass
+guicontrol, 2:enable,butsaveeditedvnc
+guicontrol, 2:enable,butcanceleditedvnc
 }
 else
 {
@@ -2256,31 +2272,91 @@ else
 	guicontrol, 2:show,txteditvncconn
 	gui, 2:font,norm s14
 	gui, 2:font,underline
-	GUI, 2:Add,Text,vtxtvncname xs x300,Connection Name
+	GUI, 2:Add,Text,vtxteditvncname xs x300,Connection Name
 	gui, 2:font,norm
-	guicontrol, 2:hide,txtvncname
-	guicontrol, 2:show,txtvncname
-	gui, 2:add, edit,w300 vvncname,My VNC Connection
+	guicontrol, 2:hide,txteditvncname
+	guicontrol, 2:show,txteditvncname
+	gui, 2:add, edit,w300 veditvncname,%vncisselected%
 	gui, 2:font,underline
-	GUI, 2:Add, Text,vtxtvncserver,Server ip and Port
+	GUI, 2:Add, Text,vtxteditvncserver,Server ip and Port
 	gui, 2:font,norm
-	guicontrol, 2:hide,txtvncserver
-	guicontrol, 2:show,txtvncserver
-	gui, 2:add, edit,w300 vvncserver, serverip::port
-	GUI, 2:Add, Text,vtxtvncpass,Password
+	guicontrol, 2:hide,txteditvncserver
+	guicontrol, 2:show,txteditvncserver
+	gui, 2:add, edit,w300 veditvncserver,%vnccredfilter2%
+	GUI, 2:Add, Text,vtxteditvncpass,Password
 	gui, 2:font,norm
-	guicontrol, 2:hide,txtvncpass
-	guicontrol, 2:show,txtvncpass
-	gui, 2:add, edit,w300 password vvncpass
-	gui, 2:add, button,border vbutsavevnc gsavevnc x42 y436 w112,Save
-	gui, 2:add, button,border vbutcancelcreatevnc gcancelcreatevnc x154 y436 w112,Cancel
-	createvncwasclicked = 1
+	guicontrol, 2:hide,txteditvncpass
+	guicontrol, 2:show,txteditvncpass
+	gui, 2:add, edit,w300 password veditvncpass,%vnccredfilter3%
+	gui, 2:add, button,border vbutsaveeditedvnc gsaveeditedvnc x42 y436 w112,Save
+	gui, 2:add, button,border vbutcanceleditedvnc gcanceleditedvnc x154 y436 w112,Cancel
+	editvncwasclicked = 1
 	if gui2wasdestroyed = 1
 		gui2wasdestroyed =
+}
 return
+saveeditedvnc:
+gui, 2:submit,nohide
+msgbox,4,,Are you sure you wish to edit connection: %vncisselected%?`nIf you select yes, your provided settings will overwrite your previous settings for the connection.`n`nNOTE:`nIf you removed the password out of the password field, it will now be blank and the connection will probably fail.
+ifmsgbox yes
+{
+	filedelete, %A_workingdir%\SavedConnections\vnc\%vncisselected%
+	data = %A_workingdir%%a_workingdir%\programbin\tvnviewer %editvncserver% -password=%editvncpass%
+	editedvnc := Encrypt(data,pass)
+	fileappend,%editedvnc%,%A_workingdir%\SavedConnections\vnc\%editvncname%
+	selectvnctab = 1
+	gosub guidestroykeeppos
+}
+else
+return
+canceleditedvnc:
+guicontrol, 2:hide,txteditvncconn
+guicontrol, 2:hide,txteditvncname
+guicontrol, 2:hide,editvncname
+guicontrol, 2:hide,txteditvncserver
+guicontrol, 2:hide,editvncserver
+guicontrol, 2:hide,txteditvncpass
+guicontrol, 2:hide,editvncpass
+guicontrol, 2:hide,butsaveeditedvnc
+guicontrol, 2:hide,butcanceleditedvnc
+guicontrol, 2:disable,txteditvncconn
+guicontrol, 2:disable,txteditvncname
+guicontrol, 2:disable,editvncname
+guicontrol, 2:disable,txteditvncserver
+guicontrol, 2:disable,editvncserver
+guicontrol, 2:disable,txteditvncpass
+guicontrol, 2:disable,editvncpass
+guicontrol, 2:disable,butsaveeditedvnc
+guicontrol, 2:disable,butcanceleditedvnc
+editvncname =
+editvncserver =
+editvncpass =
+guicontrol, 2:show,butvncconn
+guicontrol, 2:show,butvncedit
+guicontrol, 2:show,butvncdel
+guicontrol, 2:show,butvncwake
+guicontrol, 2:show,butcreatevnc
+guicontrol, 2:enable,butcreatevnc
+exit
 deletevncconnection:
+msgbox,4,,Are you sure you wish to delete connection: %vncisselected%?
+ifmsgbox yes
+	{
+		filedelete, %A_workingdir%\SavedConnections\vnc\%vncisselected%
+		selectvnctab = 1
+		gosub guidestroykeeppos
+	}
 return
-
+wakeconnection:
+filecreatedir, %a_workingdir%\programbin
+fileinstall,tvnviewer.exe,%a_workingdir%\programbin\tvnviewer.exe,1
+fileread, data, %a_workingdir%\SavedConnections\VNC\%vncisselected%
+vncconnect := Decrypt(data,pass)
+run, %vncconnect%
+sleep,400
+SendInput, {Ctrl}
+WinClose,TightVNC Viewer
+return
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
 ifmsgbox yes
