@@ -2355,7 +2355,11 @@ vncconnect := Decrypt(data,pass)
 run, %vncconnect%
 sleep,400
 SendInput, {Ctrl}
-WinClose,*TightVNC Viewer
+;WinClose,*TightVNC Viewer
+mousegetpos,,,wwid,wwctrl
+wingettitle,wwtitle,ahk_id %wwid%
+WinClose,%wwtitle%
+
 return
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
