@@ -2359,7 +2359,6 @@ SendInput, {Ctrl}
 mousegetpos,,,wwid,wwctrl
 wingettitle,wwtitle,ahk_id %wwid%
 WinClose,%wwtitle%
-
 return
 resetmasterpassword:
 msgbox,4,,Are you sure you wish to reset your master password and re-encrypt all connections?`n`nResetting the password can help to migrate connections to another computer.
@@ -2425,12 +2424,12 @@ ifmsgbox yes
 	}	
 	progress,60,RDP Connections Re-Encrypted.
 	sleep,2000
-	Progress,70,Reading All Telnet/Cisco connections...
+	Progress,65,Reading All Telnet/Cisco connections...
 	sleep,2000
 	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\Telnet > %a_workingdir%\tmp\Telnetlist,, hide
 	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\cisco > %a_workingdir%\tmp\ciscolist,, hide
 	sleep,200
-	progress,75,Decrypting and Re-Encrypting Telnet&Cisco
+	progress,70,Decrypting and Re-Encrypting Telnet&Cisco
 	Loop, read, %A_workingdir%\tmp\Telnetlist
 	{
 	sleep,100
@@ -2453,9 +2452,27 @@ ifmsgbox yes
 	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\cisco\%a_loopreadline%
 	pass = %mpass%
 	}	
-	progress,80,Telnet/Cisco Re-Encrypted.
+	progress,75,Telnet/Cisco Re-Encrypted.
 	sleep,2000
-	progress,85,Resetting Initial Password..
+	Progress,80,Reading All vnc connections...
+	sleep,2000
+	run, %comspec% /c dir /b %a_workingdir%\SavedConnections\vnc > %a_workingdir%\tmp\vnclist,, hide
+	sleep,200
+	progress,85,Decrypting and Re-Encrypting VNC...
+	Loop, read, %A_workingdir%\tmp\vnclist
+	{
+	sleep,100
+	fileread,data,%a_workingdir%\SavedConnections\vnc\%a_loopreadline%
+	filedelete, %a_workingdir%\SavedConnections\vnc\%a_loopreadline%
+	vnc2reset := Decrypt(data,pass)
+	pass = %resetmasterpass%
+	data = %vnc2reset%
+	fileappend,% Encrypt(data,pass),%a_workingdir%\SavedConnections\vnc\%a_loopreadline%
+	pass = %mpass%
+	}	
+	progress,90,VNC Connections Re-Encrypted.
+	sleep,2000
+	progress,95,Resetting Initial Password..
 	sleep,2000
 	data = %resetmasterpass%
 	pass = %resetmasterpass%
