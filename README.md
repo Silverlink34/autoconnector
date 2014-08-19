@@ -12,7 +12,6 @@ If you bought this script/exe somewhere, you have been scammed and did not recei
 ToDo:
 
 setup the following protocols:
-vnc
 ftp
 
 Other Features to add:

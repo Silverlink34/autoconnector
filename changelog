@@ -1,3 +1,7 @@
+-8/19/2014 1:06pm-
+--Version 1.2--
+Completed VNC connection protocol. Officially removed BETA tag. 
+The VNC section also has a "Wake Connection" button that is meant to wake a screen saver and immediately disconnect.
 -8/13/2014 4:17pm-
 --Version 1.1-Beta--
 Added Cisco Help Commands button. Used for some reference, find all other commands on cisco's website.
@@ -12,7 +16,6 @@ Nothing changed...it's the first release.
 --Things to do--
 
 setup the following protocols:
-vnc
 ftp
 
 Other Features to add:
