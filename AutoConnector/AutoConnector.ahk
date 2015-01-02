@@ -121,7 +121,7 @@ else
 return
 ;set master password for application
 masterpasswordset:
-gui, 5:show, w587 h250, Set Master Password
+gui, 5:show, w600 h300, Set Master Password
 gui, 5:font, s14
 guicontrol, 5:focus,masterpass
 gui, 5:add, text,,Master password has not been set.
